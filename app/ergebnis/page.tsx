@@ -486,39 +486,41 @@ export default function ErgebnisPage() {
               </div>
             </div>
 
-            {/* Kurs-Versprechen */}
-            <div className="rounded-2xl p-6 text-center" style={{ background: "#E8F7F5", border: "2px solid #8DCDC5" }}>
-              <p className="text-xs font-bold uppercase tracking-wide mb-3" style={{ color: "#2D7A73" }}>
-                Was das Training bewirkt
-              </p>
+            {/* Warteliste CTA */}
+            <div className="rounded-2xl p-6 text-center" style={{ background: "#FEF3E2", border: "2px solid #F5943A" }}>
+              <div className="inline-block text-xs font-bold uppercase tracking-wide px-3 py-1 rounded-full mb-3" style={{ background: "#F5943A", color: "white" }}>
+                🚀 Startet bald
+              </div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">
-                Nach dem VIKI-Kurs (ca. 8 Monate):
+                Der VIKI Superblick Kurs
               </h3>
+              <p className="text-sm text-gray-600 mb-4 leading-relaxed">
+                Gezieltes Augentraining für zuhause — speziell für Kinder wie {kindName !== "dein Kind" ? kindName : "dein Kind"}. Entwickelt von Dr. Sarah-Maria Kopetzky, Funktionaloptometristin.
+              </p>
               <div className="space-y-2 mb-5 text-left max-w-xs mx-auto">
                 {[
-                  "Flüssigeres und schnelleres Lesen",
-                  "Abschreiben von der Tafel fällt leichter — schneller, genauer, ohne ständiges Verlieren der Zeile",
-                  "Besseres Leseverständnis — das Gelesene bleibt hängen",
+                  "Flüssigeres Lesen & besseres Leseverständnis",
+                  "Abschreiben von der Tafel — schneller, ohne Zeilenverlust",
                   "Mehr Ausdauer und Konzentration beim Lernen",
-                  "Hausaufgaben in weniger Zeit — die Familiensituation wird entspannter",
+                  "Entspanntere Hausaufgaben-Situation",
                 ].map((v, i) => (
                   <div key={i} className="flex items-center gap-2 text-sm text-gray-700">
-                    <span className="text-green-500 font-bold">✓</span>
+                    <span className="font-bold" style={{ color: "#F5943A" }}>✓</span>
                     <span>{v}</span>
                   </div>
                 ))}
               </div>
               <a
-                href="https://vikitraining.at/superblick-kurs"
+                href="https://kurse.vikitraining.at/warteliste"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-block font-bold text-lg px-10 py-4 rounded-xl shadow-lg transition-all hover:opacity-90 hover:scale-105"
+                className="inline-block w-full font-bold text-lg py-4 rounded-xl shadow-lg transition-all hover:opacity-90 hover:scale-105"
                 style={{ background: "#F5943A", color: "white" }}
               >
-                Jetzt den Kurs für {kindName !== "dein Kind" ? kindName : "dein Kind"} starten →
+                Unverbindlich auf die Warteliste →
               </a>
               <p className="text-xs text-gray-500 mt-3">
-                Entwickelt von Dr. Sarah-Maria Kopetzky · Funktionaloptometristin & VIKI-Trainerin
+                Kostenlos · Unverbindlich · Frühbucher-Bonus inklusive
               </p>
             </div>
 
@@ -553,7 +555,7 @@ export default function ErgebnisPage() {
                   },
                   {
                     color: "#F5943A",
-                    text: `Schau dir den VIKI Superblick Kurs an — mit gezieltem Training für den erkannten Schwerpunkt von ${kindName !== "dein Kind" ? kindName : "deinem Kind"}.`,
+                    text: `Trag dich unverbindlich auf die Warteliste für den VIKI Superblick Kurs ein — und sichere dir den Frühbucher-Bonus.`,
                   },
                   {
                     color: "#EE6B85",
@@ -576,16 +578,16 @@ export default function ErgebnisPage() {
             {/* Final CTA */}
             <div className="text-center pb-4">
               <a
-                href="https://vikitraining.at/superblick-kurs"
+                href="https://kurse.vikitraining.at/warteliste"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-block font-bold text-lg px-10 py-4 rounded-xl shadow-lg transition-all hover:opacity-90"
+                className="inline-block w-full font-bold text-lg py-4 rounded-xl shadow-lg transition-all hover:opacity-90"
                 style={{ background: "#F5943A", color: "white" }}
               >
-                Zum VIKI Superblick Kurs →
+                Jetzt auf die Warteliste → 🚀
               </a>
               <p className="text-xs text-gray-500 mt-2">
-                Entwickelt von Dr. Sarah-Maria Kopetzky · Funktionaloptometristin
+                Kostenlos · Unverbindlich · Frühbucher-Bonus inklusive
               </p>
             </div>
           </>
