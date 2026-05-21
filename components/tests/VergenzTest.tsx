@@ -111,7 +111,7 @@ export default function VergenzTest({ onFertig }: Props) {
           <div className="space-y-3 text-sm text-teal-700">
             <div className="flex gap-3">
               <span className="text-lg">1️⃣</span>
-              <span>Setze dein Kind <strong>gerade vor den Bildschirm</strong>, ca. 50 cm Abstand.</span>
+              <span>Setze dein Kind <strong>gerade vor den Bildschirm</strong> — ca. <strong>30–40 cm</strong> Abstand (etwas näher als sonst, damit die Augen gut sichtbar sind).</span>
             </div>
             <div className="flex gap-3">
               <span className="text-lg">2️⃣</span>
@@ -153,17 +153,17 @@ export default function VergenzTest({ onFertig }: Props) {
           👀 Beobachte jetzt die <strong>Augen deines Kindes</strong> — folgen beide gleichmäßig dem Punkt?
         </div>
 
-        <div className="flex gap-3">
-          {/* Animationsfeld */}
+        <div className="flex flex-col gap-2">
+          {/* Animationsfeld — volle Breite */}
           <div
-            className="relative bg-gray-900 rounded-2xl overflow-hidden flex-1"
-            style={{ height: "300px" }}
+            className="relative bg-gray-900 rounded-2xl overflow-hidden w-full"
+            style={{ height: "220px" }}
           >
             {countdown !== null ? (
               /* Countdown auf dunklem Hintergrund */
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <div className="text-8xl font-black" style={{ color: "#F5943A" }}>{countdown}</div>
-                <p className="text-sm mt-3 font-medium" style={{ color: "rgba(255,255,255,0.7)" }}>Kind vor Bildschirm positionieren…</p>
+                <p className="text-sm mt-3 font-medium" style={{ color: "rgba(255,255,255,0.7)" }}>Kind nah vor den Bildschirm positionieren…</p>
               </div>
             ) : (
               <>
@@ -191,29 +191,30 @@ export default function VergenzTest({ onFertig }: Props) {
             )}
           </div>
 
-          {/* Kamera PIP */}
-          {kameraAktiv ? (
-            <div className="rounded-2xl overflow-hidden bg-gray-800 flex-shrink-0 flex flex-col" style={{ width: "110px", height: "300px" }}>
-              <video
-                ref={videoRef}
-                autoPlay
-                playsInline
-                muted
-                style={{ width: "100%", flex: 1, objectFit: "cover", transform: "scaleX(-1)" }}
-              />
-              <div style={{ padding: "4px", textAlign: "center", fontSize: "9px", color: "rgba(255,255,255,0.6)" }}>
-                👁️ Dein Kind
+          {/* Kamera liegendes Rechteck darunter */}
+          <div className="rounded-2xl overflow-hidden bg-gray-800 w-full flex flex-col" style={{ height: "150px" }}>
+            {kameraAktiv ? (
+              <>
+                <video
+                  ref={videoRef}
+                  autoPlay
+                  playsInline
+                  muted
+                  style={{ width: "100%", flex: 1, objectFit: "contain", background: "#111827", transform: "scaleX(-1)" }}
+                />
+                <div style={{ padding: "2px 4px", textAlign: "center", fontSize: "9px", color: "rgba(255,255,255,0.6)" }}>
+                  👁️ Augen deines Kindes beobachten
+                </div>
+              </>
+            ) : (
+              <div className="flex-1 flex flex-row items-center justify-center gap-3" style={{ padding: "8px" }}>
+                <span style={{ fontSize: "24px" }}>👀</span>
+                <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.6)", lineHeight: 1.4 }}>
+                  Beobachte direkt die Augen deines Kindes
+                </span>
               </div>
-            </div>
-          ) : (
-            <div className="rounded-2xl bg-gray-800 flex-shrink-0 flex flex-col items-center justify-center gap-2 text-center"
-              style={{ width: "110px", height: "300px", padding: "8px" }}>
-              <span style={{ fontSize: "28px" }}>👀</span>
-              <span style={{ fontSize: "10px", color: "rgba(255,255,255,0.6)", lineHeight: 1.3 }}>
-                Schau direkt auf die Augen deines Kindes
-              </span>
-            </div>
-          )}
+            )}
+          </div>
         </div>
 
         <p className="text-center text-sm text-gray-500 mt-2">

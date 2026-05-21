@@ -16,7 +16,7 @@ export default function Impressum() {
           <div className="space-y-6 text-gray-700">
             <div>
               <h2 className="font-semibold text-gray-900 mb-1">Betreiberin</h2>
-              <p>Dr. Sarah-Maria Kopetzky</p>
+              <p>Dr. Sarah Kopetzky</p>
               <p>Funktionaloptometristin & Visualtrainerin</p>
             </div>
 

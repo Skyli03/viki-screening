@@ -495,7 +495,7 @@ export default function ErgebnisPage() {
                 Der VIKI Superblick Kurs
               </h3>
               <p className="text-sm text-gray-600 mb-4 leading-relaxed">
-                Gezieltes Augentraining für zuhause — speziell für Kinder wie {kindName !== "dein Kind" ? kindName : "dein Kind"}. Entwickelt von Dr. Sarah-Maria Kopetzky, Funktionaloptometristin.
+                Gezieltes Augentraining für zuhause — speziell für Kinder wie {kindName !== "dein Kind" ? kindName : "dein Kind"}. Entwickelt von Dr. Sarah Kopetzky, Funktionaloptometristin.
               </p>
               <div className="space-y-2 mb-5 text-left max-w-xs mx-auto">
                 {[
