@@ -192,7 +192,7 @@ export default function VergenzTest({ onFertig }: Props) {
           </div>
 
           {/* Kamera liegendes Rechteck darunter */}
-          <div className="rounded-2xl overflow-hidden bg-gray-800 w-full flex flex-col" style={{ height: "150px" }}>
+          <div className="rounded-2xl overflow-hidden bg-gray-800 w-full flex flex-col" style={{ height: "260px" }}>
             {kameraAktiv ? (
               <>
                 <video
@@ -200,7 +200,7 @@ export default function VergenzTest({ onFertig }: Props) {
                   autoPlay
                   playsInline
                   muted
-                  style={{ width: "100%", flex: 1, objectFit: "contain", background: "#111827", transform: "scaleX(-1)" }}
+                  style={{ width: "100%", flex: 1, objectFit: "cover", objectPosition: "center 65%", background: "#111827", transform: "scaleX(-1)" }}
                 />
                 <div style={{ padding: "2px 4px", textAlign: "center", fontSize: "9px", color: "rgba(255,255,255,0.6)" }}>
                   👁️ Augen deines Kindes beobachten

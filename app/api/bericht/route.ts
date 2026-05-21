@@ -131,6 +131,22 @@ function generateReportEmail(
     </div>
   </div>
 
+  <!-- Disclaimer -->
+  <div style="padding:0 40px 24px;">
+    <div style="background:#F9FAFB;border:1px solid #E5E7EB;border-radius:10px;padding:16px 18px;">
+      <p style="font-size:11px;font-weight:700;color:#374151;margin:0 0 6px;">⚠️ Rechtlicher Hinweis</p>
+      <p style="font-size:11px;color:#6B7280;line-height:1.6;margin:0 0 8px;">
+        Der VIKI Superblick Screening-Test dient ausschließlich der <strong>unverbindlichen Erstorientierung</strong> und stellt <strong>keine medizinische oder optometrische Diagnose</strong> dar. Die Ergebnisse basieren auf Selbstbeobachtung durch Erziehungsberechtigte und können <strong>Fehler enthalten oder unvollständig sein</strong>. Eine professionelle augenärztliche oder optometrische Untersuchung kann durch dieses Tool nicht ersetzt werden. Bei Verdacht auf Sehprobleme wende dich bitte an eine Fachperson.
+      </p>
+      <p style="font-size:11px;color:#6B7280;line-height:1.6;margin:0 0 8px;">
+        <strong>VIKI Training übernimmt keine Haftung</strong> für Entscheidungen, die auf Basis dieser Screening-Ergebnisse getroffen werden.
+      </p>
+      <p style="font-size:11px;color:#6B7280;line-height:1.6;margin:0;">
+        <strong>Datenschutz:</strong> Testergebnisse werden nicht auf Servern von vikitraining.at gespeichert. Deine E-Mail-Adresse wird ausschließlich für den Versand dieses Berichts und für Informationen zu VIKI Trainingsprogrammen genutzt. Abmeldung jederzeit möglich: <a href="mailto:hallo@vikitraining.at" style="color:#9CA3AF;">hallo@vikitraining.at</a>
+      </p>
+    </div>
+  </div>
+
   <!-- Footer -->
   <div style="background:#F9FAFB;padding:20px 40px;border-top:1px solid #E5E7EB;text-align:center;">
     <p style="color:#9CA3AF;font-size:12px;margin:0;line-height:1.6;">
