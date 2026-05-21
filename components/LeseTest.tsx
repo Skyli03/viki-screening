@@ -161,6 +161,14 @@ export default function LeseTest({ kindName, klasse, onFertig }: Props) {
             Das ist Absicht! So sehen wir, ob {kindName} liest oder bereits bekannte Wörter abruft.</p>
           </div>
 
+          {klasse <= 1 && (
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 max-w-md mx-auto mb-5 text-left text-sm text-amber-800">
+              <p className="font-semibold mb-2">💡 Hinweis für Klasse 1</p>
+              <p>Dieser Text ist für Erstklässler anspruchsvoll — das ist völlig normal und kein Zeichen für ein Problem. Viele Kinder in Klasse 1 können ihn noch nicht flüssig lesen.</p>
+              <p className="mt-2"><strong>Worauf du achtest:</strong> Wie versucht {kindName} die Wörter zu erlesen? Buchstabe für Buchstabe, oder in Silben? Das ist für uns genauso wertvoll wie das Ergebnis.</p>
+            </div>
+          )}
+
           <div className="bg-orange-50 rounded-xl p-5 max-w-md mx-auto mb-8 text-left">
             <p className="font-semibold mb-3">So geht es:</p>
             <ol className="space-y-2 text-sm text-gray-700 list-decimal list-inside">
