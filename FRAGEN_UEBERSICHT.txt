@@ -1,0 +1,82 @@
+================================================================
+VIKI SUPERBLICK SCREENING — ALLE FRAGEN
+Elternfragebogen · Stand April 2026
+Antwortskala: Nie / Manchmal / Oft / Immer
+================================================================
+
+ABSCHNITT A: LESEN & SCHULVERHALTEN (10 Fragen)
+------------------------------------------------
+l1  Mein Kind verliert beim Lesen häufig die Zeile.
+l2  Mein Kind liest sehr langsam für sein Alter.
+l3  Mein Kind vertauscht Buchstaben (z.B. b und d, p und q).
+l4  Mein Kind klagt über Kopfschmerzen oder müde Augen nach dem Lesen.
+l5  Mein Kind hält das Buch sehr nah oder sehr weit weg.
+l6  Mein Kind überspringt beim Lesen Wörter oder ganze Zeilen.
+l7  Mein Kind muss beim Lesen mit dem Finger die Zeile verfolgen.
+l8  Mein Kind hat Schwierigkeiten beim Abschreiben von der Tafel.
+l9  Mein Kind vermeidet Lesen oder Hausaufgaben, wo möglich.
+l10 Mein Kind sieht Buchstaben oder Wörter verschwommen oder doppelt.
+
+ABSCHNITT B: KONZENTRATION & AUFMERKSAMKEIT (8 Fragen)
+-------------------------------------------------------
+k1  Mein Kind kann sich schlecht längere Zeit auf eine Aufgabe konzentrieren.
+k2  Mein Kind ist motorisch sehr unruhig und zappelig.
+k3  Mein Kind reagiert sehr empfindlich auf Licht oder laute Geräusche.
+k4  Mein Kind wirkt oft abgelenkt und träumt viel.
+k5  Mein Kind hat Schwierigkeiten, Anweisungen zu befolgen.
+k6  Mein Kind verliert schnell die Motivation bei schwierigen Aufgaben.
+k7  Mein Kind hat Probleme beim Einschlafen oder schläft unruhig.
+k8  Mein Kind hat Stimmungsschwankungen oder reagiert sehr impulsiv.
+
+ABSCHNITT C: KÖRPER & REFLEXE (8 Fragen)
+-----------------------------------------
+r1  Mein Kind reagiert übertrieben erschrocken auf laute oder plötzliche Geräusche.   [MORO]
+r2  Mein Kind hat Angst vor Bewegung (Schaukeln, Lift, schnelle Bewegungen).           [MORO]
+r3  Mein Kind hat eine schlechte Körperhaltung — sitzt gebeugt oder hängt durch.       [TLR]
+r4  Mein Kind hat Schwierigkeiten beim Treppensteigen oder schätzt Entfernungen falsch ein. [TLR]
+r5  Mein Kind macht beim Schreiben unbewusste Kopf- oder Mundbewegungen.               [STNR]
+r6  Mein Kind kann nicht lange ruhig am Tisch sitzen, rutscht ständig.                [STNR]
+r7  Mein Kind hat Schwierigkeiten bei Bewegungen, die beide Körperseiten gleichzeitig nutzen. [ATNR]
+r8  Mein Kind dreht beim Schreiben den Kopf zur Schreibhand.                           [ATNR]
+
+================================================================
+INTERAKTIVE TESTS (werden vom Kind selbst gespielt)
+================================================================
+
+TEST 1 — LASERBLICK (Fixation)
+  10 Runden · Ein Stern erscheint an zufälliger Position
+  → Kind klickt auf Stern oder drückt Leertaste
+  Misst: Reaktionszeit, Genauigkeit
+
+TEST 2 — BLITZBLICK (Sakkaden)
+  16 Runden · Oranges Leuchten wechselt links/rechts
+  → Kind klickt auf leuchtende Seite oder drückt ← →
+  Misst: Reaktionszeit, Konsistenz der Augenbewegung
+
+TEST 3 — SUPERFINGER (Smooth Pursuit)
+  15 Sekunden · Rakete bewegt sich horizontal
+  → Kind verfolgt mit der Maus
+  Misst: Abweichung beim Verfolgen
+
+TEST 4 — SPÜRNASE (Visuelle Diskrimination)
+  10 Runden · 4 Symbole, eines ist anders
+  → Kind klickt auf das andere Symbol
+  Misst: Fehlerrate, Geschwindigkeit
+
+TEST 5 — BUCHSTABENJÄGER (LRS / b-d-p-q)
+  12 Runden · Zwei Buchstaben werden gezeigt
+  → Kind drückt "Gleich" oder "Verschieden"
+  Misst: Verwechslungen (b/d/p/q), Reaktionszeit
+
+TEST 6 — SUPERHELDEN-RADAR (Peripheres Sehen)
+  12 Runden · Kind fixiert Mittelpunkt, Blitz erscheint am Rand
+  → Kind klickt auf Blitz
+  Misst: Reaktionszeit, Trefferquote
+
+================================================================
+HINWEIS FÜR DR. SARAH-MARIA KOPETZKY:
+Bitte durchgehen und markieren:
+  [ ] Fragen die geändert werden sollen
+  [ ] Fragen die gelöscht werden sollen
+  [ ] Neue Fragen die hinzugefügt werden sollen
+================================================================

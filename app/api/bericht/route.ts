@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import nodemailer from "nodemailer";
 
 interface BerichtRequest {
   email: string;
@@ -14,7 +15,6 @@ export async function POST(request: NextRequest) {
   const { email, kindName, vikiTyp, gesamtScore, auffaelligkeiten, kategorien } = body;
 
   const systemeioKey = process.env.SYSTEMEIO_API_KEY;
-  const resendKey = process.env.RESEND_API_KEY;
 
   // ── 1. Systeme.io: Kontakt + Tag anlegen ────────────────────────────────
   if (systemeioKey) {
@@ -36,25 +36,26 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  // ── 2. Resend: Report-Email an Elternteil ───────────────────────────────
-  if (resendKey) {
+  // ── 2. Gmail SMTP: Report-Email an Elternteil ──────────────────────────
+  const smtpUser = process.env.SMTP_USER;
+  const smtpPass = process.env.SMTP_PASS;
+  if (smtpUser && smtpPass) {
     try {
+      const transporter = nodemailer.createTransport({
+        host: "smtp.gmail.com",
+        port: 587,
+        secure: false,
+        auth: { user: smtpUser, pass: smtpPass },
+      });
       const emailHtml = generateReportEmail(kindName, vikiTyp, gesamtScore, auffaelligkeiten, kategorien);
-      await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${resendKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          from: "VIKI Superblick <hallo@vikitraining.at>",
-          to: email,
-          subject: `Dein VIKI Superblick Screening-Bericht${kindName !== "dein Kind" ? ` für ${kindName}` : ""}`,
-          html: emailHtml,
-        }),
+      await transporter.sendMail({
+        from: `"VIKI Superblick" <${smtpUser}>`,
+        to: email,
+        subject: `Dein VIKI Superblick Screening-Bericht${kindName !== "dein Kind" ? ` für ${kindName}` : ""}`,
+        html: emailHtml,
       });
     } catch (e) {
-      console.error("Resend Fehler:", e);
+      console.error("Gmail SMTP Fehler:", e);
     }
   }
 
