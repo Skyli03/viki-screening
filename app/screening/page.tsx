@@ -32,6 +32,11 @@ export default function ScreeningPage() {
     const kl = sessionStorage.getItem("klasse");
     if (name) setKindName(name);
     if (kl) setKlasse(Number(kl));
+    // Falls Seite während des Tests neu geladen wurde, Phase wiederherstellen
+    const gespeichertePhase = sessionStorage.getItem("screeningPhase") as Phase | null;
+    if (gespeichertePhase && gespeichertePhase !== "kamera") {
+      setPhase(gespeichertePhase);
+    }
   }, []);
 
   function phasenIndex() {
@@ -39,6 +44,7 @@ export default function ScreeningPage() {
   }
 
   function naechstePhase(nach: Phase) {
+    sessionStorage.setItem("screeningPhase", nach);
     setPhase(nach);
     window.scrollTo(0, 0);
   }
