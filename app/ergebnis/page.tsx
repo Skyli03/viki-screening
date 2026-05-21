@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 import { berechneScreeningProfil } from "@/lib/auswertung";
-import { sendeEmailAnSystemeio } from "@/lib/systemeio";
 import type { ScreeningProfil } from "@/lib/auswertung";
 import type { TrackingErgebnis, ZeilenAnalyse } from "@/lib/eyetracking";
 import type { VisuellTestErgebnis } from "@/lib/auswertung";
@@ -173,7 +172,26 @@ export default function ErgebnisPage() {
     }
     setEmailFehler("");
     setLaden(true);
-    await sendeEmailAnSystemeio(email, kindName, `VIKI-Typ ${profil?.typ ?? "D"}`);
+    try {
+      await fetch("/api/bericht", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          kindName,
+          vikiTyp: profil?.typ ?? "D",
+          gesamtScore: profil?.gesamtScore ?? 0,
+          auffaelligkeiten: profil?.auffaelligkeitenAnzahl ?? 0,
+          kategorien: profil?.kategorien.map((k) => ({
+            name: k.name,
+            ampel: k.ampel,
+            elternText: k.elternText,
+          })) ?? [],
+        }),
+      });
+    } catch (e) {
+      console.error("Bericht-API Fehler:", e);
+    }
     setEmailGesendet(true);
     setEmailFreigegeben(true);
     setLaden(false);
