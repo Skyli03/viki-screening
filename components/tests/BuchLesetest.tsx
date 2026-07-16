@@ -46,7 +46,10 @@ export default function BuchLesetest({ kindName, onFertig }: Props) {
       <div className="text-center">
         <div className="text-5xl mb-4">📚</div>
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Lesetest — Buch</h2>
-        <p className="text-sm text-gray-500 mb-6">{kindName} liest aus einem eigenen Buch — du beobachtest.</p>
+        <p className="text-sm text-gray-500 mb-3">{kindName} liest aus einem eigenen Buch — du beobachtest.</p>
+        <div className="rounded-xl px-4 py-3 mb-5 text-sm text-center max-w-lg mx-auto" style={{ background: "#E4F5F3", color: "#2D7A73" }}>
+          💡 Das echte Buch zeigt, was kein Bildschirmtest abbildet: wie die Augen Zeile für Zeile verarbeiten — mit echtem Papier, echtem Abstand, echtem Licht.
+        </div>
 
         <div className="bg-white rounded-2xl border-2 p-6 mb-5 text-left max-w-lg mx-auto" style={{ borderColor: "#8DCDC5" }}>
           <p className="font-semibold text-gray-900 mb-4">So geht es:</p>

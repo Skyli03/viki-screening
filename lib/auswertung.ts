@@ -90,6 +90,7 @@ function scoreAugensteuerung(daten: ScreeningDaten): number {
   let score = 100;
   const k = daten.konvergenz;
   const f = daten.fixation;
+  const sak = daten.sakkaden;
   const s = daten.stiftReise;
 
   // Konvergenz
@@ -103,6 +104,11 @@ function scoreAugensteuerung(daten: ScreeningDaten): number {
   // Fixation (10 Sekunden ruhig fixieren)
   if (f.qualitaet === "stark_unruhig_oder_abgelenkt") score -= 30;
   else if (f.qualitaet === "leicht_unruhig") score -= 15;
+
+  // Blicksprünge (Sakkaden)
+  if (sak.praezision === "ungenau_sucht") score -= 25;
+  else if (sak.praezision === "ueberschiesst") score -= 12;
+  if (sak.kopf_mitbewegt) score -= 8;
 
   // Stift-Reise (smooth pursuit)
   if (s.folgt === "verliert_stift") score -= 30;

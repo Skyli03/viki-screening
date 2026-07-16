@@ -90,7 +90,10 @@ export default function KonvergenzEltern({ kindName, onFertig }: Props) {
           <KonvergenzIcon />
         </div>
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Konvergenz-Test</h2>
-        <p className="text-sm text-gray-500 mb-6">Du führst diesen Test durch — {kindName} macht mit.</p>
+        <p className="text-sm text-gray-500 mb-3">Du führst diesen Test durch — {kindName} macht mit.</p>
+        <div className="rounded-xl px-4 py-3 mb-5 text-sm text-center max-w-lg mx-auto" style={{ background: "#E4F5F3", color: "#2D7A73" }}>
+          💡 Beim Lesen bewegen sich beide Augen ständig zur Nase hin. Arbeiten sie nicht als Team zusammen, verschwimmen Buchstaben oder erscheinen doppelt — das merken Kinder selbst oft nicht.
+        </div>
 
         <div className="bg-white rounded-2xl border-2 p-6 mb-5 text-left max-w-lg mx-auto" style={{ borderColor: "#8DCDC5" }}>
           <p className="font-semibold text-gray-900 mb-4">So geht es:</p>

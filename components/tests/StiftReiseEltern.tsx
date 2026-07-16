@@ -55,7 +55,10 @@ export default function StiftReiseEltern({ kindName, onFertig }: Props) {
         <div className="text-5xl mb-4">✏️</div>
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Stift-Reise</h2>
         <p className="text-sm text-gray-500 mb-1">Kann {kindName} einem Stift nur mit den Augen folgen?</p>
-        <p className="text-xs font-semibold mb-6" style={{ color: "#8DCDC5" }}>Muster und Geschwindigkeit beobachten</p>
+        <p className="text-xs font-semibold mb-3" style={{ color: "#8DCDC5" }}>Muster und Geschwindigkeit beobachten</p>
+        <div className="rounded-xl px-4 py-3 mb-5 text-sm text-center max-w-lg mx-auto" style={{ background: "#E4F5F3", color: "#2D7A73" }}>
+          💡 Flüssiges Lesen braucht Augen, die gleichmäßig gleiten können. Ruckeln sie statt zu gleiten, holpert auch die Lektüre — selbst wenn das Kind jeden Buchstaben kennt.
+        </div>
 
         <div className="bg-white rounded-2xl border-2 p-6 mb-5 text-left max-w-lg mx-auto" style={{ borderColor: "#8DCDC5" }}>
           <p className="font-semibold text-gray-900 mb-4">So geht es:</p>

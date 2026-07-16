@@ -20,13 +20,16 @@ type Phase =
   | "merkspanne";
 
 function IntroCard({
-  emoji, name, beschreibung, hinweis, onStart,
-}: { emoji: string; name: string; beschreibung: string; hinweis: string; onStart: () => void }) {
+  emoji, name, beschreibung, warum, hinweis, onStart,
+}: { emoji: string; name: string; beschreibung: string; warum: string; hinweis: string; onStart: () => void }) {
   return (
     <div className="text-center">
       <div className="text-6xl mb-3">{emoji}</div>
       <h2 className="text-2xl font-bold text-gray-900 mb-1">{name}</h2>
-      <p className="text-gray-500 text-sm mb-6">{beschreibung}</p>
+      <p className="text-gray-500 text-sm mb-3">{beschreibung}</p>
+      <div className="rounded-xl px-4 py-3 mb-4 text-sm text-center max-w-sm mx-auto" style={{ background: "#E4F5F3", color: "#2D7A73" }}>
+        💡 {warum}
+      </div>
       <div className="bg-teal-50 border border-teal-200 rounded-xl p-4 text-sm text-teal-800 text-left mb-6 max-w-sm mx-auto">
         {hinweis}
       </div>
@@ -90,6 +93,7 @@ export default function VisuelleTests({ kindName, klasse, onFertig }: Props) {
           emoji="🔤"
           name="Buchstabenjäger"
           beschreibung={`${kindName} entscheidet: Sind die zwei Buchstaben gleich oder verschieden?`}
+          warum={`b, d, p, q sind spiegelverkehrt zum Verwechseln ähnlich. Wer sie nicht automatisch unterscheidet, muss beim Lesen jedes Mal kurz nachdenken statt sofort zu erkennen.`}
           hinweis={`Manche Buchstaben (b/d, p/q${klasse >= 3 ? ", n/u, m/w" : ""}) sehen sich sehr ähnlich. Schau genau hin — und antworte schnell!`}
           onStart={() => setPhase("buchstaben")}
         />
@@ -104,6 +108,7 @@ export default function VisuelleTests({ kindName, klasse, onFertig }: Props) {
           emoji="🔍"
           name="Spürnase"
           beschreibung={`3 Symbole sind gleich — eines schleicht sich rein. ${kindName} tippt so schnell wie möglich das Sonderzeichen!`}
+          warum="Das Gehirn muss Formen blitzschnell sortieren und unterscheiden. Klappt das nicht automatisch, wird jedes Lesen zur Denkaufgabe statt zur Routine."
           hinweis="Schau dir alle 4 Symbole genau an. Drei davon sind identisch — welches passt nicht dazu? Schnell tippen!"
           onStart={() => setPhase("formen")}
         />
@@ -118,6 +123,7 @@ export default function VisuelleTests({ kindName, klasse, onFertig }: Props) {
           emoji="⚡"
           name="Blitzgedächtnis"
           beschreibung={`Ein Symbol blitzt kurz auf und verschwindet. ${kindName} tippt es aus dem Gedächtnis!`}
+          warum="Wer ein Zeichen sieht und es sofort vergisst, kann aus Buchstaben kein Wort zusammensetzen. Visuelles Kurzzeitgedächtnis ist die unsichtbare Grundlage des Lesens."
           hinweis={`${klasse <= 2 ? "Ein Symbol" : "Ein Buchstabe"} erscheint kurz — und ist dann weg. Welches war es? Schnell tippen!`}
           onStart={() => setPhase("merkspanne")}
         />

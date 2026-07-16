@@ -75,6 +75,7 @@ function demoScreeningDaten(): ScreeningDaten {
       fehlerAnzahl: 2, blinzeln: "selten", pc_leichter: null,
     },
     fixation: { qualitaet: "leicht_unruhig" },
+    sakkaden: { praezision: "ueberschiesst", kopf_mitbewegt: false },
     stiftReise: { folgt: "ruckelig_mit_pausen", kopf_mitbewegt: false, konvergenz_nahfern: "nicht_getestet" },
     miniTests: {
       buchstaben: { verwechslungen: 3, reaktionszeit: 2200 },

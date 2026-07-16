@@ -4,15 +4,14 @@ import { useRouter } from "next/navigation";
 import KonvergenzEltern from "@/components/tests/KonvergenzEltern";
 import BuchLesetest from "@/components/tests/BuchLesetest";
 import PCLesetest from "@/components/tests/PCLesetest";
-import FixationEltern from "@/components/tests/FixationEltern";
+import SakkadenEltern from "@/components/tests/SakkadenEltern";
 import StiftReiseEltern from "@/components/tests/StiftReiseEltern";
 import VisuelleTests from "@/components/VisuelleTests";
 import Fragebogen from "@/components/Fragebogen";
 import type {
   KonvergenzErgebnis,
   BuchLeseErgebnis,
-  PCLeseErgebnis,
-  FixationErgebnis,
+  SakkadenErgebnis,
   StiftReiseErgebnis,
   MiniTestErgebnis,
   ScreeningDaten,
@@ -22,20 +21,18 @@ import type { FragebogenAntworten } from "@/data/fragebogen";
 type Phase =
   | "konvergenz"
   | "buch_lese"
-  | "pc_lese"
-  | "fixation"
   | "stift_reise"
+  | "sakkaden"
   | "mini_tests"
   | "fragebogen";
 
 const PHASEN: { id: Phase; label: string; icon: string }[] = [
-  { id: "konvergenz",   label: "Konvergenz", icon: "👁️" },
-  { id: "buch_lese",   label: "Buch-Lesen",  icon: "📖" },
-  { id: "pc_lese",     label: "PC-Lesen",    icon: "💻" },
-  { id: "fixation",    label: "Fixation",    icon: "🎯" },
-  { id: "stift_reise", label: "Stift",       icon: "✏️" },
-  { id: "mini_tests",  label: "Mini-Tests",  icon: "🎮" },
-  { id: "fragebogen",  label: "Fragebogen",  icon: "📋" },
+  { id: "konvergenz",   label: "Konvergenz",  icon: "👁️" },
+  { id: "buch_lese",   label: "Buch-Lesen",   icon: "📖" },
+  { id: "stift_reise", label: "Stift",        icon: "✏️" },
+  { id: "sakkaden",    label: "Blicksprung",  icon: "👈👉" },
+  { id: "mini_tests",  label: "Mini-Tests",   icon: "🎮" },
+  { id: "fragebogen",  label: "Fragebogen",   icon: "📋" },
 ];
 
 export default function ScreeningPage() {
@@ -46,9 +43,8 @@ export default function ScreeningPage() {
 
   const [konvergenz, setKonvergenz] = useState<KonvergenzErgebnis | null>(null);
   const [buchLese, setBuchLese] = useState<BuchLeseErgebnis | null>(null);
-  const [pcLese, setPcLese] = useState<PCLeseErgebnis | null>(null);
-  const [fixation, setFixation] = useState<FixationErgebnis | null>(null);
   const [stiftReise, setStiftReise] = useState<StiftReiseErgebnis | null>(null);
+  const [sakkaden, setSakkaden] = useState<SakkadenErgebnis | null>(null);
   const [miniTests, setMiniTests] = useState<MiniTestErgebnis | null>(null);
 
   useEffect(() => {
@@ -71,8 +67,9 @@ export default function ScreeningPage() {
     const daten: ScreeningDaten = {
       konvergenz: konvergenz!,
       buchLese: buchLese!,
-      pcLese: pcLese!,
-      fixation: fixation!,
+      pcLese: { lesezeitSekunden: 0, lesequalitaet: [], fehlerAnzahl: 0, blinzeln: "nicht_beobachtet", pc_leichter: null },
+      fixation: { qualitaet: "ruhig" },
+      sakkaden: sakkaden!,
       stiftReise: stiftReise!,
       miniTests: miniTests!,
       fragebogen: antworten,
@@ -125,26 +122,19 @@ export default function ScreeningPage() {
         {phase === "buch_lese" && (
           <BuchLesetest
             kindName={kindName}
-            onFertig={(r) => { setBuchLese(r); naechstePhase("pc_lese"); }}
-          />
-        )}
-        {phase === "pc_lese" && (
-          <PCLesetest
-            kindName={kindName}
-            klasse={klasse}
-            onFertig={(r) => { setPcLese(r); naechstePhase("fixation"); }}
-          />
-        )}
-        {phase === "fixation" && (
-          <FixationEltern
-            kindName={kindName}
-            onFertig={(r) => { setFixation(r); naechstePhase("stift_reise"); }}
+            onFertig={(r) => { setBuchLese(r); naechstePhase("stift_reise"); }}
           />
         )}
         {phase === "stift_reise" && (
           <StiftReiseEltern
             kindName={kindName}
-            onFertig={(r) => { setStiftReise(r); naechstePhase("mini_tests"); }}
+            onFertig={(r) => { setStiftReise(r); naechstePhase("sakkaden"); }}
+          />
+        )}
+        {phase === "sakkaden" && (
+          <SakkadenEltern
+            kindName={kindName}
+            onFertig={(r) => { setSakkaden(r); naechstePhase("mini_tests"); }}
           />
         )}
         {phase === "mini_tests" && (
