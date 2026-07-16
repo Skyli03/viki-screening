@@ -242,18 +242,16 @@ export default function ErgebnisPage() {
             ))}
           </div>
           <div className="rounded-xl p-4 text-sm text-gray-700 leading-relaxed" style={{ background: "#F0F9F8" }}>
-            <span className="font-semibold" style={{ color: "#2D7A73" }}>Der Grund:</span>{" "}
+            <span className="font-semibold" style={{ color: "#2D7A73" }}>Der mögliche Grund:</span>{" "}
             {typDaten.mechanismus}
           </div>
-          {hatAuffaelligkeiten && (
-            <div className="mt-4 rounded-xl p-4 text-sm" style={{ background: "#FEF3E2" }}>
-              <p className="font-semibold mb-2" style={{ color: "#C47020" }}>💡 Wichtig zu wissen:</p>
-              <ul className="space-y-2 text-gray-700">
-                <li>• Schwierigkeiten bei der visuellen Verarbeitung bleiben oft jahrelang unentdeckt — weil Kinder keinen Vergleich haben und gar nicht wissen, dass andere anders sehen als sie.</li>
-                <li>• Was wie Unaufmerksamkeit oder mangelnde Motivation wirkt, ist häufig eine unsichtbare visuelle Belastung.</li>
-              </ul>
-            </div>
-          )}
+          <div className="mt-4 rounded-xl p-4 text-sm" style={{ background: "#FEF3E2" }}>
+            <p className="font-semibold mb-2" style={{ color: "#C47020" }}>💡 Wichtig zu wissen:</p>
+            <ul className="space-y-2 text-gray-700">
+              <li>• Schwierigkeiten bei der visuellen Verarbeitung bleiben oft jahrelang unentdeckt — weil Kinder keinen Vergleich haben und gar nicht wissen, dass andere anders sehen als sie.</li>
+              <li>• Was wie Unaufmerksamkeit oder mangelnde Motivation wirkt, ist häufig eine unsichtbare visuelle Belastung.</li>
+            </ul>
+          </div>
         </div>
 
         {/* 4. Kategorien (erste 2 immer sichtbar) */}
@@ -414,8 +412,8 @@ export default function ErgebnisPage() {
               <h3 className="text-xl font-bold text-gray-900 mb-2">Der VIKI Superblick Kurs</h3>
               <p className="text-sm text-gray-600 mb-4 leading-relaxed">
                 Gezieltes Augentraining für zuhause — speziell für Kinder wie {kindName !== "dein Kind" ? kindName : "dein Kind"}.
-                Entwickelt von Dr. Sarah Kopetzky, Funktionaloptometristin.
               </p>
+              <p className="text-xs text-gray-500 mb-4">Entwickelt von Dr. Sarah Kopetzky, Funktionaloptometristin.</p>
               <div className="space-y-2 mb-5 text-left max-w-xs mx-auto">
                 {[
                   "Flüssigeres Lesen & besseres Leseverständnis",

@@ -241,7 +241,7 @@ function erkenneMuster(scores: Record<string, number>, daten: ScreeningDaten): M
   ) {
     hinweise.push({
       titel: "Hinweis auf Konvergenzinsuffizienz",
-      text: "Auffälligkeiten beim Konvergenztest kombiniert mit einem unruhigen Lesefluss sind ein typisches Muster. Die Augen arbeiten beim Nahsehen nicht präzise zusammen — Buchstaben können verschwimmen oder doppelt erscheinen. Betrifft ca. 5% aller Schulkinder.",
+      text: "Auffälligkeiten beim Konvergenztest kombiniert mit einem unruhigen Lesefluss sind ein typisches Muster. Die Augen arbeiten beim Nahsehen nicht präzise zusammen — Buchstaben können verschwimmen oder doppelt erscheinen.",
       staerke: k.beideAugen === "deutlich_auffaellig" ? "stark" : "mittel",
     });
   }
