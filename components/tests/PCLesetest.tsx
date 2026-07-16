@@ -128,7 +128,7 @@ export default function PCLesetest({ kindName, klasse, onFertig }: Props) {
 
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-5 text-sm text-amber-800">
           <p className="font-semibold mb-1">⏱️ Starte den Timer erst wenn {kindName} bereit ist:</p>
-          <p className="text-sm">Klicke auf „Lesetest starten" → dann auf den Start-Knopf → 3-2-1 Countdown beginnt.</p>
+          <p className="text-sm">Klicke auf „Lesetest starten" → 3-2-1 Countdown beginnt automatisch.</p>
         </div>
 
         <button

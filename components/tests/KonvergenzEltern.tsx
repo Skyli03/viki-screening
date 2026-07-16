@@ -15,48 +15,33 @@ const ZEICHEN_OPTIONEN = [
   { id: "anstrengend", label: "Kind berichtet, dass die Übung anstrengend war", emoji: "😮‍💨" },
 ];
 
-// Einfache SVG-Illustration: Sarah mit blauem Pulli und Stift
-function SarahIllustration() {
+const ANIMATION_CSS = `
+  @keyframes konv-nah {
+    0%, 100% { transform: scale(0.35); opacity: 0.55; }
+    50%       { transform: scale(1.7);  opacity: 1; }
+  }
+`;
+
+function NahFernDot() {
   return (
-    <svg viewBox="0 0 180 210" xmlns="http://www.w3.org/2000/svg" width="160" height="185">
-      {/* Blauer Pulli */}
-      <ellipse cx="90" cy="185" rx="68" ry="50" fill="#3B82F6" />
-      <rect x="36" y="148" width="108" height="50" rx="0" fill="#3B82F6" />
-      {/* V-Ausschnitt */}
-      <polygon points="68,148 90,168 112,148" fill="#2563EB" />
-      {/* Hals */}
-      <rect x="76" y="131" width="28" height="22" rx="8" fill="#F5C99A" />
-      {/* Kopf */}
-      <ellipse cx="90" cy="88" rx="48" ry="50" fill="#F5C99A" />
-      {/* Haare oben */}
-      <ellipse cx="90" cy="54" rx="48" ry="30" fill="#2D1B0D" />
-      {/* Haare seitlich links */}
-      <path d="M42 88 Q35 115 43 138" stroke="#2D1B0D" strokeWidth="22" fill="none" strokeLinecap="round" />
-      {/* Haare seitlich rechts */}
-      <path d="M138 88 Q145 115 137 136" stroke="#2D1B0D" strokeWidth="22" fill="none" strokeLinecap="round" />
-      {/* Augen */}
-      <ellipse cx="72" cy="86" rx="9" ry="10" fill="white" />
-      <ellipse cx="108" cy="86" rx="9" ry="10" fill="white" />
-      <circle cx="74" cy="88" r="5.5" fill="#1a3560" />
-      <circle cx="110" cy="88" r="5.5" fill="#1a3560" />
-      <circle cx="75.5" cy="86" r="2" fill="white" />
-      <circle cx="111.5" cy="86" r="2" fill="white" />
-      {/* Augenbrauen */}
-      <path d="M63 73 Q72 67 81 73" stroke="#2D1B0D" strokeWidth="2.8" fill="none" strokeLinecap="round" />
-      <path d="M99 73 Q108 67 117 73" stroke="#2D1B0D" strokeWidth="2.8" fill="none" strokeLinecap="round" />
-      {/* Lächeln */}
-      <path d="M73 108 Q90 124 107 108" stroke="#7c4a2a" strokeWidth="3" fill="none" strokeLinecap="round" />
-      {/* Rechter Arm mit Stift nach vorne */}
-      <path d="M140 158 Q162 140 176 112" stroke="#3B82F6" strokeWidth="22" strokeLinecap="round" fill="none" />
-      {/* Hand */}
-      <ellipse cx="180" cy="106" rx="14" ry="14" fill="#F5C99A" />
-      {/* Stift (nach vorne zeigend) */}
-      <g transform="rotate(-35 174 90)">
-        <rect x="169" y="70" width="10" height="36" rx="2.5" fill="#FCD34D" />
-        <rect x="169" y="67" width="10" height="7" rx="2" fill="#FDA4AF" />
-        <polygon points="169,106 179,106 174,118" fill="#4A2B10" />
-      </g>
-    </svg>
+    <div
+      className="rounded-2xl flex flex-col items-center justify-center gap-3 mx-auto"
+      style={{ width: "220px", height: "160px", background: "#E4F5F3" }}
+    >
+      <style>{ANIMATION_CSS}</style>
+      <div
+        style={{
+          width: "48px",
+          height: "48px",
+          borderRadius: "50%",
+          background: "#F5943A",
+          animation: "konv-nah 3s ease-in-out infinite",
+        }}
+      />
+      <p className="text-xs text-teal-700 font-semibold text-center px-3">
+        So schnell — Stift zur Nase
+      </p>
+    </div>
   );
 }
 
@@ -77,8 +62,8 @@ export default function KonvergenzEltern({ kindName, onFertig }: Props) {
   if (phase === "anleitung") {
     return (
       <div className="text-center">
-        <div className="flex justify-center mb-3">
-          <SarahIllustration />
+        <div className="flex justify-center mb-4">
+          <NahFernDot />
         </div>
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Konvergenz-Test</h2>
         <p className="text-sm text-gray-500 mb-6">Du führst diesen Test durch — {kindName} macht mit.</p>
@@ -88,7 +73,7 @@ export default function KonvergenzEltern({ kindName, onFertig }: Props) {
           <ol className="space-y-4 text-sm text-gray-700">
             <li className="flex gap-3">
               <span className="w-6 h-6 rounded-full text-white text-xs flex items-center justify-center font-bold shrink-0 mt-0.5" style={{ background: "#F5943A" }}>1</span>
-              <span>Halte einen <strong>Stift oder Finger</strong> ca. <strong>30–40 cm</strong> vor die Nase von {kindName}. {kindName} schaut den Stift an.</span>
+              <span>Halte einen <strong>Stift oder Finger</strong> ca. <strong>30 cm</strong> vor die Nase von {kindName}. {kindName} schaut den Stift an.</span>
             </li>
             <li className="flex gap-3">
               <span className="w-6 h-6 rounded-full text-white text-xs flex items-center justify-center font-bold shrink-0 mt-0.5" style={{ background: "#F5943A" }}>2</span>
@@ -102,7 +87,7 @@ export default function KonvergenzEltern({ kindName, onFertig }: Props) {
         </div>
 
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 max-w-lg mx-auto mb-6 text-sm text-amber-800 text-left">
-          <p className="font-semibold mb-2">👁️ Worauf du achtest:</p>
+          <p className="font-semibold mb-2 text-base">👁️ Worauf du achtest:</p>
           <ul className="space-y-1 text-sm">
             <li>• Folgen beide Augen gleichmäßig nach innen?</li>
             <li>• Weicht ein Auge nach außen ab (springt weg)?</li>
@@ -130,29 +115,8 @@ export default function KonvergenzEltern({ kindName, onFertig }: Props) {
           <p className="text-sm text-gray-500">Stift 3× langsam zur Nase und zurück</p>
         </div>
 
-        {/* Illustration statt schwarzer Box */}
-        <div
-          className="rounded-2xl overflow-hidden mb-5 mx-auto max-w-sm flex flex-col items-center justify-center py-4"
-          style={{ background: "#E4F5F3", minHeight: "160px" }}
-        >
-          <div className="flex items-center gap-4 mb-2">
-            <span className="text-4xl">👁️</span>
-            <div
-              className="w-4 h-4 rounded-full"
-              style={{
-                background: "#F5943A",
-                animation: "konvergenz-puls 2s ease-in-out infinite",
-              }}
-            />
-            <span className="text-4xl">👁️</span>
-          </div>
-          <p className="text-xs text-teal-700 font-medium">Beide Augen folgen dem Stift nach innen</p>
-          <style>{`
-            @keyframes konvergenz-puls {
-              0%, 100% { transform: translateX(0) scale(1); }
-              50% { transform: translateX(0) scale(0.35); opacity: 0.6; }
-            }
-          `}</style>
+        <div className="flex justify-center mb-5">
+          <NahFernDot />
         </div>
 
         <div className="bg-teal-50 border border-teal-200 rounded-xl p-4 mb-6 text-sm text-teal-800">

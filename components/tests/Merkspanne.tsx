@@ -6,21 +6,38 @@ interface Props {
   onFertig: (result: { fehlerrate: number; reaktionszeit: number }) => void;
 }
 
-// Klasse 1-2: einfache Symbole
+// Klasse 1-2: Formen
 const POOL_LEICHT = ["○", "□", "△", "★", "◇", "♡", "☆", "⬡"];
 // Klasse 3-4: konfundierbare Buchstaben
 const POOL_SCHWER = ["b", "d", "p", "q", "n", "u", "m", "w"];
 
-function generiereRunde(pool: string[], rundeIndex: number) {
-  // Wähle das Ziel-Symbol deterministisch nach Index, dann misch die Reihenfolge leicht
+// Ähnlich aussehende Ablenker pro Symbol — macht den Test deutlich schwieriger
+const AEHNLICHE_LEICHT: Record<string, string[]> = {
+  "○": ["⬡", "◇", "□"],
+  "□": ["◇", "△", "⬡"],
+  "△": ["◇", "□", "⬡"],
+  "★": ["☆", "♡", "◇"],
+  "◇": ["□", "△", "⬡"],
+  "♡": ["☆", "★", "◇"],
+  "☆": ["★", "♡", "○"],
+  "⬡": ["○", "◇", "□"],
+};
+const AEHNLICHE_SCHWER: Record<string, string[]> = {
+  "b": ["d", "p", "q"],
+  "d": ["b", "p", "q"],
+  "p": ["q", "b", "d"],
+  "q": ["p", "b", "d"],
+  "n": ["u", "m", "w"],
+  "u": ["n", "m", "w"],
+  "m": ["w", "n", "u"],
+  "w": ["m", "n", "u"],
+};
+
+function generiereRunde(pool: string[], aehnliche: Record<string, string[]>, rundeIndex: number) {
   const shuffled = [...pool].sort(() => (Math.sin(rundeIndex * 137.5) > 0 ? 1 : -1));
   const zielItem = shuffled[rundeIndex % pool.length];
-  // 3 Ablenker aus dem Pool — NIEMALS das Ziel selbst
-  const moeglicheAblenker = pool.filter(x => x !== zielItem);
-  const ablenker = moeglicheAblenker
-    .sort(() => Math.random() - 0.5)
-    .slice(0, 3);
-  // Alle 4 Optionen zusammenstellen
+  const moeglicheAblenker = aehnliche[zielItem] ?? pool.filter(x => x !== zielItem).slice(0, 3);
+  const ablenker = [...moeglicheAblenker].sort(() => Math.random() - 0.5).slice(0, 3);
   const optionen: string[] = [...ablenker];
   const richtigPos = Math.floor(Math.random() * 4);
   optionen.splice(richtigPos, 0, zielItem);
@@ -32,12 +49,13 @@ const RUNDEN = 8;
 export default function Merkspanne({ klasse, onFertig }: Props) {
   const schwer = klasse >= 3;
   const pool = schwer ? POOL_SCHWER : POOL_LEICHT;
-  const zeigeDauer = schwer ? 1000 : 1500;
+  const aehnliche = schwer ? AEHNLICHE_SCHWER : AEHNLICHE_LEICHT;
+  const zeigeDauer = schwer ? 750 : 1000;
   const anzeigeGroesse = schwer ? "56px" : "64px";
 
   const [runde, setRunde] = useState(0);
   const [displayPhase, setDisplayPhase] = useState<"zeigen" | "antworten" | "feedback">("zeigen");
-  const [aktRundeDaten, setAktRundeDaten] = useState(() => generiereRunde(pool, 0));
+  const [aktRundeDaten, setAktRundeDaten] = useState(() => generiereRunde(pool, aehnliche, 0));
   const [fehler, setFehler] = useState(0);
   const [zeiten, setZeiten] = useState<number[]>([]);
   const [letzteRichtig, setLetzteRichtig] = useState<boolean | null>(null);
@@ -71,7 +89,7 @@ export default function Merkspanne({ klasse, onFertig }: Props) {
         setFehler(neueFehler);
         setZeiten(neueZeiten);
         setRunde(naechste);
-        setAktRundeDaten(generiereRunde(pool, naechste));
+        setAktRundeDaten(generiereRunde(pool, aehnliche, naechste));
         setLetzteRichtig(null);
         setDisplayPhase("zeigen");
       }
@@ -84,7 +102,6 @@ export default function Merkspanne({ klasse, onFertig }: Props) {
         Runde {Math.min(runde + 1, RUNDEN)} / {RUNDEN}
       </div>
 
-      {/* Fortschritt */}
       <div className="flex gap-1 mb-5">
         {Array.from({ length: RUNDEN }).map((_, i) => (
           <div
@@ -95,18 +112,18 @@ export default function Merkspanne({ klasse, onFertig }: Props) {
         ))}
       </div>
 
-      {/* Zeige-Phase — 1 Symbol */}
+      {/* Zeige-Phase */}
       {displayPhase === "zeigen" && (
         <div className="text-center">
           <div className="text-xs text-gray-400 mb-3 uppercase tracking-wide font-semibold">
             Merke dir dieses Symbol:
           </div>
           <div
-            className="rounded-2xl flex items-center justify-center mx-auto mb-4"
-            style={{ height: "160px", maxWidth: "220px", background: "#1F2937" }}
+            className="rounded-2xl flex items-center justify-center mx-auto mb-4 border-2"
+            style={{ height: "160px", maxWidth: "220px", background: "white", borderColor: "#8DCDC5" }}
           >
             <span
-              className="font-mono font-bold text-white"
+              className="font-mono font-bold text-gray-900"
               style={{ fontSize: schwer ? "96px" : "108px", lineHeight: 1 }}
             >
               {aktRundeDaten.zielItem}

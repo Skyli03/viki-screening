@@ -57,7 +57,7 @@ const TYP_DATEN: Record<string, {
 };
 
 const TESTIMONIALS = [
-  { name: "Sabine K.", details: "Mama von Lukas, 9 Jahre, 3. Klasse", text: "wir machen gerade den Online-Kurs und Lukas merkt langsam selber, dass alles leichter fällt. Die Hausaufgabensituation war immer ein Kampf, alleine bis er angefangen hat, dauerte es schon ewig. Ich bin sowas von happy, dass wir endlich wissen, was Sache ist." },
+  { name: "Sabine K.", details: "Mama von Lukas, 9 Jahre, 3. Klasse", text: "Wir machen gerade den Online-Kurs und Lukas merkt langsam selber, dass alles leichter fällt. Die Hausaufgabensituation war immer ein Kampf, alleine bis er angefangen hat, dauerte es schon ewig. Ich bin sowas von happy, dass wir endlich wissen, was Sache ist." },
   { name: "Thomas M.", details: "Papa von Emma, 8 Jahre, 2. Klasse", text: "Wir haben schon so viel ausprobiert — Kinderarzt, Legasthenietraining, alles Mögliche. Aber an die Augen hat niemand gedacht. Jetzt geht vieles viel leichter für Emma." },
   { name: "Maria L.", details: "Mama von Noah, 10 Jahre, 4. Klasse", text: "Noah sagt jetzt selbst: 'Mama, Lesen geht jetzt leichter!' — Das hat er noch nie gesagt. Die Lehrerin hat gefragt, was wir anders machen." },
 ];
@@ -247,10 +247,10 @@ export default function ErgebnisPage() {
           </div>
           {hatAuffaelligkeiten && (
             <div className="mt-4 rounded-xl p-4 text-sm" style={{ background: "#FEF3E2" }}>
-              <p className="font-semibold mb-2" style={{ color: "#C47020" }}>📊 Das betrifft mehr Kinder als du denkst:</p>
+              <p className="font-semibold mb-2" style={{ color: "#C47020" }}>💡 Wichtig zu wissen:</p>
               <ul className="space-y-2 text-gray-700">
-                <li>• Bei <strong>1 von 20 Kindern</strong> besteht eine <strong>Konvergenzinsuffizienz</strong> — die Augen können beim Nahsehen nicht richtig zusammenarbeiten. Buchstaben verschwimmen oder verdoppeln sich. Wird oft jahrelang nicht erkannt.</li>
-                <li>• <strong>Probleme bei der Augensteuerung</strong> werden häufig als Konzentrationsschwäche oder Faulheit fehlgedeutet — obwohl das Kind sich wirklich anstrengt.</li>
+                <li>• Schwierigkeiten bei der visuellen Verarbeitung bleiben oft jahrelang unentdeckt — weil Kinder keinen Vergleich haben und gar nicht wissen, dass andere anders sehen als sie.</li>
+                <li>• Was wie Unaufmerksamkeit oder mangelnde Motivation wirkt, ist häufig eine unsichtbare visuelle Belastung.</li>
               </ul>
             </div>
           )}
@@ -436,7 +436,7 @@ export default function ErgebnisPage() {
                 className="inline-block w-full font-bold text-lg py-4 rounded-xl shadow-lg transition-all hover:opacity-90"
                 style={{ background: "#F5943A", color: "white" }}
               >
-                Zum Kurs ansehen →
+                JETZT KURS ANSEHEN
               </a>
               <p className="text-xs text-gray-500 mt-3">Kostenlos</p>
             </div>
@@ -478,7 +478,7 @@ export default function ErgebnisPage() {
                 className="inline-block w-full font-bold text-lg py-4 rounded-xl shadow-lg transition-all hover:opacity-90"
                 style={{ background: "#F5943A", color: "white" }}
               >
-                Zum Kurs ansehen → 🚀
+                JETZT KURS ANSEHEN
               </a>
               <p className="text-xs text-gray-500 mt-2">Kostenlos</p>
             </div>

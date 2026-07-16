@@ -3,9 +3,9 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 const SCHRITTE = [
-  { nr: "1", icon: "📖", titel: "Lesetest", text: "Dein Kind liest einen kurzen Text laut vor. Die Kamera beobachtet dabei sanft die Augenbewegungen." },
-  { nr: "2", icon: "🎯", titel: "Sehtest", text: "6 kurze, spielerische Aufgaben am Bildschirm — dauert nur 5 Minuten." },
-  { nr: "3", icon: "📋", titel: "Fragebogen", text: "Du beantwortest Fragen über dein Kind als Elternteil. Dauert ca. 3 Minuten." },
+  { nr: "1", icon: "📖", titel: "Lesetest", text: "Dein Kind liest je einen kurzen Text laut vor — einmal aus dem Buch, einmal am Bildschirm. Du beobachtest dabei." },
+  { nr: "2", icon: "🎯", titel: "Übungen", text: "3 kurze Eltern-Übungen mit Stift + 2 spielerische Mini-Aufgaben am Bildschirm. Dauert ca. 5 Minuten." },
+  { nr: "3", icon: "📋", titel: "Fragebogen", text: "Du beantwortest ca. 25 kurze Fragen über Alltagsbeobachtungen deines Kindes. Dauert ca. 3–4 Minuten." },
 ];
 
 export default function Startseite() {
@@ -165,7 +165,7 @@ export default function Startseite() {
           </div>
 
           <p className="text-xs text-gray-400 text-center mt-4">
-            🔒 Kein Account nötig · Kamerabild bleibt auf deinem Gerät · DSGVO-konform
+            🔒 Kein Account nötig · Keine Kamera · DSGVO-konform
           </p>
         </div>
 
@@ -174,11 +174,9 @@ export default function Startseite() {
           <p className="text-xs text-gray-400">
             ⚠️ Dieser Test ersetzt keine augenärztliche oder optometrische Diagnostik. Bei Verdacht auf Sehprobleme wende dich bitte an eine Fachperson.
           </p>
-          <p className="text-sm font-medium" style={{ color: "#8DCDC5" }}>Funktionaloptometrie & Visualtraining</p>
           <div className="text-sm text-gray-500">
             <a href="https://vikitraining.at" target="_blank" rel="noopener noreferrer" className="hover:underline" style={{ color: "#F5943A" }}>vikitraining.at</a>
-            {" · "}Funktionaloptometristin & Visualtrainerin
-            {" · "}
+            {" · Funktionaloptometrie & Visualtraining · "}
             <a href="/impressum" className="hover:underline text-gray-400">Impressum</a>
             {" · "}
             <a href="/datenschutz" className="hover:underline text-gray-400">Datenschutz</a>
