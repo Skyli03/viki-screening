@@ -2,20 +2,28 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 
 interface Props {
+  klasse: number;
   onFertig: (result: { verwechslungen: number; reaktionszeit: number }) => void;
 }
 
-const PAARE: Array<[string, string, boolean]> = [
+// Klasse 1-2: b/d/p/q Kernpaare + gleiche
+// Klasse 3-4: mehr ähnliche Paare n/u, m/w, i/l, 6/9 zusätzlich
+const PAARE_BASIS: Array<[string, string, boolean]> = [
   ["b", "d", false], ["p", "q", false], ["b", "b", true], ["d", "d", true],
   ["p", "p", true], ["b", "p", false], ["d", "q", false], ["b", "q", false],
   ["p", "d", false], ["b", "d", false], ["q", "q", true], ["p", "b", false],
   ["d", "b", false], ["q", "p", false], ["b", "b", true], ["d", "q", false],
 ];
 
+const PAARE_SCHWER: Array<[string, string, boolean]> = [
+  ...PAARE_BASIS,
+  ["n", "u", false], ["m", "w", false], ["i", "l", false], ["6", "9", false],
+  ["n", "n", true], ["m", "m", true], ["i", "i", true], ["6", "6", true],
+  ["u", "n", false], ["w", "m", false], ["l", "i", false], ["9", "6", false],
+];
+
 const RUNDEN = 12;
 
-// Zeitlimits pro Klasse (ms) — ab wann gilt eine Antwort als "langsam"
-// Basierend auf Entwicklungsforschung zur visuellen Diskrimination
 const ZEITLIMIT_MS: Record<number, number> = {
   1: 3500,
   2: 2800,
@@ -28,7 +36,11 @@ function getZeitlimit(klasse: number): number {
   return ZEITLIMIT_MS[klasse] ?? 2200;
 }
 
-export default function LRSTest({ onFertig }: Props) {
+export default function LRSTest({ klasse, onFertig }: Props) {
+  const paare = klasse >= 3 ? PAARE_SCHWER : PAARE_BASIS;
+  const schriftGroesse = klasse <= 2 ? 96 : 52;
+  const zeitlimit = getZeitlimit(klasse);
+
   const [runde, setRunde] = useState(0);
   const [verwechslungen, setVerwechslungen] = useState(0);
   const [zeiten, setZeiten] = useState<number[]>([]);
@@ -38,13 +50,8 @@ export default function LRSTest({ onFertig }: Props) {
   const [verstricheneMs, setVerstricheneMs] = useState(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
 
-  // Klasse aus sessionStorage lesen
-  const klasse = typeof window !== "undefined"
-    ? Number(sessionStorage.getItem("klasse") ?? "2")
-    : 2;
-  const zeitlimit = getZeitlimit(klasse);
+  const [links, rechts, gleich] = paare[runde % paare.length];
 
-  // Timer pro Runde
   useEffect(() => {
     if (bewertet) {
       if (timerRef.current) clearInterval(timerRef.current);
@@ -57,8 +64,6 @@ export default function LRSTest({ onFertig }: Props) {
     }, 100);
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
   }, [runde, bewertet]);
-
-  const [links, rechts, gleich] = PAARE[runde % PAARE.length];
 
   const antworten = useCallback((antwortGleich: boolean) => {
     if (bewertet) return;
@@ -88,7 +93,6 @@ export default function LRSTest({ onFertig }: Props) {
 
   const timerProzent = Math.min(100, (verstricheneMs / zeitlimit) * 100);
   const timerFarbe = timerProzent < 60 ? "#8DCDC5" : timerProzent < 85 ? "#F5943A" : "#EF4444";
-  const timerSek = (verstricheneMs / 1000).toFixed(1);
 
   return (
     <div>
@@ -96,27 +100,23 @@ export default function LRSTest({ onFertig }: Props) {
         Runde {Math.min(runde + 1, RUNDEN)} / {RUNDEN} — Sind die zwei Buchstaben gleich oder verschieden?
       </div>
 
-      {/* Timer-Balken */}
       {!bewertet && (
         <div className="mb-4">
           <div className="flex justify-between text-xs text-gray-400 mb-1">
-            <span>⏱️ {timerSek}s</span>
+            <span>⏱️ {(verstricheneMs / 1000).toFixed(1)}s</span>
             <span style={{ color: timerProzent > 85 ? "#EF4444" : "#9CA3AF" }}>
               {timerProzent > 85 ? "⚠️ langsam" : `Ziel: <${(zeitlimit / 1000).toFixed(1)}s`}
             </span>
           </div>
           <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-            <div
-              className="h-full rounded-full transition-all"
-              style={{ width: `${timerProzent}%`, background: timerFarbe, transition: "width 0.1s linear" }}
-            />
+            <div className="h-full rounded-full" style={{ width: `${timerProzent}%`, background: timerFarbe, transition: "width 0.1s linear" }} />
           </div>
         </div>
       )}
 
       <div className="flex items-center justify-center gap-12 mb-10" style={{ minHeight: "160px" }}>
-        <span className="font-mono font-bold text-gray-900 select-none" style={{ fontSize: "96px", lineHeight: 1 }}>{links}</span>
-        <span className="font-mono font-bold text-gray-900 select-none" style={{ fontSize: "96px", lineHeight: 1 }}>{rechts}</span>
+        <span className="font-mono font-bold text-gray-900 select-none" style={{ fontSize: `${schriftGroesse}px`, lineHeight: 1 }}>{links}</span>
+        <span className="font-mono font-bold text-gray-900 select-none" style={{ fontSize: `${schriftGroesse}px`, lineHeight: 1 }}>{rechts}</span>
       </div>
 
       {letzteAntwort !== null && (
@@ -126,18 +126,12 @@ export default function LRSTest({ onFertig }: Props) {
       )}
 
       <div className="flex gap-4 justify-center">
-        <button
-          onClick={() => antworten(true)}
-          disabled={bewertet}
-          className="flex-1 max-w-xs py-4 rounded-xl font-bold text-xl border-2 border-green-400 bg-green-50 text-green-800 hover:bg-green-100 active:scale-95 transition-all disabled:opacity-50"
-        >
+        <button onClick={() => antworten(true)} disabled={bewertet}
+          className="flex-1 max-w-xs py-4 rounded-xl font-bold text-xl border-2 border-green-400 bg-green-50 text-green-800 hover:bg-green-100 active:scale-95 transition-all disabled:opacity-50">
           👍 Gleich
         </button>
-        <button
-          onClick={() => antworten(false)}
-          disabled={bewertet}
-          className="flex-1 max-w-xs py-4 rounded-xl font-bold text-xl border-2 border-orange-400 bg-orange-50 text-orange-800 hover:bg-orange-100 active:scale-95 transition-all disabled:opacity-50"
-        >
+        <button onClick={() => antworten(false)} disabled={bewertet}
+          className="flex-1 max-w-xs py-4 rounded-xl font-bold text-xl border-2 border-orange-400 bg-orange-50 text-orange-800 hover:bg-orange-100 active:scale-95 transition-all disabled:opacity-50">
           ✌️ Verschieden
         </button>
       </div>

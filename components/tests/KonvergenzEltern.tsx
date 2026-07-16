@@ -1,0 +1,193 @@
+"use client";
+import { useState } from "react";
+import type { KonvergenzErgebnis } from "@/lib/screening-types";
+
+interface Props {
+  kindName: string;
+  onFertig: (ergebnis: KonvergenzErgebnis) => void;
+}
+
+const ZEICHEN_OPTIONEN = [
+  { id: "doppelbilder", label: "Kind klagt über Doppelbilder", emoji: "👀" },
+  { id: "auge_springt", label: "Ein Auge weicht aus / springt raus", emoji: "↗️" },
+  { id: "schaut_weg", label: "Kind schaut weg oder blinzelt stark", emoji: "😣" },
+  { id: "kann_nicht_folgen", label: "Kind kann Stift nicht bis zur Nase folgen", emoji: "🚫" },
+];
+
+export default function KonvergenzEltern({ kindName, onFertig }: Props) {
+  const [phase, setPhase] = useState<"anleitung" | "beobachtung" | "zeichen">("anleitung");
+  const [beideAugen, setBeideAugen] = useState<KonvergenzErgebnis["beideAugen"] | null>(null);
+  const [zeichen, setZeichen] = useState<string[]>([]);
+
+  function toggleZeichen(id: string) {
+    setZeichen(prev => prev.includes(id) ? prev.filter(z => z !== id) : [...prev, id]);
+  }
+
+  function abschicken() {
+    if (!beideAugen) return;
+    onFertig({ beideAugen, zeichen });
+  }
+
+  if (phase === "anleitung") {
+    return (
+      <div className="text-center">
+        <div className="text-5xl mb-4">✏️</div>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">Konvergenz-Test</h2>
+        <p className="text-sm text-gray-500 mb-6">Du führst diesen Test durch — {kindName} macht mit.</p>
+
+        <div className="bg-white rounded-2xl border-2 p-6 mb-5 text-left max-w-lg mx-auto" style={{ borderColor: "#8DCDC5" }}>
+          <p className="font-semibold text-gray-900 mb-4">So geht es:</p>
+          <ol className="space-y-4 text-sm text-gray-700">
+            <li className="flex gap-3">
+              <span className="w-6 h-6 rounded-full text-white text-xs flex items-center justify-center font-bold shrink-0 mt-0.5" style={{ background: "#F5943A" }}>1</span>
+              <span>Halte einen <strong>Stift oder Finger</strong> ca. <strong>30–40 cm</strong> vor die Nase von {kindName}. {kindName} schaut den Stift an.</span>
+            </li>
+            <li className="flex gap-3">
+              <span className="w-6 h-6 rounded-full text-white text-xs flex items-center justify-center font-bold shrink-0 mt-0.5" style={{ background: "#F5943A" }}>2</span>
+              <span>Bewege den Stift <strong>langsam auf die Nase zu</strong> (bis ca. 5–10 cm). Dann wieder zurück. <strong>3× wiederholen.</strong></span>
+            </li>
+            <li className="flex gap-3">
+              <span className="w-6 h-6 rounded-full text-white text-xs flex items-center justify-center font-bold shrink-0 mt-0.5" style={{ background: "#F5943A" }}>3</span>
+              <span><strong>Beobachte</strong> dabei die Augen von {kindName}: Folgen <em>beide</em> Augen gleichmäßig? Weicht ein Auge aus?</span>
+            </li>
+          </ol>
+        </div>
+
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 max-w-lg mx-auto mb-6 text-sm text-amber-800 text-left">
+          <p className="font-semibold mb-1">👁️ Worauf du achtest:</p>
+          <ul className="space-y-1">
+            <li>• Folgen beide Augen gleichmäßig nach innen?</li>
+            <li>• Weicht ein Auge nach außen ab (springt weg)?</li>
+            <li>• Klagt {kindName} über Doppelbilder?</li>
+            <li>• Blinzelt {kindName} stark oder schaut weg?</li>
+          </ul>
+        </div>
+
+        <button
+          onClick={() => setPhase("beobachtung")}
+          className="w-full max-w-lg text-white font-bold text-xl py-4 rounded-xl shadow-md"
+          style={{ background: "#F5943A" }}
+        >
+          Test jetzt durchführen →
+        </button>
+      </div>
+    );
+  }
+
+  if (phase === "beobachtung") {
+    return (
+      <div>
+        <div className="text-center mb-6">
+          <div className="text-5xl mb-3">✏️👀</div>
+          <h2 className="text-xl font-bold text-gray-900">Jetzt durchführen</h2>
+          <p className="text-sm text-gray-500 mt-1">Stift 3× langsam zur Nase und zurück</p>
+        </div>
+
+        {/* Animations-Illustration */}
+        <div className="relative bg-gray-900 rounded-2xl overflow-hidden mb-6 mx-auto max-w-sm" style={{ height: "160px" }}>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="relative flex items-center gap-2">
+              <span className="text-4xl">👁️</span>
+              <div
+                className="w-4 h-4 rounded-full"
+                style={{
+                  background: "#F5943A",
+                  animation: "konvergenz-puls 2s ease-in-out infinite",
+                }}
+              />
+              <span className="text-4xl">👁️</span>
+            </div>
+          </div>
+          <p className="absolute bottom-3 left-0 right-0 text-center text-xs text-gray-400">
+            Beide Augen folgen dem Stift nach innen
+          </p>
+          <style>{`
+            @keyframes konvergenz-puls {
+              0%, 100% { transform: translateX(0) scale(1); opacity: 1; }
+              50% { transform: translateX(0) scale(0.4); opacity: 0.7; }
+            }
+          `}</style>
+        </div>
+
+        <div className="bg-teal-50 border border-teal-200 rounded-xl p-4 mb-6 text-sm text-teal-800">
+          <p className="font-semibold">Stift 3× langsam von 30 cm auf 5 cm annähern und zurück.</p>
+          <p className="mt-1 text-xs">Wenn du fertig beobachtet hast → weiter.</p>
+        </div>
+
+        <button
+          onClick={() => setPhase("zeichen")}
+          className="w-full text-white font-bold text-xl py-4 rounded-xl shadow-md"
+          style={{ background: "#8DCDC5" }}
+        >
+          Fertig beobachtet → Ergebnis eingeben
+        </button>
+      </div>
+    );
+  }
+
+  // Phase "zeichen"
+  return (
+    <div>
+      <div className="text-center mb-5">
+        <div className="text-4xl mb-2">📋</div>
+        <h2 className="text-xl font-bold text-gray-900">Was hast du beobachtet?</h2>
+      </div>
+
+      {/* Hauptbewertung */}
+      <div className="bg-white rounded-2xl border-2 p-5 mb-4" style={{ borderColor: "#8DCDC5" }}>
+        <p className="font-semibold text-gray-900 mb-3">Wie haben die Augen von {kindName} dem Stift gefolgt?</p>
+        <div className="space-y-2">
+          {([
+            { val: "unauffaellig", label: "Beide Augen folgen gleichmäßig", sub: "Kein Ausweichen, kein Zögern", color: "#16A34A", bg: "#F0FDF4", border: "#86EFAC" },
+            { val: "leicht_auffaellig", label: "Ein Auge weicht leicht aus", sub: "Kurzes Ausweichen, aber Kind folgt noch", color: "#D97706", bg: "#FFFBEB", border: "#FCD34D" },
+            { val: "deutlich_auffaellig", label: "Deutliche Auffälligkeit", sub: "Auge springt klar raus, Doppelbilder, Kind schaut weg", color: "#DC2626", bg: "#FEF2F2", border: "#FCA5A5" },
+          ] as const).map(opt => (
+            <button
+              key={opt.val}
+              onClick={() => setBeideAugen(opt.val)}
+              className="w-full p-3 rounded-xl border-2 text-left transition-all"
+              style={beideAugen === opt.val
+                ? { background: opt.bg, borderColor: opt.border }
+                : { borderColor: "#E5E7EB" }
+              }
+            >
+              <div className="font-semibold text-sm" style={{ color: opt.color }}>{opt.label}</div>
+              <div className="text-xs text-gray-500">{opt.sub}</div>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Zusatzzeichen */}
+      <div className="bg-white rounded-2xl border border-gray-100 p-5 mb-5">
+        <p className="font-semibold text-gray-900 mb-1 text-sm">Hast du zusätzlich folgendes beobachtet?</p>
+        <p className="text-xs text-gray-400 mb-3">Mehrfachauswahl möglich — nichts wählen wenn unauffällig</p>
+        <div className="space-y-2">
+          {ZEICHEN_OPTIONEN.map(opt => (
+            <button
+              key={opt.id}
+              onClick={() => toggleZeichen(opt.id)}
+              className="w-full p-3 rounded-xl border-2 text-left flex items-center gap-3 transition-all"
+              style={zeichen.includes(opt.id)
+                ? { borderColor: "#F5943A", background: "#FEF3E2" }
+                : { borderColor: "#E5E7EB" }
+              }
+            >
+              <span className="text-lg">{opt.emoji}</span>
+              <span className="text-sm font-medium text-gray-700">{opt.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <button
+        onClick={abschicken}
+        disabled={!beideAugen}
+        className="w-full text-white font-bold text-xl py-4 rounded-xl shadow-md disabled:opacity-40"
+        style={{ background: "#F5943A" }}
+      >
+        Weiter →
+      </button>
+    </div>
+  );
+}

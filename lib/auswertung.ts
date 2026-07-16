@@ -1,28 +1,4 @@
-import type { FragebogenAntworten } from "@/data/fragebogen";
-
-export interface LesetestErgebnis {
-  ruecksprueungeProZeile: number;
-  vorwaertssprueungeProZeile: number;
-  lesegeschwindigkeitWPM: number;
-  blinzelrateProMinute: number;
-  lesetempoRuhig: boolean;
-  zeilenverluste: number;
-  rohdaten: { zeit: number; x: number; y: number }[];
-  // Gi em Aus Unsinntext-Felder (neu)
-  lesequalitaet?: string[];
-  fehlerAnzahl?: number;
-  lesezeitSekunden?: number;
-}
-
-export interface VisuellTestErgebnis {
-  fixation: { reaktionszeit: number; genauigkeit: number };
-  sakkaden: { timing: number; konsistenz: number };
-  smoothPursuit: { abweichung: number };
-  diskrimination: { fehlerrate: number; geschwindigkeit: number };
-  lrs: { verwechslungen: number; reaktionszeit: number };
-  peripher: { reaktionszeit: number; trefferquote: number };
-  vergenz?: { ergebnis: "normal" | "auffaellig" | "stark_auffaellig" };
-}
+import type { ScreeningDaten } from "@/lib/screening-types";
 
 export interface KategorieScore {
   name: string;
@@ -33,32 +9,27 @@ export interface KategorieScore {
   icon: string;
 }
 
-export interface BlinzelInfo {
-  wertProMinute: number;
-  ampel: "gruen" | "gelb" | "rot";
-  label: string;
-  elternText: string;
-}
-
 export interface MusterHinweis {
   titel: string;
   text: string;
   staerke: "mittel" | "stark";
 }
 
+export interface BlinzelInfo {
+  ampel: "gruen" | "gelb" | "rot";
+  label: string;
+  elternText: string;
+}
+
 export interface ScreeningProfil {
   typ: "A" | "B" | "C" | "D";
   hauptproblem: string;
-  empfohlenModule: string;
   kategorien: KategorieScore[];
   gesamtScore: number;
   auffaelligkeitenAnzahl: number;
   blinzelinfo: BlinzelInfo;
   musterHinweise: MusterHinweis[];
-  lesegeschwindigkeitInfo: { wpm: number; bewertung: "gut" | "grenzwertig" | "langsam"; normMin: number; normMax: number };
 }
-
-// ─── Ampel ────────────────────────────────────────────────────────────────────
 
 function getAmpel(score: number): "gruen" | "gelb" | "rot" {
   if (score >= 71) return "gruen";
@@ -66,273 +37,238 @@ function getAmpel(score: number): "gruen" | "gelb" | "rot" {
   return "rot";
 }
 
-// ─── Lesefluss ────────────────────────────────────────────────────────────────
-// Quellen: Rayner (2009), Buswell (1920), McConkie & Rayner (1975)
-// Normwerte für deutschsprachigen Raum angepasst
-//
-// Regressions-Normwerte pro Zeile (6 Zeilen Text):
-//   Klasse 1: bis 2.5 Rücksprünge/Zeile normal (Refixationsrate ~50-57% typisch)
-//   Klasse 2: bis 2.0 normal (Refixationsrate sinkt auf ~40%)
-//   Klasse 3: bis 1.5 normal (>50% Refixationsrate = Förderbedarf laut Rayner 2009)
-//   Klasse 4: bis 1.0 normal
-//
-// WPM-Normwerte (mündliches Lesen, deutschsprachig, konservative Schätzung):
-//   Klasse 1: 40–70 WPM | Klasse 2: 65–100 WPM
-//   Klasse 3: 90–120 WPM | Klasse 4: 110–145 WPM
+// ─── 1. Lesefluss & Augenbewegungen ──────────────────────────────────────────
+// Sources: BuchLeseErgebnis + PCLeseErgebnis + Fragebogen l1-l10
 
-function scoreLesefluss(ergebnis: LesetestErgebnis, klasse: number): number {
-  // ── Gi em Aus Normwerte (ENWAKO-Protokoll, Dr. Sarah-Maria Kopetzky) ───────
-  // Primärindikator: Lesezeit + Fehleranzahl des Unsinntext-Tests
-  // Sekundär: Lesequalität-Beobachtung durch Elternteil
-  const giEmAusNormen = [
-    { zeitGut: 120, zeitWarn: 180, fehlerGut: 12, fehlerWarn: 18 }, // Klasse 1
-    { zeitGut: 100, zeitWarn: 150, fehlerGut: 10, fehlerWarn: 15 }, // Klasse 2
-    { zeitGut:  70, zeitWarn: 110, fehlerGut:  7, fehlerWarn: 12 }, // Klasse 3–4
-    { zeitGut:  55, zeitWarn:  85, fehlerGut:  2, fehlerWarn:  6 }, // Klasse 5+
-  ];
-  const norm = giEmAusNormen[Math.min(klasse <= 2 ? klasse - 1 : klasse <= 4 ? 2 : 3, 3)];
-
+function scoreLesefluss(daten: ScreeningDaten): number {
   let score = 100;
+  const b = daten.buchLese;
+  const pc = daten.pcLese;
+  const fragen = daten.fragebogen;
 
-  // ── Lesezeit (primär) ────────────────────────────────────────────────────
-  const zeit = ergebnis.lesezeitSekunden ?? 0;
-  if (zeit > 0) {
-    if (zeit > norm.zeitWarn) score -= 35;
-    else if (zeit > norm.zeitGut) score -= 18;
-  }
+  // Buchlesetest — direkte klinische Beobachtungen
+  if (b.verliert_zeile)            score -= 20;
+  if (b.ueberspringt_woerter)      score -= 15;
+  if (b.benutzt_finger)            score -= 10;
+  if (b.viele_fehler_bekannte_woerter) score -= 20;
+  if (b.fluessig)                  score = Math.max(score, 80);
 
-  // ── Fehleranzahl (primär) ───────────────────────────────────────────────
-  const fehler = ergebnis.fehlerAnzahl ?? 0;
-  if (fehler > norm.fehlerWarn) score -= 30;
-  else if (fehler > norm.fehlerGut) score -= 15;
+  if (b.leseabstand === "zu_nah" || b.leseabstand === "wechselnd") score -= 10;
+  if (b.kopfhaltung === "schief_oder_verdreht") score -= 10;
 
-  // ── Lesequalität (Elternbeobachtung, klinisch interpretiert) ────────────
-  // Klinische Regeln nach Sarah Kopetzky:
-  //   holprig     → ATNR, MORO, Sakkaden, Konvergenz
-  //   endungen    → ATNR / MORO
-  //   langsam     → MORO + visuelles System
-  //   vertauscht  → ATNR + visuelle Verarbeitung
-  const qualitaet = ergebnis.lesequalitaet ?? [];
-  if (qualitaet.includes("vertauscht")) score -= 20; // stärkstes Signal
-  if (qualitaet.includes("holprig"))    score -= 15;
-  if (qualitaet.includes("endungen"))   score -= 10;
-  if (qualitaet.includes("langsam") && !qualitaet.includes("vertauscht")) score -= 8;
-  if (qualitaet.includes("fluessig"))   score = Math.max(score, 75); // Minimum grün wenn fließend
+  // Monokularer Vergleich: wenn ein Auge deutlich besser → Binokularproblem
+  if (b.monokular === "besser") score -= 15;
 
-  // ── Kopfbewegungsanalyse (Kamera, wenn verfügbar) ────────────────────────
-  const trackingVerfuegbar = ergebnis.rohdaten.length >= 10;
-  if (trackingVerfuegbar) {
-    if (ergebnis.ruecksprueungeProZeile > 3) score -= 15;
-    else if (ergebnis.ruecksprueungeProZeile > 1.5) score -= 7;
-    if (!ergebnis.lesetempoRuhig) score -= 8;
-    if (ergebnis.zeilenverluste > 2) score -= 10;
-    if (ergebnis.blinzelrateProMinute >= 0 && ergebnis.blinzelrateProMinute < 4) score -= 8;
-  }
+  // PC-Lesetest Qualität
+  const q = pc.lesequalitaet;
+  if (q.includes("vertauscht")) score -= 20;
+  if (q.includes("holprig"))    score -= 12;
+  if (q.includes("endungen"))   score -= 8;
+  if (q.includes("langsam") && !q.includes("vertauscht")) score -= 8;
+  if (q.includes("fluessig"))   score = Math.max(score, 75);
 
-  return Math.max(0, score);
+  // PC-Lesetest Fehleranzahl
+  if (pc.fehlerAnzahl >= 8)  score -= 20;
+  else if (pc.fehlerAnzahl >= 4) score -= 10;
+
+  // Fragebogen Lesefragen l1-l10 (0=nie/1=manchmal/2=oft/3=immer)
+  const lKeys = ["l1","l2","l3","l4","l5","l6","l7","l8","l9","l10"];
+  const lSumme = lKeys.reduce((s, k) => s + (fragen[k] ?? 0), 0);
+  const lMax = lKeys.length * 3;
+  const lProzent = lSumme / lMax;
+  if (lProzent > 0.6)      score -= 20;
+  else if (lProzent > 0.35) score -= 10;
+  else if (lProzent > 0.15) score -= 4;
+
+  return Math.max(0, Math.min(100, score));
 }
 
-// ─── Augensteuerung ───────────────────────────────────────────────────────────
-// Quellen: NSUCO Oculomotor Test; Normative Values of Saccades in Children
-// (PubMed 2019); Smooth Pursuit in Children (PMC 2019)
-//
-// Fixation: >800ms Reaktionszeit = verzögert; <0.7 Genauigkeit = ungenau
-// Sakkaden: Konsistenz <0.6 = instabil; Timing >500ms = langsam
-// Smooth Pursuit: abweichung >80 (Elternrating 3) = problematisch
+// ─── 2. Augensteuerung ────────────────────────────────────────────────────────
+// Sources: KonvergenzErgebnis + FixationErgebnis + StiftReiseErgebnis
 
-function scoreAugensteuerung(v: VisuellTestErgebnis): number {
+function scoreAugensteuerung(daten: ScreeningDaten): number {
   let score = 100;
+  const k = daten.konvergenz;
+  const f = daten.fixation;
+  const s = daten.stiftReise;
 
-  // Fixation (Laserblick)
-  if (v.fixation.reaktionszeit > 1000) score -= 25;
-  else if (v.fixation.reaktionszeit > 800) score -= 15;
-  if (v.fixation.genauigkeit < 0.6) score -= 20;
-  else if (v.fixation.genauigkeit < 0.75) score -= 10;
+  // Konvergenz
+  if (k.beideAugen === "deutlich_auffaellig") score -= 35;
+  else if (k.beideAugen === "leicht_auffaellig") score -= 18;
 
-  // Sakkaden (Blitzblick) — Konsistenz ist Hauptindikator
-  if (v.sakkaden.konsistenz < 0.4) score -= 25;
-  else if (v.sakkaden.konsistenz < 0.6) score -= 15;
-  if (v.sakkaden.timing > 600) score -= 15;
-  else if (v.sakkaden.timing > 450) score -= 8;
+  if (k.zeichen.includes("doppelbilder")) score -= 15;
+  if (k.zeichen.includes("auge_springt_raus")) score -= 15;
+  if (k.zeichen.includes("schaut_weg")) score -= 10;
 
-  // Smooth Pursuit (Raketenblick) — Elternbeurteilung
-  // abweichung 15 = flüssig, 55 = ruckelig, 90 = kaum verfolgt
-  if (v.smoothPursuit.abweichung >= 90) score -= 20;
-  else if (v.smoothPursuit.abweichung >= 55) score -= 10;
+  // Fixation (10 Sekunden ruhig fixieren)
+  if (f.qualitaet === "stark_unruhig_oder_abgelenkt") score -= 30;
+  else if (f.qualitaet === "leicht_unruhig") score -= 15;
 
-  // Vergenz / Konvergenz — binokulare Zusammenarbeit (Convergence Insufficiency Treatment Trial, CITT 2008)
-  // Konvergenzinsuffizienz betrifft ~5% aller Schulkinder; stark assoziiert mit Leseschwierigkeiten
-  // Elternbeurteilung anhand Augenabweichung während animiertem Nahpunkt-Test
-  if (v.vergenz?.ergebnis === "stark_auffaellig") score -= 30;
-  else if (v.vergenz?.ergebnis === "auffaellig") score -= 15;
+  // Stift-Reise (smooth pursuit)
+  if (s.folgt === "verliert_stift") score -= 30;
+  else if (s.folgt === "ruckelig_mit_pausen") score -= 18;
 
-  return Math.max(0, score);
+  if (s.kopf_mitbewegt) score -= 10;
+
+  return Math.max(0, Math.min(100, score));
 }
 
-// ─── Visuelle Verarbeitung ────────────────────────────────────────────────────
-// Quellen: Dusek et al. (2020) — Frequency of Visual Deficits in Dyslexia (PMC)
-// DEM Test norms; b/d reversal age norms (BDA, Dynamic Vision Therapy)
-//
-// Buchstabenverwechslungen (LRS) nach Klasse:
-//   Klasse 1: >5 = gelb, >8 = rot  (bis 15% Fehlerrate noch altersgemäß)
-//   Klasse 2: >3 = gelb, >5 = rot  (>10% Fehlerrate = Förderbedarf)
-//   Klasse 3+: >1 = gelb, >3 = rot  (>5% Fehlerrate = Überweisung empfohlen)
-//
-// Referenz: 66% der Kinder mit Dyslexie fallen im DEM-Fehlertest durch,
-//           vs. nur 3% der typischen Leser (PMC 2021)
+// ─── 3. Visuelle Verarbeitung ─────────────────────────────────────────────────
+// Sources: MiniTests buchstaben + formen, class-scaled
 
-function scoreVisuelleVerarbeitung(v: VisuellTestErgebnis, klasse: number): number {
+function scoreVisuelleVerarbeitung(daten: ScreeningDaten, klasse: number): number {
   let score = 100;
+  const lrs = daten.miniTests.buchstaben;
+  const disk = daten.miniTests.formen;
 
-  // Diskrimination (visuelle Unterscheidung)
-  if (v.diskrimination.fehlerrate > 0.4) score -= 30;
-  else if (v.diskrimination.fehlerrate > 0.25) score -= 18;
-  else if (v.diskrimination.fehlerrate > 0.15) score -= 8;
-
-  if (v.diskrimination.geschwindigkeit > 4000) score -= 12;
-  else if (v.diskrimination.geschwindigkeit > 3000) score -= 6;
-
-  // LRS-Buchstabenverwechslungen — klassenabhängige Schwellen
+  // Buchstabenverwechslungen (class-scaled)
   const lrsGrenz = klasse <= 1
     ? { gelb: 5, rot: 8 }
     : klasse <= 2
     ? { gelb: 3, rot: 5 }
     : { gelb: 1, rot: 3 };
 
-  if (v.lrs.verwechslungen >= lrsGrenz.rot) score -= 40;
-  else if (v.lrs.verwechslungen >= lrsGrenz.gelb) score -= 20;
+  if (lrs.verwechslungen >= lrsGrenz.rot)   score -= 35;
+  else if (lrs.verwechslungen >= lrsGrenz.gelb) score -= 18;
 
-  return Math.max(0, score);
+  // Visuelle Diskrimination (Spürnase)
+  if (disk.fehlerrate > 0.4)       score -= 25;
+  else if (disk.fehlerrate > 0.25) score -= 15;
+  else if (disk.fehlerrate > 0.1)  score -= 8;
+
+  if (disk.geschwindigkeit > 4000) score -= 10;
+  else if (disk.geschwindigkeit > 2800) score -= 5;
+
+  return Math.max(0, Math.min(100, score));
 }
 
-// ─── Peripheres Sehen ─────────────────────────────────────────────────────────
-// Quelle: Peripheral Visual Fields in Children (PMC 2016)
-// Reaktionszeit verbessert sich stark mit Alter (5J: hohes Varianz, 8J: nahezu adult)
-// Trefferquote: <0.6 = problematisch
+// ─── 4. Visuelle Merkspanne (Blitzgedächtnis) ────────────────────────────────
 
-function scorePeripheresSehen(v: VisuellTestErgebnis, klasse: number): number {
+function scoreMerkspanne(daten: ScreeningDaten, klasse: number): number {
   let score = 100;
+  const m = daten.miniTests.merkspanne;
 
-  // Reaktionszeit — altersabhängige Toleranz (jüngere Kinder langsamer)
-  const rtGrenz = klasse <= 1
-    ? { gelb: 1400, rot: 1800 }
-    : klasse <= 2
-    ? { gelb: 1200, rot: 1600 }
-    : { gelb: 1000, rot: 1300 };
+  if (m.fehlerrate > 0.6)       score -= 40;
+  else if (m.fehlerrate > 0.4)  score -= 25;
+  else if (m.fehlerrate > 0.25) score -= 12;
 
-  if (v.peripher.reaktionszeit > rtGrenz.rot) score -= 40;
-  else if (v.peripher.reaktionszeit > rtGrenz.gelb) score -= 20;
+  // Reaktionszeit (class-adjusted)
+  const rtGrenz = klasse <= 2 ? { gelb: 3500, rot: 5000 } : { gelb: 2500, rot: 4000 };
+  if (m.reaktionszeit > rtGrenz.rot)  score -= 15;
+  else if (m.reaktionszeit > rtGrenz.gelb) score -= 8;
 
-  // Trefferquote
-  if (v.peripher.trefferquote < 0.5) score -= 30;
-  else if (v.peripher.trefferquote < 0.7) score -= 15;
-
-  return Math.max(0, score);
+  return Math.max(0, Math.min(100, score));
 }
 
-// ─── Konzentration ────────────────────────────────────────────────────────────
-function scoreKonzentration(antworten: FragebogenAntworten): number {
-  const keys = ["k1", "k2", "k3", "k4", "k5", "k6", "k7", "k8"];
-  const summe = keys.reduce((s, k) => s + (antworten[k] ?? 0), 0);
+// ─── 5. Konzentration ─────────────────────────────────────────────────────────
+
+function scoreKonzentration(fragen: Record<string, number>): number {
+  const keys = ["k1","k2","k3","k4","k5","k6","k7","k8"];
+  const summe = keys.reduce((s, k) => s + (fragen[k] ?? 0), 0);
   const max = keys.length * 3;
-  return Math.round(100 - (summe / max) * 100);
+  return Math.round(Math.max(0, 100 - (summe / max) * 100));
 }
 
-// ─── Reflexintegration ────────────────────────────────────────────────────────
-// Quelle: Goddard-Blythe (2017) INPP; Frontiers in Psychology (2025)
-// Gewichtung: MORO (r1,r2) und ATNR (r7,r8) haben direkten Einfluss auf Lesen
-//
-// Zusatz: Lesequalität aus Gi em Aus verstärkt Reflex-Score:
-//   holprig / endungen / vertauscht → höhere Wahrscheinlichkeit für aktive ATNR/MORO
-//   (Klinische Beobachtung: Sarah Kopetzky, ENWAKO-Protokoll)
+// ─── 6. Reflexintegration ────────────────────────────────────────────────────
+// MORO (r1,r2) und ATNR (r7,r8) doppelt gewichtet
 
-function scoreReflexintegration(antworten: FragebogenAntworten, lesequalitaet?: string[]): number {
-  const allKeys = ["r1", "r2", "r3", "r4", "r5", "r6", "r7", "r8"];
-  // MORO und ATNR doppelt gewichten (stärkster Einfluss auf Lesen/Augensteuerung)
+function scoreReflexintegration(fragen: Record<string, number>, buchLese: ScreeningDaten["buchLese"]): number {
+  const allKeys = ["r1","r2","r3","r4","r5","r6","r7","r8"];
   const gewichtung: Record<string, number> = {
-    r1: 1.5, r2: 1.5,  // MORO
-    r3: 1.0, r4: 1.0,  // TLR
-    r5: 1.0, r6: 1.0,  // STNR
-    r7: 1.5, r8: 1.5,  // ATNR
+    r1: 1.5, r2: 1.5, r3: 1.0, r4: 1.0,
+    r5: 1.0, r6: 1.0, r7: 1.5, r8: 1.5,
   };
-  const summe = allKeys.reduce((s, k) => s + (antworten[k] ?? 0) * (gewichtung[k] ?? 1), 0);
+  const summe = allKeys.reduce((s, k) => s + (fragen[k] ?? 0) * (gewichtung[k] ?? 1), 0);
   const maxGewichtet = allKeys.reduce((s, k) => s + 3 * (gewichtung[k] ?? 1), 0);
   let score = Math.round(100 - (summe / maxGewichtet) * 100);
 
-  // Lesequalität als zusätzliches Reflex-Signal
-  if (lesequalitaet) {
-    if (lesequalitaet.includes("vertauscht")) score = Math.min(score, 55); // ATNR-Signal stark
-    else if (lesequalitaet.includes("holprig") || lesequalitaet.includes("endungen")) {
-      score = Math.min(score, 65); // ATNR/MORO-Signal mittel
-    }
-  }
+  // Lesebeobachtungen als zusätzliches Reflex-Signal
+  const q = buchLese;
+  if (q.verliert_zeile && q.benutzt_finger)    score = Math.min(score, 60);
+  if (q.kopfhaltung === "schief_oder_verdreht") score = Math.min(score, 65);
+
   return Math.max(0, score);
 }
 
-// ─── Mustererkennung ──────────────────────────────────────────────────────────
-// Kombinierte Muster aus mehreren Bereichen erhöhen die Aussagekraft erheblich
-// Quelle: Dusek et al. (2020): 79% der Kinder mit Dyslexie zeigen Defizite
-//         in MEHREREN visuellen Bereichen gleichzeitig
+// ─── Blinzelverhalten (PC-Lesetest) ──────────────────────────────────────────
 
-function erkenneMuster(
-  scores: Record<string, number>,
-  v: VisuellTestErgebnis,
-  antworten: FragebogenAntworten,
-  bpm: number,
-  klasse: number
-): MusterHinweis[] {
+function berecheBlinzelinfo(blinzeln: ScreeningDaten["pcLese"]["blinzeln"]): BlinzelInfo {
+  switch (blinzeln) {
+    case "selten":
+      return {
+        ampel: "rot",
+        label: "Sehr selten",
+        elternText:
+          "Dein Kind blinzelt beim Lesen am Bildschirm sehr selten. Seltenes Blinzeln trocknet die Augen aus und ist ein Zeichen von visuellem Stress. Kurze Pausen alle 20 Minuten helfen.",
+      };
+    case "normal":
+      return {
+        ampel: "gruen",
+        label: "Unauffällig",
+        elternText:
+          "Das Blinzelverhalten am Bildschirm war unauffällig — die Augen entspannen sich regelmäßig.",
+      };
+    case "oft":
+      return {
+        ampel: "gelb",
+        label: "Häufig",
+        elternText:
+          "Dein Kind blinzelt beim Lesen am Bildschirm oft. Das kann auf Augenreizung oder erhöhte Anspannung hinweisen.",
+      };
+    default:
+      return {
+        ampel: "gelb",
+        label: "Nicht beobachtet",
+        elternText: "Das Blinzelverhalten am Bildschirm wurde nicht beobachtet.",
+      };
+  }
+}
+
+// ─── Mustererkennung ──────────────────────────────────────────────────────────
+
+function erkenneMuster(scores: Record<string, number>, daten: ScreeningDaten): MusterHinweis[] {
   const hinweise: MusterHinweis[] = [];
 
-  // Muster 2: Visueller Stress
-  // Niedrige Blinzelrate + schlechter Lesefluss + langsame Augensteuerung
-  if (bpm < 6 && scores.lesefluss < 65 && scores.augensteuerung < 65) {
-    hinweise.push({
-      titel: "Zeichen von visuellem Stress",
-      text:
-        "Sehr seltenes Blinzeln kombiniert mit Schwierigkeiten beim Lesefluss und der Augensteuerung deutet auf visuellen Stress hin. Das Gehirn versucht, durch Blinzeln möglichst wenig zu verpassen — ein klares Signal der Überlastung.",
-      staerke: bpm < 4 ? "stark" : "mittel",
-    });
-  }
-
-  // Muster 3: Reflexdominantes Muster
-  // Aktive Reflexe + schlechte Konzentration + Augensteuerungsprobleme
+  // Konvergenzinsuffizienz-Muster
+  const k = daten.konvergenz;
   if (
-    scores.reflexintegration < 55 &&
-    scores.konzentration < 60 &&
-    scores.augensteuerung < 65
-  ) {
-    hinweise.push({
-      titel: "Reflexintegration beeinflusst Lernen",
-      text:
-        "Aktive frühkindliche Reflexe kombiniert mit Konzentrationsschwierigkeiten und eingeschränkter Augensteuerung ist ein typisches Muster. Die Reflexe erzeugen im Nervensystem eine dauerhafte Grundanspannung — das raubt Energie, die fürs Lernen fehlt.",
-      staerke: scores.reflexintegration < 40 ? "stark" : "mittel",
-    });
-  }
-
-  // Muster 4b: Konvergenzinsuffizienz-Muster
-  // Vergenz auffällig + schlechter Lesefluss + Buchstabenverschwimmen (L10)
-  if (
-    (v.vergenz?.ergebnis === "auffaellig" || v.vergenz?.ergebnis === "stark_auffaellig") &&
+    (k.beideAugen === "leicht_auffaellig" || k.beideAugen === "deutlich_auffaellig" || k.zeichen.includes("doppelbilder")) &&
     scores.lesefluss < 70
   ) {
     hinweise.push({
       titel: "Hinweis auf Konvergenzinsuffizienz",
-      text:
-        "Die Augen weichen beim Nahsehen auseinander — kombiniert mit einem unruhigen Lesefluss ist das ein typisches Zeichen einer Konvergenzinsuffizienz. Betroffen sind ca. 5% aller Schulkinder. Die Buchstaben verschwimmen oder erscheinen doppelt, weil beide Augen nicht präzise zusammenarbeiten. Ein Funktionaloptometriker kann das gezielt abklären und mit Übungen trainieren.",
-      staerke: v.vergenz?.ergebnis === "stark_auffaellig" ? "stark" : "mittel",
+      text: "Auffälligkeiten beim Konvergenztest kombiniert mit einem unruhigen Lesefluss sind ein typisches Muster. Die Augen arbeiten beim Nahsehen nicht präzise zusammen — Buchstaben können verschwimmen oder doppelt erscheinen. Betrifft ca. 5% aller Schulkinder.",
+      staerke: k.beideAugen === "deutlich_auffaellig" ? "stark" : "mittel",
     });
   }
 
-  // Muster 4: Motorische Unruhe + STNR-Hinweis
-  // Kind sitzt schlecht + kann nicht ruhig sitzen + unbewusste Mundbewegungen
-  const stnr1 = antworten["r5"] ?? 0;
-  const stnr2 = antworten["r6"] ?? 0;
-  const tlr1 = antworten["r3"] ?? 0;
+  // Monokularer Vergleich + Augensteuerung → klarer Binokularbefund
+  if (daten.buchLese.monokular === "besser" && scores.augensteuerung < 70) {
+    hinweise.push({
+      titel: "Binokulare Zusammenarbeit eingeschränkt",
+      text: "Das Kind liest mit einem Auge bedeckt flüssiger — ein starkes Zeichen, dass die Teamarbeit beider Augen nicht optimal funktioniert. Das ist trainierbar.",
+      staerke: "stark",
+    });
+  }
+
+  // Reflexdominantes Muster
+  if (scores.reflexintegration < 55 && scores.konzentration < 60 && scores.augensteuerung < 65) {
+    hinweise.push({
+      titel: "Reflexintegration beeinflusst Lernen",
+      text: "Aktive frühkindliche Reflexe kombiniert mit Konzentrationsschwierigkeiten und eingeschränkter Augensteuerung ist ein typisches Muster. Die Reflexe erzeugen eine Grundanspannung, die Energie für das Lernen raubt.",
+      staerke: scores.reflexintegration < 40 ? "stark" : "mittel",
+    });
+  }
+
+  // Sitzposition + STNR/TLR
+  const fragen = daten.fragebogen;
+  const stnr1 = fragen["r5"] ?? 0;
+  const stnr2 = fragen["r6"] ?? 0;
+  const tlr1 = fragen["r3"] ?? 0;
   if (stnr1 + stnr2 >= 4 && tlr1 >= 2) {
     hinweise.push({
       titel: "STNR/TLR-Muster: Sitzen und Schreiben",
-      text:
-        "Unbewusste Mitbewegungen beim Schreiben und eine schlechte Sitzhaltung sind klassische Zeichen eines noch aktiven STNR- und TLR-Reflexes.",
+      text: "Unbewusste Mitbewegungen beim Schreiben und eine schlechte Sitzhaltung sind Zeichen eines noch aktiven STNR- und TLR-Reflexes.",
       staerke: "mittel",
     });
   }
@@ -340,233 +276,127 @@ function erkenneMuster(
   return hinweise;
 }
 
-// ─── Lesegeschwindigkeit bewerten ─────────────────────────────────────────────
-
-function bewerteLesegeschwindigkeit(
-  wpm: number,
-  klasse: number
-): { wpm: number; bewertung: "gut" | "grenzwertig" | "langsam"; normMin: number; normMax: number } {
-  const normen = [
-    { normMin: 40, normMax: 70 },   // Klasse 1
-    { normMin: 65, normMax: 100 },  // Klasse 2
-    { normMin: 90, normMax: 120 },  // Klasse 3
-    { normMin: 110, normMax: 145 }, // Klasse 4+
-  ];
-  const norm = normen[Math.min(klasse - 1, 3)];
-  const bewertung =
-    wpm >= norm.normMin ? "gut" :
-    wpm >= norm.normMin * 0.75 ? "grenzwertig" : "langsam";
-  return { wpm, bewertung, normMin: norm.normMin, normMax: norm.normMax };
-}
-
-// ─── Blinzelverhalten ─────────────────────────────────────────────────────────
-// Quelle: Blink Rate Measured In Situ (PMC 2023); ADHD Blink Rate (PMC 2017)
-// Optimale Blinzelrate beim Lesen: 7–15/min (Studie: 7.9–10.7/min gemessen)
-// <4/min: starke visuelle Anspannung (kognitive Unterdrückung)
-// >20/min: Augenreizung, Trockenheit oder Unaufmerksamkeit
-
-function berecheBlinzelinfo(bpm: number): BlinzelInfo {
-  // -1 = Tracking nicht verfügbar (kein Gesicht erkannt oder Kamera-Problem)
-  if (bpm < 0) {
-    return {
-      wertProMinute: 0,
-      ampel: "gelb",
-      label: "Nicht gemessen",
-      elternText:
-        "Das Blinzelverhalten konnte bei diesem Durchlauf nicht gemessen werden. Mögliche Ursachen: Kind zu weit von der Kamera entfernt, schlechte Beleuchtung, oder das Gesicht war nicht gut sichtbar. Beim nächsten Test darauf achten: ca. 40–60 cm Abstand, gutes Frontlicht.",
-    };
-  }
-  if (bpm < 4) {
-    return {
-      wertProMinute: bpm,
-      ampel: "rot",
-      label: "Zu selten",
-      elternText:
-        "Dein Kind blinzelt beim Lesen sehr selten — weniger als 4 Mal pro Minute. Studien zeigen: Kinder blinzeln im Schnitt 8–11 Mal pro Minute beim Lesen. So seltenes Blinzeln ist ein klares Zeichen starker visueller Anspannung. Die Augen trocknen aus, ermüden schnell und der Fokus bricht ein.",
-    };
-  } else if (bpm <= 7) {
-    return {
-      wertProMinute: bpm,
-      ampel: "gelb",
-      label: "Leicht zu selten",
-      elternText:
-        "Die Blinzelrate deines Kindes liegt etwas unter dem optimalen Bereich (8–11 Mal/Minute). Das kann ein Zeichen leichter visueller Anspannung sein — noch kein Alarm, aber ein Hinweis.",
-    };
-  } else if (bpm <= 15) {
-    return {
-      wertProMinute: bpm,
-      ampel: "gruen",
-      label: "Optimal",
-      elternText:
-        "Die Blinzelrate deines Kindes beim Lesen liegt im optimalen Bereich (Studienmittel: 8–11 Mal/Minute). Das deutet auf entspannte, gut arbeitende Augen hin.",
-    };
-  } else if (bpm <= 22) {
-    return {
-      wertProMinute: bpm,
-      ampel: "gelb",
-      label: "Leicht erhöht",
-      elternText:
-        "Dein Kind blinzelt beim Lesen etwas häufiger als üblich. Das kann auf leichte Augenreizung, Trockenheit oder erhöhte Anspannung hinweisen — früher Hinweis, den man beobachten sollte.",
-    };
-  } else {
-    return {
-      wertProMinute: bpm,
-      ampel: "rot",
-      label: "Erhöht",
-      elternText:
-        "Dein Kind blinzelt beim Lesen sehr häufig — mehr als doppelt so oft wie im Normbereich. Das ist ein deutliches Zeichen für Augenreizung, Trockenheit oder starken visuellen Stress.",
-    };
-  }
-}
-
 // ─── Hauptauswertung ──────────────────────────────────────────────────────────
 
 export function berechneScreeningProfil(
-  lesetest: LesetestErgebnis,
-  visuell: VisuellTestErgebnis,
-  fragebogen: FragebogenAntworten,
+  daten: ScreeningDaten,
   klasse: number
 ): ScreeningProfil {
   const scores = {
-    lesefluss: scoreLesefluss(lesetest, klasse),
-    augensteuerung: scoreAugensteuerung(visuell),
-    visuelleVerarbeitung: scoreVisuelleVerarbeitung(visuell, klasse),
-    peripheresSehen: scorePeripheresSehen(visuell, klasse),
-    konzentration: scoreKonzentration(fragebogen),
-    reflexintegration: scoreReflexintegration(fragebogen, lesetest.lesequalitaet),
+    lesefluss:            scoreLesefluss(daten),
+    augensteuerung:       scoreAugensteuerung(daten),
+    visuelleVerarbeitung: scoreVisuelleVerarbeitung(daten, klasse),
+    merkspanne:           scoreMerkspanne(daten, klasse),
+    konzentration:        scoreKonzentration(daten.fragebogen),
+    reflexintegration:    scoreReflexintegration(daten.fragebogen, daten.buchLese),
   };
-
-  const wpmInfo = bewerteLesegeschwindigkeit(lesetest.lesegeschwindigkeitWPM, klasse);
-
-  // WPM-Zusatz für Lesefluss-Text
-  const wpmText =
-    wpmInfo.wpm > 0
-      ? wpmInfo.bewertung === "gut"
-        ? ` Die Lesegeschwindigkeit (${wpmInfo.wpm} Wörter/Min.) liegt im Normbereich für diese Klasse.`
-        : wpmInfo.bewertung === "grenzwertig"
-        ? ` Die Lesegeschwindigkeit (${wpmInfo.wpm} Wörter/Min.) liegt leicht unter dem Erwartungswert (${wpmInfo.normMin}–${wpmInfo.normMax} Wörter/Min.).`
-        : ` Die Lesegeschwindigkeit (${wpmInfo.wpm} Wörter/Min.) ist deutlich unter dem Normbereich (${wpmInfo.normMin}–${wpmInfo.normMax} Wörter/Min.) — ein klarer Hinweis auf Lesefluss-Probleme.`
-      : "";
 
   const kategorien: KategorieScore[] = [
     {
       name: "Lesefluss",
       score: scores.lesefluss,
       ampel: getAmpel(scores.lesefluss),
-      beschreibung: "Augenbewegungen, Rücksprünge und Lesegeschwindigkeit",
+      beschreibung: "Zeilenverluste, Wortüberspringen, Lesefluss und -qualität",
       elternText:
         scores.lesefluss < 41
-          ? `Beim Lesen zeigt dein Kind deutliche Bewegungsmuster, die auf Schwierigkeiten mit dem Lesefluss hinweisen. Das kostet viel Kraft und verlangsamt das Verstehen.${wpmText}`
+          ? "Beim Lesen zeigt dein Kind deutliche Auffälligkeiten: Zeilen verlieren, Wörter überspringen oder raten statt wirklich lesen. Das kostet viel Energie."
           : scores.lesefluss < 71
-          ? `Der Lesefluss deines Kindes zeigt leichte Unregelmäßigkeiten.${wpmText}`
-          : `Der Lesefluss deines Kindes ist gut und stabil.${wpmText}`,
+          ? "Der Lesefluss zeigt leichte Unregelmäßigkeiten — einzelne Auffälligkeiten beim Lesen wurden beobachtet."
+          : "Der Lesefluss ist gut und stabil — dein Kind liest flüssig und verliert keine Zeilen.",
       icon: "📖",
     },
     {
       name: "Augensteuerung",
       score: scores.augensteuerung,
       ampel: getAmpel(scores.augensteuerung),
-      beschreibung: "Fixieren, Folgen, Sakkaden und binokulare Konvergenz",
+      beschreibung: "Konvergenz, Fixation und Stift-Folgebewegungen",
       elternText:
         scores.augensteuerung < 41
-          ? `Die Augensteuerung deines Kindes braucht Training — Fixieren, Verfolgen und schnelle Augenbewegungen fallen schwer.${visuell.vergenz?.ergebnis === "stark_auffaellig" ? " Beim Konvergenztest (Nahsehen) wurde ein deutliches Ausweichen eines Auges beobachtet — das sollte fachlich abgeklärt werden." : visuell.vergenz?.ergebnis === "auffaellig" ? " Beim Konvergenztest wurden leichte Auffälligkeiten beobachtet." : ""}`
+          ? `Die Augensteuerung zeigt deutliche Auffälligkeiten — Konvergenztest, Fixation und/oder Stift-Folgebewegungen waren eingeschränkt.${daten.konvergenz.zeichen.includes("doppelbilder") ? " Beim Konvergenztest wurden Doppelbilder berichtet — das sollte fachlich abgeklärt werden." : ""}`
           : scores.augensteuerung < 71
-          ? `Die Augensteuerung ist in einigen Bereichen noch nicht optimal entwickelt.${visuell.vergenz?.ergebnis === "stark_auffaellig" ? " Beim Konvergenztest wurde ein deutliches Ausweichen beobachtet." : visuell.vergenz?.ergebnis === "auffaellig" ? " Der Konvergenztest zeigte leichte Auffälligkeiten beim Nahsehen." : ""}`
-          : "Die Augensteuerung deines Kindes ist gut entwickelt.",
+          ? "Die Augensteuerung ist in einzelnen Bereichen noch nicht optimal."
+          : "Die Augensteuerung ist gut — Konvergenz, Fixation und Verfolgung unauffällig.",
       icon: "🎯",
     },
     {
       name: "Visuelle Verarbeitung",
       score: scores.visuelleVerarbeitung,
       ampel: getAmpel(scores.visuelleVerarbeitung),
-      beschreibung: "Buchstaben unterscheiden, visuelle Diskrimination",
+      beschreibung: "Buchstaben unterscheiden (b/d, p/q) und visuelle Diskrimination",
       elternText:
         scores.visuelleVerarbeitung < 41
-          ? "Dein Kind hat Schwierigkeiten, ähnliche Buchstaben (b/d, p/q) visuell zu unterscheiden. Das kann das Lesen und Schreiben erschweren."
+          ? "Dein Kind hat Schwierigkeiten, ähnliche Buchstaben visuell zu unterscheiden — das kann Lesen und Schreiben deutlich erschweren."
           : scores.visuelleVerarbeitung < 71
-          ? "Die visuelle Unterscheidungsfähigkeit zeigt leichte Auffälligkeiten — für das Klassenalter noch beobachtbar, aber ein früher Hinweis."
-          : "Dein Kind kann Buchstaben und Muster gut unterscheiden.",
+          ? "Die visuelle Unterscheidungsfähigkeit zeigt leichte Auffälligkeiten — für das Klassenalter beobachtbar."
+          : "Dein Kind kann Buchstaben und Symbole gut unterscheiden.",
       icon: "🔍",
     },
     {
-      name: "Peripheres Sehen",
-      score: scores.peripheresSehen,
-      ampel: getAmpel(scores.peripheresSehen),
-      beschreibung: "Reaktion auf Reize am Rand des Sichtfelds",
+      name: "Visuelle Merkspanne",
+      score: scores.merkspanne,
+      ampel: getAmpel(scores.merkspanne),
+      beschreibung: "Kurzfristiges visuelles Gedächtnis (Blitzgedächtnis)",
       elternText:
-        scores.peripheresSehen < 41
-          ? "Das periphere Sehen deines Kindes reagiert langsam — das erschwert die Raumorientierung und das Erfassen von Zeilen."
-          : scores.peripheresSehen < 71
-          ? "Das periphere Sehen zeigt leichte Verzögerungen."
-          : "Das periphere Sehen deines Kindes ist gut.",
-      icon: "👁️",
+        scores.merkspanne < 41
+          ? "Das kurzzeitige visuelle Merken fällt schwer — dein Kind hat Mühe, kurz gesehene Symbole zu behalten. Das betrifft z. B. das Abschreiben von der Tafel."
+          : scores.merkspanne < 71
+          ? "Die visuelle Merkspanne ist leicht eingeschränkt — manchmal gehen kurz gesehene Details verloren."
+          : "Die visuelle Merkspanne ist gut — kurz Gesehenes bleibt gut im Gedächtnis.",
+      icon: "⚡",
     },
     {
       name: "Konzentration",
       score: scores.konzentration,
       ampel: getAmpel(scores.konzentration),
-      beschreibung: "Aufmerksamkeit, Ruhe und Fokus in der Schule",
+      beschreibung: "Aufmerksamkeit, Ruhe und Fokus",
       elternText:
         scores.konzentration < 41
           ? "Dein Kind zeigt laut deinen Angaben deutliche Konzentrationsschwierigkeiten — oft ein Zusammenspiel aus visuellem Stress und Aufmerksamkeit."
           : scores.konzentration < 71
           ? "Gelegentliche Konzentrationsprobleme können mit visueller Überlastung zusammenhängen."
-          : "Die Konzentration deines Kindes ist im Normalbereich.",
+          : "Die Konzentration ist im Normalbereich.",
       icon: "🧠",
     },
     {
       name: "Reflexintegration",
       score: scores.reflexintegration,
       ampel: getAmpel(scores.reflexintegration),
-      beschreibung: "Frühkindliche Reflexe (MORO, TLR, STNR, ATNR) — gewichtet",
+      beschreibung: "Frühkindliche Reflexe (MORO, TLR, STNR, ATNR)",
       elternText:
         scores.reflexintegration < 41
           ? "Mehrere frühkindliche Reflexe scheinen noch aktiv zu sein — MORO und ATNR beeinflussen dabei direkt die Augensteuerung und das Lesen."
           : scores.reflexintegration < 71
           ? "Einzelne frühkindliche Reflexe könnten noch nicht vollständig integriert sein."
-          : "Die Reflexintegration deines Kindes zeigt keine Auffälligkeiten.",
+          : "Die Reflexintegration zeigt keine Auffälligkeiten.",
       icon: "🦺",
     },
   ];
 
-  const auffaelligkeitenAnzahl = kategorien.filter(
-    (k) => k.ampel === "rot" || k.ampel === "gelb"
-  ).length;
+  const auffaelligkeitenAnzahl = kategorien.filter(k => k.ampel !== "gruen").length;
 
   const gesamtScore = Math.round(
     Object.values(scores).reduce((s, v) => s + v, 0) / 6
   );
 
-  // VIKI-Typ bestimmen
+  // VIKI-Typ
+  const niedrigste = kategorien.reduce((a, b) => a.score < b.score ? a : b);
   let typ: "A" | "B" | "C" | "D" = "D";
   let hauptproblem = "Ganzheitlicher Förderbedarf";
-  const empfohlenModule = "alle 8 Module";
 
-  const niedrigsteKategorie = kategorien.reduce((a, b) =>
-    a.score < b.score ? a : b
-  );
-
-  if (niedrigsteKategorie.name === "Lesefluss" && scores.lesefluss < 50) {
-    typ = "A";
-    hauptproblem = "Lesefluss & Augenbewegungen";
-  } else if (niedrigsteKategorie.name === "Augensteuerung" && scores.augensteuerung < 50) {
-    typ = "B";
-    hauptproblem = "Augensteuerung & Fokus";
-  } else if (niedrigsteKategorie.name === "Reflexintegration" && scores.reflexintegration < 50) {
-    typ = "C";
-    hauptproblem = "Reflexintegration & Körperwahrnehmung";
+  if (niedrigste.name === "Lesefluss" && scores.lesefluss < 50) {
+    typ = "A"; hauptproblem = "Lesefluss & Augenbewegungen";
+  } else if (niedrigste.name === "Augensteuerung" && scores.augensteuerung < 50) {
+    typ = "B"; hauptproblem = "Augensteuerung & Fokus";
+  } else if (niedrigste.name === "Reflexintegration" && scores.reflexintegration < 50) {
+    typ = "C"; hauptproblem = "Reflexintegration & Körperwahrnehmung";
   }
 
-  const blinzelinfo = berecheBlinzelinfo(lesetest.blinzelrateProMinute);
-
-  const musterHinweise = erkenneMuster(
-    scores, visuell, fragebogen, lesetest.blinzelrateProMinute, klasse
-  );
+  const blinzelinfo = berecheBlinzelinfo(daten.pcLese.blinzeln);
+  const musterHinweise = erkenneMuster(scores, daten);
 
   return {
-    typ, hauptproblem, empfohlenModule,
+    typ, hauptproblem,
     kategorien, gesamtScore, auffaelligkeitenAnzahl,
     blinzelinfo, musterHinweise,
-    lesegeschwindigkeitInfo: wpmInfo,
   };
 }
