@@ -167,8 +167,8 @@ function generateReportEmail(
       <h3 style="color:#92400E;font-size:15px;font-weight:700;margin:0 0 10px;">Was tun mit diesen Ergebnissen?</h3>
       <ol style="margin:0;padding-left:18px;font-size:13px;color:#78350F;line-height:1.8;">
         <li>Lies den Bericht in Ruhe durch — du wirst jetzt verstehen, warum manche Dinge für dein Kind schwieriger sind.</li>
-        <li>Bei deutlichen Auffälligkeiten (rot) ist eine Überweisung zum Funktionaloptometristen oder Augenarzt sinnvoll.</li>
-        <li>Gezieltes Augentraining zuhause kann schon nach wenigen Wochen erste Verbesserungen bringen.</li>
+        <li>Bei deutlichen Auffälligkeiten (rot) ist eine Abklärung durch einen Funktionaloptometristen sinnvoll.</li>
+        <li>Gezieltes Visualtraining kann schon nach wenigen Wochen Verbesserungen erzielen.</li>
       </ol>
     </div>
 

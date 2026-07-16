@@ -36,7 +36,6 @@ export default function Impressum() {
             <div>
               <h2 className="font-semibold text-gray-900 mb-1">Berufsbezeichnung</h2>
               <p>Funktionaloptometristin, Visualtrainerin, ENWAKO-Therapeutin</p>
-              <p className="text-sm text-gray-500">Verliehen in: Österreich</p>
             </div>
 
             <div>

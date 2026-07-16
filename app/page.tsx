@@ -174,6 +174,7 @@ export default function Startseite() {
           <p className="text-xs text-gray-400">
             ⚠️ Dieser Test ersetzt keine augenärztliche oder optometrische Diagnostik. Bei Verdacht auf Sehprobleme wende dich bitte an eine Fachperson.
           </p>
+          <p className="text-sm font-medium" style={{ color: "#8DCDC5" }}>Funktionaloptometrie & Visualtraining</p>
           <div className="text-sm text-gray-500">
             <a href="https://vikitraining.at" target="_blank" rel="noopener noreferrer" className="hover:underline" style={{ color: "#F5943A" }}>vikitraining.at</a>
             {" · "}Funktionaloptometristin & Visualtrainerin
