@@ -32,12 +32,6 @@ export interface FixationErgebnis {
   qualitaet: "ruhig" | "leicht_unruhig" | "stark_unruhig_oder_abgelenkt";
 }
 
-export interface SakkadenErgebnis {
-  /** Wie präzise sind die Blicksprünge von Ziel zu Ziel? */
-  praezision: "praezise" | "ueberschiesst" | "ungenau_sucht";
-  kopf_mitbewegt: boolean;
-}
-
 export interface StiftReiseErgebnis {
   folgt: "fluessig" | "ruckelig_mit_pausen" | "verliert_stift";
   kopf_mitbewegt: boolean;
@@ -58,7 +52,6 @@ export interface ScreeningDaten {
   buchLese: BuchLeseErgebnis;
   pcLese: PCLeseErgebnis;
   fixation: FixationErgebnis;
-  sakkaden: SakkadenErgebnis;
   stiftReise: StiftReiseErgebnis;
   miniTests: MiniTestErgebnis;
   fragebogen: Record<string, Antwort>;

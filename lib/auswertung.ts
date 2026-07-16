@@ -90,7 +90,6 @@ function scoreAugensteuerung(daten: ScreeningDaten): number {
   let score = 100;
   const k = daten.konvergenz;
   const f = daten.fixation;
-  const sak = daten.sakkaden;
   const s = daten.stiftReise;
 
   // Konvergenz
@@ -104,11 +103,6 @@ function scoreAugensteuerung(daten: ScreeningDaten): number {
   // Fixation (10 Sekunden ruhig fixieren)
   if (f.qualitaet === "stark_unruhig_oder_abgelenkt") score -= 30;
   else if (f.qualitaet === "leicht_unruhig") score -= 15;
-
-  // Blicksprünge (Sakkaden)
-  if (sak.praezision === "ungenau_sucht") score -= 25;
-  else if (sak.praezision === "ueberschiesst") score -= 12;
-  if (sak.kopf_mitbewegt) score -= 8;
 
   // Stift-Reise (smooth pursuit)
   if (s.folgt === "verliert_stift") score -= 30;
@@ -322,10 +316,10 @@ export function berechneScreeningProfil(
       beschreibung: "Konvergenz, Fixation und Stift-Folgebewegungen",
       elternText:
         scores.augensteuerung < 41
-          ? `Die Augensteuerung zeigt deutliche Auffälligkeiten — Konvergenztest, Fixation, Blicksprünge und/oder Stift-Folgebewegungen waren eingeschränkt.${daten.konvergenz.zeichen.includes("doppelbilder") ? " Beim Konvergenztest wurden Doppelbilder berichtet — das sollte fachlich abgeklärt werden." : ""}`
+          ? `Die Augensteuerung zeigt deutliche Auffälligkeiten — Konvergenztest, Fixation und/oder Stift-Folgebewegungen waren eingeschränkt.${daten.konvergenz.zeichen.includes("doppelbilder") ? " Beim Konvergenztest wurden Doppelbilder berichtet — das sollte fachlich abgeklärt werden." : ""}`
           : scores.augensteuerung < 71
           ? "Die Augensteuerung ist in einzelnen Bereichen noch nicht optimal."
-          : "Die Augensteuerung ist gut — Konvergenz, Fixation, Blicksprünge und Verfolgung unauffällig.",
+          : "Die Augensteuerung ist gut — Konvergenz, Fixation und Verfolgung unauffällig.",
       icon: "🎯",
     },
     {
