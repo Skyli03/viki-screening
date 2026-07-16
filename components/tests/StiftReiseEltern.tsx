@@ -20,17 +20,11 @@ const BEWEGUNGEN: PursuitBewegung[] = [
     beschreibung: "Von unten links nach oben rechts — und zurück",
     animation: "stift-diag1",
   },
-  {
-    richtung: "Diagonal ↙ ↗",
-    beschreibung: "Von oben links nach unten rechts — und zurück",
-    animation: "stift-diag2",
-  },
 ];
 
 const ANIMATION_CSS = `
   @keyframes stift-lr    { 0%,100%{transform:translateX(-90px)} 50%{transform:translateX(90px)} }
   @keyframes stift-diag1 { 0%,100%{transform:translate(-70px,50px)} 50%{transform:translate(70px,-50px)} }
-  @keyframes stift-diag2 { 0%,100%{transform:translate(-70px,-50px)} 50%{transform:translate(70px,50px)} }
 `;
 
 type Phase = "anleitung" | "bewegungen" | "bewertung_stift";
@@ -76,7 +70,7 @@ export default function StiftReiseEltern({ kindName, onFertig }: Props) {
             </li>
             <li className="flex gap-3">
               <span className="w-6 h-6 rounded-full text-white text-xs flex items-center justify-center font-bold shrink-0 mt-0.5" style={{ background: "#F5943A" }}>3</span>
-              <span>Du führst <strong>3 Bewegungen</strong> durch — Schritt für Schritt.</span>
+              <span>Du führst <strong>2 Bewegungen</strong> durch — Links-Rechts und einmal Diagonal.</span>
             </li>
           </ol>
         </div>

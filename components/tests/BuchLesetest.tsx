@@ -250,7 +250,17 @@ export default function BuchLesetest({ kindName, onFertig }: Props) {
   return (
     <div>
       <div className="text-center mb-5">
-        <div className="text-5xl mb-3">🏴‍☠️</div>
+        <div className="flex justify-center mb-3">
+          <svg viewBox="0 0 100 50" width="90" height="45" xmlns="http://www.w3.org/2000/svg">
+            {/* Linkes Auge: offen */}
+            <ellipse cx="25" cy="25" rx="18" ry="11" fill="none" stroke="#8DCDC5" strokeWidth="2.5"/>
+            <circle cx="25" cy="25" r="5" fill="#8DCDC5"/>
+            <circle cx="27" cy="23" r="2" fill="white"/>
+            {/* Rechtes Auge: abgedeckt */}
+            <ellipse cx="75" cy="25" rx="18" ry="11" fill="none" stroke="#D1D5DB" strokeWidth="2.5"/>
+            <line x1="59" y1="15" x2="91" y2="35" stroke="#EE6B85" strokeWidth="2.5" strokeLinecap="round"/>
+          </svg>
+        </div>
         <h2 className="text-xl font-bold text-gray-900">Augen-Vergleich</h2>
         <p className="text-sm text-gray-500 mt-1">Wie liest {kindName} mit nur einem Auge?</p>
       </div>
@@ -268,7 +278,7 @@ export default function BuchLesetest({ kindName, onFertig }: Props) {
         <p className="font-semibold text-sm text-gray-900 mb-3">Ergebnis des Augen-Vergleichs:</p>
         <div className="space-y-2">
           {([
-            { val: "besser", label: "Ja — mit einem Auge liest es deutlich ruhiger / flüssiger", color: "#DC2626", bg: "#FEF2F2", border: "#FCA5A5", sub: "Wichtiges Zeichen: Beide Augen arbeiten nicht gut als Team" },
+            { val: "besser", label: "Ja — mit einem Auge ist der Lesefluss ruhiger / flüssiger", color: "#DC2626", bg: "#FEF2F2", border: "#FCA5A5", sub: "Wichtiges Zeichen: Beide Augen arbeiten nicht gut als Team" },
             { val: "gleich", label: "Gleich — kein Unterschied", color: "#D97706", bg: "#FFFBEB", border: "#FCD34D", sub: "Kein klares binokulares Signal" },
             { val: "schlechter", label: "Schlechter — mit beiden Augen liest es besser", color: "#16A34A", bg: "#F0FDF4", border: "#86EFAC", sub: "Beide Augen arbeiten gut zusammen" },
             { val: "nicht_getestet", label: "Konnte ich nicht testen", color: "#6B7280", bg: "#F9FAFB", border: "#E5E7EB", sub: "" },

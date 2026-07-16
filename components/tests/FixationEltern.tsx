@@ -89,7 +89,7 @@ export default function FixationEltern({ kindName, onFertig }: Props) {
     return (
       <div className="flex flex-col items-center justify-center" style={{ minHeight: "400px" }}>
         <p className="text-gray-500 text-lg mb-4">Punkt zeigen … dann beobachten</p>
-        <div className="text-9xl font-black" style={{ color: "#F5943A", lineHeight: 1 }}>{countdown}</div>
+        <div className="text-9xl font-black" style={{ color: countdown > 1 ? "#F5943A" : "#8DCDC5", lineHeight: 1 }}>{countdown}</div>
         <p className="text-gray-400 text-sm mt-6">{kindName} soll den Wandpunkt schon anschauen</p>
       </div>
     );

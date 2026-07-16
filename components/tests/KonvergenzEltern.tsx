@@ -22,6 +22,30 @@ const ANIMATION_CSS = `
   }
 `;
 
+function KonvergenzIcon() {
+  return (
+    <svg viewBox="0 0 100 50" width="110" height="55" xmlns="http://www.w3.org/2000/svg">
+      {/* Linkes Auge */}
+      <circle cx="10" cy="25" r="9" fill="#8DCDC5"/>
+      <circle cx="10" cy="25" r="4.5" fill="#2D7A73"/>
+      <circle cx="12" cy="23" r="1.8" fill="white"/>
+      {/* Rechtes Auge */}
+      <circle cx="90" cy="25" r="9" fill="#8DCDC5"/>
+      <circle cx="90" cy="25" r="4.5" fill="#2D7A73"/>
+      <circle cx="92" cy="23" r="1.8" fill="white"/>
+      {/* Linker Pfeil → Mitte */}
+      <line x1="23" y1="25" x2="43" y2="25" stroke="#F5943A" strokeWidth="3" strokeLinecap="round"/>
+      <polygon points="40,20 49,25 40,30" fill="#F5943A"/>
+      {/* Rechter Pfeil → Mitte */}
+      <line x1="77" y1="25" x2="57" y2="25" stroke="#F5943A" strokeWidth="3" strokeLinecap="round"/>
+      <polygon points="60,20 51,25 60,30" fill="#F5943A"/>
+      {/* Stift-Punkt in der Mitte */}
+      <circle cx="50" cy="25" r="7" fill="#F5943A"/>
+      <circle cx="50" cy="25" r="3" fill="white"/>
+    </svg>
+  );
+}
+
 function NahFernDot() {
   return (
     <div
@@ -35,11 +59,11 @@ function NahFernDot() {
           height: "48px",
           borderRadius: "50%",
           background: "#F5943A",
-          animation: "konv-nah 3s ease-in-out infinite",
+          animation: "konv-nah 5s ease-in-out infinite",
         }}
       />
       <p className="text-xs text-teal-700 font-semibold text-center px-3">
-        So schnell — Stift zur Nase
+        Hier siehst du die Geschwindigkeit — Stift zur Nase
       </p>
     </div>
   );
@@ -62,8 +86,8 @@ export default function KonvergenzEltern({ kindName, onFertig }: Props) {
   if (phase === "anleitung") {
     return (
       <div className="text-center">
-        <div className="flex justify-center mb-4">
-          <NahFernDot />
+        <div className="flex justify-center mb-3">
+          <KonvergenzIcon />
         </div>
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Konvergenz-Test</h2>
         <p className="text-sm text-gray-500 mb-6">Du führst diesen Test durch — {kindName} macht mit.</p>

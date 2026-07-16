@@ -6,13 +6,19 @@ interface Props {
   onFertig: (result: { fehlerrate: number; geschwindigkeit: number }) => void;
 }
 
-// Klasse 1-2: klar unterschiedliche Symbole
+// Klasse 1-2: Formenunterschiede (kein Gefüllt/Leer – das ist zu einfach)
+// 3 zeigen dasselbe Symbol, 1 zeigt eine andere Form/Richtung → Kind sucht das Andere
 const SETS_LEICHT = [
-  { basis: "○", aehnlich: "●" }, { basis: "□", aehnlich: "■" },
-  { basis: "△", aehnlich: "▲" }, { basis: "◇", aehnlich: "◆" },
-  { basis: "★", aehnlich: "☆" }, { basis: "○", aehnlich: "●" },
-  { basis: "□", aehnlich: "■" }, { basis: "△", aehnlich: "▲" },
-  { basis: "◇", aehnlich: "◆" }, { basis: "★", aehnlich: "☆" },
+  { basis: "△", aehnlich: "▽" },  // Dreieck oben vs. unten (gespiegelt)
+  { basis: "◁", aehnlich: "▷" },  // Dreieck links vs. rechts
+  { basis: "□", aehnlich: "◇" },  // Quadrat vs. rautenförmig (45° gedreht)
+  { basis: "▷", aehnlich: "△" },  // Rechts-Dreieck vs. Aufwärts-Dreieck
+  { basis: "▽", aehnlich: "△" },  // Unten vs. oben
+  { basis: "◁", aehnlich: "△" },  // Links vs. oben
+  { basis: "◇", aehnlich: "□" },  // Raute vs. Quadrat
+  { basis: "○", aehnlich: "□" },  // Kreis vs. Quadrat
+  { basis: "⬡", aehnlich: "○" },  // Hexagon vs. Kreis
+  { basis: "▷", aehnlich: "◁" },  // Rechts vs. links
 ];
 
 // Klasse 3-4: ähnlichere Symbole

@@ -120,8 +120,7 @@ export default function PCLesetest({ kindName, klasse, onFertig }: Props) {
           <p className="font-semibold text-gray-900 mb-3">Jetzt bitte beobachten:</p>
           <div className="space-y-2 text-sm text-gray-700">
             <div className="flex gap-2"><span>👁️</span><span><strong>Blinzeln:</strong> Blinzelt {kindName} oft, selten oder gar nicht?</span></div>
-            <div className="flex gap-2"><span>📏</span><span><strong>Abstand:</strong> Kommt {kindName} näher zum Bildschirm als zum Buch?</span></div>
-            <div className="flex gap-2"><span>🔄</span><span><strong>Vergleich:</strong> Liest {kindName} am Bildschirm besser oder schlechter?</span></div>
+            <div className="flex gap-2"><span>🔄</span><span><strong>Vergleich:</strong> Liest {kindName} am Bildschirm besser oder schlechter als aus dem Buch?</span></div>
             <div className="flex gap-2"><span>❌</span><span><strong>Fehler:</strong> Zähle falsch gelesene Wörter</span></div>
           </div>
         </div>
@@ -148,7 +147,7 @@ export default function PCLesetest({ kindName, klasse, onFertig }: Props) {
         <p className="text-gray-500 text-lg mb-4">{kindName} bereit machen …</p>
         <div
           className="text-9xl font-black mb-6"
-          style={{ color: countdown > 1 ? "#F5943A" : "#16A34A", lineHeight: 1 }}
+          style={{ color: countdown > 1 ? "#F5943A" : "#8DCDC5", lineHeight: 1 }}
         >
           {countdown}
         </div>
@@ -170,7 +169,6 @@ export default function PCLesetest({ kindName, klasse, onFertig }: Props) {
 
         <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-2 mb-4 text-xs text-amber-700 flex gap-4">
           <span>👁️ Blinzeln beobachten</span>
-          <span>📏 Abstand merken</span>
           <span>❌ Fehler zählen</span>
         </div>
 
