@@ -57,7 +57,7 @@ const TYP_DATEN: Record<string, {
 };
 
 const TESTIMONIALS = [
-  { name: "Sabine K.", details: "Mama von Lukas, 9 Jahre, 3. Klasse", text: "Nach dem VIKI-Training hat Lukas zum ersten Mal selbst ein Buch vom Regal geholt. Die Hausaufgaben dauern jetzt halb so lang — ganz ohne Streit." },
+  { name: "Sabine K.", details: "Mama von Lukas, 9 Jahre, 3. Klasse", text: "wir machen gerade den Online-Kurs und Lukas merkt langsam selber, dass alles leichter fällt. Die Hausaufgabensituation war immer ein Kampf, alleine bis er angefangen hat, dauerte es schon ewig. Ich bin sowas von happy, dass wir endlich wissen, was Sache ist." },
   { name: "Thomas M.", details: "Papa von Emma, 8 Jahre, 2. Klasse", text: "Wir haben schon so viel ausprobiert — Kinderarzt, Legasthenietraining, alles Mögliche. Aber an die Augen hat niemand gedacht. Jetzt geht vieles viel leichter für Emma." },
   { name: "Maria L.", details: "Mama von Noah, 10 Jahre, 4. Klasse", text: "Noah sagt jetzt selbst: 'Mama, Lesen geht jetzt leichter!' — Das hat er noch nie gesagt. Die Lehrerin hat gefragt, was wir anders machen." },
 ];
@@ -75,7 +75,7 @@ function demoScreeningDaten(): ScreeningDaten {
       fehlerAnzahl: 2, blinzeln: "selten", pc_leichter: null,
     },
     fixation: { qualitaet: "leicht_unruhig" },
-    stiftReise: { folgt: "ruckelig_mit_pausen", kopf_mitbewegt: false },
+    stiftReise: { folgt: "ruckelig_mit_pausen", kopf_mitbewegt: false, konvergenz_nahfern: "nicht_getestet" },
     miniTests: {
       buchstaben: { verwechslungen: 3, reaktionszeit: 2200 },
       formen: { fehlerrate: 0.2, geschwindigkeit: 2000 },
@@ -185,6 +185,10 @@ export default function ErgebnisPage() {
         <div className="max-w-2xl mx-auto px-5 py-4 flex items-center gap-2">
           <span className="text-2xl">🦸</span>
           <span className="font-bold text-gray-900">VIKI Superblick — Screening-Ergebnis</span>
+        </div>
+        <div className="max-w-2xl mx-auto px-5 pb-2 text-xs text-gray-400 flex items-center gap-1">
+          <span>🔒</span>
+          <span>Deine Testergebnisse werden nicht auf unseren Servern gespeichert.</span>
         </div>
       </header>
 
@@ -407,9 +411,6 @@ export default function ErgebnisPage() {
             </div>
 
             <div className="rounded-2xl p-6 text-center" style={{ background: "#FEF3E2", border: "2px solid #F5943A" }}>
-              <div className="inline-block text-xs font-bold uppercase tracking-wide px-3 py-1 rounded-full mb-3" style={{ background: "#F5943A", color: "white" }}>
-                🚀 Startet bald
-              </div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">Der VIKI Superblick Kurs</h3>
               <p className="text-sm text-gray-600 mb-4 leading-relaxed">
                 Gezieltes Augentraining für zuhause — speziell für Kinder wie {kindName !== "dein Kind" ? kindName : "dein Kind"}.
@@ -429,15 +430,15 @@ export default function ErgebnisPage() {
                 ))}
               </div>
               <a
-                href="https://kurse.vikitraining.at/warteliste"
+                href="https://kurse.vikitraining.at/superblick"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-block w-full font-bold text-lg py-4 rounded-xl shadow-lg transition-all hover:opacity-90 hover:scale-105"
+                className="inline-block w-full font-bold text-lg py-4 rounded-xl shadow-lg transition-all hover:opacity-90"
                 style={{ background: "#F5943A", color: "white" }}
               >
-                Unverbindlich auf die Warteliste →
+                Zum Kurs ansehen →
               </a>
-              <p className="text-xs text-gray-500 mt-3">Kostenlos · Unverbindlich · Frühbucher-Bonus inklusive</p>
+              <p className="text-xs text-gray-500 mt-3">Kostenlos</p>
             </div>
 
             <div>
@@ -457,8 +458,8 @@ export default function ErgebnisPage() {
               <h3 className="font-bold text-gray-900 mb-4">Deine nächsten Schritte</h3>
               <ol className="space-y-4">
                 {[
-                  { color: "#8DCDC5", text: "Du hast den vollständigen Screening-Bericht per E-Mail erhalten — lies ihn in Ruhe durch und teile ihn mit der Lehrerin." },
-                  { color: "#F5943A", text: "Trag dich unverbindlich auf die Warteliste für den VIKI Superblick Kurs ein — und sichere dir den Frühbucher-Bonus." },
+                  { color: "#8DCDC5", text: "Du hast den vollständigen Screening-Bericht per E-Mail erhalten — lies ihn in Ruhe durch." },
+                  { color: "#F5943A", text: "Starte jetzt mit dem VIKI Superblick Kurs — gezieltes Augentraining für zuhause, speziell für Kinder wie deines." },
                   { color: "#EE6B85", text: "Schon wenige Minuten Training täglich machen einen Unterschied. Viele Eltern merken erste Verbesserungen nach kurzer Zeit." },
                 ].map((s, i) => (
                   <li key={i} className="flex gap-3 text-sm text-gray-700">
@@ -471,15 +472,15 @@ export default function ErgebnisPage() {
 
             <div className="text-center pb-4">
               <a
-                href="https://kurse.vikitraining.at/warteliste"
+                href="https://kurse.vikitraining.at/superblick"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-block w-full font-bold text-lg py-4 rounded-xl shadow-lg transition-all hover:opacity-90"
                 style={{ background: "#F5943A", color: "white" }}
               >
-                Jetzt auf die Warteliste → 🚀
+                Zum Kurs ansehen → 🚀
               </a>
-              <p className="text-xs text-gray-500 mt-2">Kostenlos · Unverbindlich · Frühbucher-Bonus inklusive</p>
+              <p className="text-xs text-gray-500 mt-2">Kostenlos</p>
             </div>
           </>
         )}

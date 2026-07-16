@@ -35,6 +35,7 @@ export interface FixationErgebnis {
 export interface StiftReiseErgebnis {
   folgt: "fluessig" | "ruckelig_mit_pausen" | "verliert_stift";
   kopf_mitbewegt: boolean;
+  konvergenz_nahfern: "gleichmaessig" | "ein_auge_langsamer" | "ruckelt" | "kann_nicht_fixieren" | "nicht_getestet";
 }
 
 export interface MiniTestErgebnis {

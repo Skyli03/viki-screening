@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import type { PCLeseErgebnis } from "@/lib/screening-types";
 
 interface Props {
@@ -8,7 +8,6 @@ interface Props {
   onFertig: (ergebnis: PCLeseErgebnis) => void;
 }
 
-// Gekürzter Quatschtext (Hälfte des ursprünglichen "Gi em Aus")
 const KURZTEXTE: Record<number, { zeilen: string[]; wortanzahl: number; schriftgroesse: number }> = {
   1: {
     zeilen: ["Gi em Aus", "As est Wentar.", "Temi, Mumu ond Gi bahan reis.", "Gi est dar Hond vin Temi.", "Temi ond Gi send bota Frienda.", "Temi, Mumu ond Gi bahan zom Tauch."],
@@ -52,7 +51,8 @@ const FEHLER_STUFEN = [
 
 export default function PCLesetest({ kindName, klasse, onFertig }: Props) {
   const text = getKurztext(klasse);
-  const [phase, setPhase] = useState<"briefing" | "lesen" | "qualitaet" | "fehler" | "blinzeln">("briefing");
+  const [phase, setPhase] = useState<"briefing" | "countdown" | "lesen" | "qualitaet" | "fehler" | "blinzeln">("briefing");
+  const [countdown, setCountdown] = useState(3);
   const [vergangeneZeit, setVergangeneZeit] = useState(0);
   const [lesequalitaet, setLesequalitaet] = useState<Qualitaet[]>([]);
   const [fehlerAnzahl, setFehlerAnzahl] = useState<number | null>(null);
@@ -61,13 +61,26 @@ export default function PCLesetest({ kindName, klasse, onFertig }: Props) {
   const startzeitRef = useRef<number>(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  function lesenStarten() {
-    setPhase("lesen");
-    startzeitRef.current = Date.now();
-    timerRef.current = setInterval(() => {
-      setVergangeneZeit(Math.floor((Date.now() - startzeitRef.current) / 1000));
-    }, 1000);
-  }
+  useEffect(() => {
+    if (phase === "countdown") {
+      let c = 3;
+      setCountdown(3);
+      const interval = setInterval(() => {
+        c -= 1;
+        setCountdown(c);
+        if (c <= 0) {
+          clearInterval(interval);
+          // Lesen starten
+          startzeitRef.current = Date.now();
+          timerRef.current = setInterval(() => {
+            setVergangeneZeit(Math.floor((Date.now() - startzeitRef.current) / 1000));
+          }, 1000);
+          setPhase("lesen");
+        }
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [phase]);
 
   function lesenFertig() {
     if (timerRef.current) clearInterval(timerRef.current);
@@ -100,7 +113,7 @@ export default function PCLesetest({ kindName, klasse, onFertig }: Props) {
         <div className="text-center mb-6">
           <div className="text-5xl mb-3">💻</div>
           <h2 className="text-2xl font-bold text-gray-900 mb-1">Lesetest — Bildschirm</h2>
-          <p className="text-sm text-gray-500">{kindName} liest jetzt denselben Quatschtext — aber am Bildschirm.</p>
+          <p className="text-sm text-gray-500">{kindName} liest jetzt <strong>EINEN Quatschtext</strong> am Bildschirm.</p>
         </div>
 
         <div className="bg-white rounded-2xl border-2 p-5 mb-5" style={{ borderColor: "#8DCDC5" }}>
@@ -108,18 +121,38 @@ export default function PCLesetest({ kindName, klasse, onFertig }: Props) {
           <div className="space-y-2 text-sm text-gray-700">
             <div className="flex gap-2"><span>👁️</span><span><strong>Blinzeln:</strong> Blinzelt {kindName} oft, selten oder gar nicht?</span></div>
             <div className="flex gap-2"><span>📏</span><span><strong>Abstand:</strong> Kommt {kindName} näher zum Bildschirm als zum Buch?</span></div>
-            <div className="flex gap-2"><span>🔄</span><span><strong>Vergleich:</strong> Liest es am Bildschirm besser oder schlechter als aus dem Buch?</span></div>
+            <div className="flex gap-2"><span>🔄</span><span><strong>Vergleich:</strong> Liest {kindName} am Bildschirm besser oder schlechter?</span></div>
             <div className="flex gap-2"><span>❌</span><span><strong>Fehler:</strong> Zähle falsch gelesene Wörter</span></div>
           </div>
         </div>
 
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-5 text-sm text-amber-800">
+          <p className="font-semibold mb-1">⏱️ Starte den Timer erst wenn {kindName} bereit ist:</p>
+          <p className="text-sm">Klicke auf „Lesetest starten" → dann auf den Start-Knopf → 3-2-1 Countdown beginnt.</p>
+        </div>
+
         <button
-          onClick={lesenStarten}
+          onClick={() => setPhase("countdown")}
           className="w-full text-white font-bold text-xl py-4 rounded-xl shadow-md"
           style={{ background: "#F5943A" }}
         >
           ⏱️ Lesetest starten →
         </button>
+      </div>
+    );
+  }
+
+  if (phase === "countdown") {
+    return (
+      <div className="flex flex-col items-center justify-center text-center" style={{ minHeight: "400px" }}>
+        <p className="text-gray-500 text-lg mb-4">{kindName} bereit machen …</p>
+        <div
+          className="text-9xl font-black mb-6"
+          style={{ color: countdown > 1 ? "#F5943A" : "#16A34A", lineHeight: 1 }}
+        >
+          {countdown}
+        </div>
+        <p className="text-gray-400 text-sm">{kindName} soll schon auf den Bildschirm schauen</p>
       </div>
     );
   }

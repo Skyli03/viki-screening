@@ -68,13 +68,13 @@ export default function BuchLesetest({ kindName, onFertig }: Props) {
 
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 max-w-lg mx-auto mb-6 text-left text-sm text-amber-800">
           <p className="font-semibold mb-2">👀 Worauf du achtest:</p>
-          <div className="grid grid-cols-2 gap-1 text-xs">
+          <div className="grid grid-cols-2 gap-1 text-sm">
             <span>• Verliert {kindName} die Zeile?</span>
-            <span>• Benutzt es den Finger?</span>
-            <span>• Überspringt es Wörter?</span>
+            <span>• Benutzt {kindName} den Finger?</span>
+            <span>• Überspringt {kindName} Wörter?</span>
             <span>• Wie weit ist das Buch weg?</span>
             <span>• Viele Fehler bei bekannten Wörtern?</span>
-            <span>• Hält es den Kopf schief?</span>
+            <span>• Hält {kindName} den Kopf schief?</span>
           </div>
         </div>
 
@@ -258,8 +258,8 @@ export default function BuchLesetest({ kindName, onFertig }: Props) {
       <div className="bg-white rounded-2xl border-2 p-5 mb-5 text-left" style={{ borderColor: "#8DCDC5" }}>
         <p className="font-semibold text-gray-900 mb-3">So geht es:</p>
         <ol className="space-y-2 text-sm text-gray-700">
-          <li className="flex gap-2"><span className="font-bold" style={{ color: "#F5943A" }}>1.</span><span>Decke {kindName} das <strong>linke Auge</strong> sanft mit der Hand ab. {kindName} liest denselben Textabschnitt nochmal kurz.</span></li>
-          <li className="flex gap-2"><span className="font-bold" style={{ color: "#F5943A" }}>2.</span><span>Dann das <strong>rechte Auge</strong> — wieder denselben Abschnitt.</span></li>
+          <li className="flex gap-2"><span className="font-bold" style={{ color: "#F5943A" }}>1.</span><span>Decke {kindName} das <strong>linke Auge</strong> sanft mit der Hand ab. {kindName} liest einen <strong>anderen, ähnlichen Abschnitt</strong> im Buch.</span></li>
+          <li className="flex gap-2"><span className="font-bold" style={{ color: "#F5943A" }}>2.</span><span>Dann das <strong>rechte Auge</strong> — wieder ein neuer Abschnitt.</span></li>
           <li className="flex gap-2"><span className="font-bold" style={{ color: "#F5943A" }}>3.</span><span>Vergleiche: Wird es <strong>ruhiger und flüssiger</strong>?</span></li>
         </ol>
       </div>

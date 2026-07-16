@@ -110,6 +110,10 @@ function scoreAugensteuerung(daten: ScreeningDaten): number {
 
   if (s.kopf_mitbewegt) score -= 10;
 
+  // Nah-Fern Konvergenz (eigene Übung)
+  if (s.konvergenz_nahfern === "kann_nicht_fixieren") score -= 20;
+  else if (s.konvergenz_nahfern === "ein_auge_langsamer" || s.konvergenz_nahfern === "ruckelt") score -= 12;
+
   return Math.max(0, Math.min(100, score));
 }
 

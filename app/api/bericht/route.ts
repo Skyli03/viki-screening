@@ -166,7 +166,7 @@ function generateReportEmail(
     <div style="background:#FEF3E2;border:1px solid #FED7AA;border-radius:12px;padding:20px 24px;margin-bottom:24px;">
       <h3 style="color:#92400E;font-size:15px;font-weight:700;margin:0 0 10px;">Was tun mit diesen Ergebnissen?</h3>
       <ol style="margin:0;padding-left:18px;font-size:13px;color:#78350F;line-height:1.8;">
-        <li>Zeig den Bericht der Klassenlehrer:in — sie kann damit besser einschätzen, was dein Kind braucht.</li>
+        <li>Lies den Bericht in Ruhe durch — du wirst jetzt verstehen, warum manche Dinge für dein Kind schwieriger sind.</li>
         <li>Bei deutlichen Auffälligkeiten (rot) ist eine Überweisung zum Funktionaloptometristen oder Augenarzt sinnvoll.</li>
         <li>Gezieltes Augentraining zuhause kann schon nach wenigen Wochen erste Verbesserungen bringen.</li>
       </ol>
@@ -180,10 +180,10 @@ function generateReportEmail(
         Gezieltes Augentraining für zuhause — entwickelt von Dr. Sarah Kopetzky, Funktionaloptometristin.<br>
         Speziell für Schulkinder mit visuellen Lernschwierigkeiten.
       </p>
-      <a href="https://kurse.vikitraining.at/warteliste" style="display:inline-block;background:#F5943A;color:white;font-weight:700;font-size:15px;padding:14px 32px;border-radius:10px;text-decoration:none;">
-        Unverbindlich auf die Warteliste →
+      <a href="https://kurse.vikitraining.at/superblick" style="display:inline-block;background:#F5943A;color:white;font-weight:700;font-size:15px;padding:14px 32px;border-radius:10px;text-decoration:none;">
+        Zum Kurs ansehen →
       </a>
-      <p style="color:#9CA3AF;font-size:11px;margin:10px 0 0;">Kostenlos · Unverbindlich · Frühbucher-Bonus inklusive</p>
+      <p style="color:#9CA3AF;font-size:11px;margin:10px 0 0;">Kostenlos</p>
     </div>
   </div>
 

@@ -52,7 +52,7 @@ export default function FixationEltern({ kindName, onFertig }: Props) {
           <ol className="space-y-3 text-sm text-gray-700">
             <li className="flex gap-3">
               <span className="w-6 h-6 rounded-full text-white text-xs flex items-center justify-center font-bold shrink-0 mt-0.5" style={{ background: "#F5943A" }}>1</span>
-              <span>Zeige {kindName} einen <strong>Punkt an der Wand</strong> — ein Aufkleber, eine Ecke, ein kleines Bild. Ca. <strong>2–3 Meter entfernt</strong>, auf Augenhöhe.</span>
+              <span>Zeige {kindName} einen <strong>Punkt an der Wand</strong> — ein Aufkleber, eine Ecke, ein kleines Bild. Ungefähr <strong>so weit entfernt wie von einem Schulpult zur Tafel</strong> — ca. 2–4 Meter, auf Augenhöhe.</span>
             </li>
             <li className="flex gap-3">
               <span className="w-6 h-6 rounded-full text-white text-xs flex items-center justify-center font-bold shrink-0 mt-0.5" style={{ background: "#F5943A" }}>2</span>
@@ -67,7 +67,7 @@ export default function FixationEltern({ kindName, onFertig }: Props) {
 
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 max-w-lg mx-auto mb-6 text-sm text-amber-800 text-left">
           <p className="font-semibold mb-1">🔍 Auffällig ist:</p>
-          <ul className="space-y-1 text-xs">
+          <ul className="space-y-1 text-sm">
             <li>• Augen zittern oder machen kleine Sprünge</li>
             <li>• {kindName} schaut nach wenigen Sekunden weg</li>
             <li>• {kindName} kann sich nicht auf den Punkt konzentrieren</li>

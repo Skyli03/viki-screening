@@ -12,7 +12,53 @@ const ZEICHEN_OPTIONEN = [
   { id: "auge_springt", label: "Ein Auge weicht aus / springt raus", emoji: "↗️" },
   { id: "schaut_weg", label: "Kind schaut weg oder blinzelt stark", emoji: "😣" },
   { id: "kann_nicht_folgen", label: "Kind kann Stift nicht bis zur Nase folgen", emoji: "🚫" },
+  { id: "anstrengend", label: "Kind berichtet, dass die Übung anstrengend war", emoji: "😮‍💨" },
 ];
+
+// Einfache SVG-Illustration: Sarah mit blauem Pulli und Stift
+function SarahIllustration() {
+  return (
+    <svg viewBox="0 0 180 210" xmlns="http://www.w3.org/2000/svg" width="160" height="185">
+      {/* Blauer Pulli */}
+      <ellipse cx="90" cy="185" rx="68" ry="50" fill="#3B82F6" />
+      <rect x="36" y="148" width="108" height="50" rx="0" fill="#3B82F6" />
+      {/* V-Ausschnitt */}
+      <polygon points="68,148 90,168 112,148" fill="#2563EB" />
+      {/* Hals */}
+      <rect x="76" y="131" width="28" height="22" rx="8" fill="#F5C99A" />
+      {/* Kopf */}
+      <ellipse cx="90" cy="88" rx="48" ry="50" fill="#F5C99A" />
+      {/* Haare oben */}
+      <ellipse cx="90" cy="54" rx="48" ry="30" fill="#2D1B0D" />
+      {/* Haare seitlich links */}
+      <path d="M42 88 Q35 115 43 138" stroke="#2D1B0D" strokeWidth="22" fill="none" strokeLinecap="round" />
+      {/* Haare seitlich rechts */}
+      <path d="M138 88 Q145 115 137 136" stroke="#2D1B0D" strokeWidth="22" fill="none" strokeLinecap="round" />
+      {/* Augen */}
+      <ellipse cx="72" cy="86" rx="9" ry="10" fill="white" />
+      <ellipse cx="108" cy="86" rx="9" ry="10" fill="white" />
+      <circle cx="74" cy="88" r="5.5" fill="#1a3560" />
+      <circle cx="110" cy="88" r="5.5" fill="#1a3560" />
+      <circle cx="75.5" cy="86" r="2" fill="white" />
+      <circle cx="111.5" cy="86" r="2" fill="white" />
+      {/* Augenbrauen */}
+      <path d="M63 73 Q72 67 81 73" stroke="#2D1B0D" strokeWidth="2.8" fill="none" strokeLinecap="round" />
+      <path d="M99 73 Q108 67 117 73" stroke="#2D1B0D" strokeWidth="2.8" fill="none" strokeLinecap="round" />
+      {/* Lächeln */}
+      <path d="M73 108 Q90 124 107 108" stroke="#7c4a2a" strokeWidth="3" fill="none" strokeLinecap="round" />
+      {/* Rechter Arm mit Stift nach vorne */}
+      <path d="M140 158 Q162 140 176 112" stroke="#3B82F6" strokeWidth="22" strokeLinecap="round" fill="none" />
+      {/* Hand */}
+      <ellipse cx="180" cy="106" rx="14" ry="14" fill="#F5C99A" />
+      {/* Stift (nach vorne zeigend) */}
+      <g transform="rotate(-35 174 90)">
+        <rect x="169" y="70" width="10" height="36" rx="2.5" fill="#FCD34D" />
+        <rect x="169" y="67" width="10" height="7" rx="2" fill="#FDA4AF" />
+        <polygon points="169,106 179,106 174,118" fill="#4A2B10" />
+      </g>
+    </svg>
+  );
+}
 
 export default function KonvergenzEltern({ kindName, onFertig }: Props) {
   const [phase, setPhase] = useState<"anleitung" | "beobachtung" | "zeichen">("anleitung");
@@ -31,7 +77,9 @@ export default function KonvergenzEltern({ kindName, onFertig }: Props) {
   if (phase === "anleitung") {
     return (
       <div className="text-center">
-        <div className="text-5xl mb-4">✏️</div>
+        <div className="flex justify-center mb-3">
+          <SarahIllustration />
+        </div>
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Konvergenz-Test</h2>
         <p className="text-sm text-gray-500 mb-6">Du führst diesen Test durch — {kindName} macht mit.</p>
 
@@ -54,8 +102,8 @@ export default function KonvergenzEltern({ kindName, onFertig }: Props) {
         </div>
 
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 max-w-lg mx-auto mb-6 text-sm text-amber-800 text-left">
-          <p className="font-semibold mb-1">👁️ Worauf du achtest:</p>
-          <ul className="space-y-1">
+          <p className="font-semibold mb-2">👁️ Worauf du achtest:</p>
+          <ul className="space-y-1 text-sm">
             <li>• Folgen beide Augen gleichmäßig nach innen?</li>
             <li>• Weicht ein Auge nach außen ab (springt weg)?</li>
             <li>• Klagt {kindName} über Doppelbilder?</li>
@@ -77,34 +125,32 @@ export default function KonvergenzEltern({ kindName, onFertig }: Props) {
   if (phase === "beobachtung") {
     return (
       <div>
-        <div className="text-center mb-6">
-          <div className="text-5xl mb-3">✏️👀</div>
-          <h2 className="text-xl font-bold text-gray-900">Jetzt durchführen</h2>
-          <p className="text-sm text-gray-500 mt-1">Stift 3× langsam zur Nase und zurück</p>
+        <div className="text-center mb-5">
+          <h2 className="text-xl font-bold text-gray-900 mb-1">Jetzt durchführen</h2>
+          <p className="text-sm text-gray-500">Stift 3× langsam zur Nase und zurück</p>
         </div>
 
-        {/* Animations-Illustration */}
-        <div className="relative bg-gray-900 rounded-2xl overflow-hidden mb-6 mx-auto max-w-sm" style={{ height: "160px" }}>
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="relative flex items-center gap-2">
-              <span className="text-4xl">👁️</span>
-              <div
-                className="w-4 h-4 rounded-full"
-                style={{
-                  background: "#F5943A",
-                  animation: "konvergenz-puls 2s ease-in-out infinite",
-                }}
-              />
-              <span className="text-4xl">👁️</span>
-            </div>
+        {/* Illustration statt schwarzer Box */}
+        <div
+          className="rounded-2xl overflow-hidden mb-5 mx-auto max-w-sm flex flex-col items-center justify-center py-4"
+          style={{ background: "#E4F5F3", minHeight: "160px" }}
+        >
+          <div className="flex items-center gap-4 mb-2">
+            <span className="text-4xl">👁️</span>
+            <div
+              className="w-4 h-4 rounded-full"
+              style={{
+                background: "#F5943A",
+                animation: "konvergenz-puls 2s ease-in-out infinite",
+              }}
+            />
+            <span className="text-4xl">👁️</span>
           </div>
-          <p className="absolute bottom-3 left-0 right-0 text-center text-xs text-gray-400">
-            Beide Augen folgen dem Stift nach innen
-          </p>
+          <p className="text-xs text-teal-700 font-medium">Beide Augen folgen dem Stift nach innen</p>
           <style>{`
             @keyframes konvergenz-puls {
-              0%, 100% { transform: translateX(0) scale(1); opacity: 1; }
-              50% { transform: translateX(0) scale(0.4); opacity: 0.7; }
+              0%, 100% { transform: translateX(0) scale(1); }
+              50% { transform: translateX(0) scale(0.35); opacity: 0.6; }
             }
           `}</style>
         </div>
@@ -133,7 +179,6 @@ export default function KonvergenzEltern({ kindName, onFertig }: Props) {
         <h2 className="text-xl font-bold text-gray-900">Was hast du beobachtet?</h2>
       </div>
 
-      {/* Hauptbewertung */}
       <div className="bg-white rounded-2xl border-2 p-5 mb-4" style={{ borderColor: "#8DCDC5" }}>
         <p className="font-semibold text-gray-900 mb-3">Wie haben die Augen von {kindName} dem Stift gefolgt?</p>
         <div className="space-y-2">
@@ -158,7 +203,6 @@ export default function KonvergenzEltern({ kindName, onFertig }: Props) {
         </div>
       </div>
 
-      {/* Zusatzzeichen */}
       <div className="bg-white rounded-2xl border border-gray-100 p-5 mb-5">
         <p className="font-semibold text-gray-900 mb-1 text-sm">Hast du zusätzlich folgendes beobachtet?</p>
         <p className="text-xs text-gray-400 mb-3">Mehrfachauswahl möglich — nichts wählen wenn unauffällig</p>
