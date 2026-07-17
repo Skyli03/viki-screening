@@ -92,7 +92,7 @@ export default function KonvergenzEltern({ kindName, onFertig }: Props) {
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Konvergenz-Test</h2>
         <p className="text-sm text-gray-500 mb-3">Du führst diesen Test durch — {kindName} macht mit.</p>
         <div className="rounded-xl px-4 py-3 mb-5 text-sm text-center max-w-lg mx-auto" style={{ background: "#E4F5F3", color: "#2D7A73" }}>
-          💡 Beide Augen müssen beim Lesen exakt auf dasselbe Wort zeigen — wie zwei Scheinwerfer, die gemeinsam leuchten. Klappt das nicht, verschwimmen Buchstaben oder erscheinen doppelt — das merken Kinder selbst oft nicht.
+          💡 Beim Lesen drehen sich die Augen ständig ein und aus — für jede Zeile, jeden Tafel-Heft-Blick. Klappt das nicht reibungslos, verschwimmen Buchstaben, erscheinen doppelt, oder das Kind muss viel mehr Energie aufwenden als andere.
         </div>
 
         <div className="bg-white rounded-2xl border-2 p-6 mb-5 text-left max-w-lg mx-auto" style={{ borderColor: "#8DCDC5" }}>
