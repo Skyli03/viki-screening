@@ -3,8 +3,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 const SCHRITTE = [
-  { nr: "1", icon: "📖", titel: "Lesetest", text: "Dein Kind liest je einen kurzen Text laut vor — einmal aus dem Buch, einmal am Bildschirm. Du beobachtest dabei." },
-  { nr: "2", icon: "🎯", titel: "Übungen", text: "3 kurze Eltern-Übungen mit Stift + 2 spielerische Mini-Aufgaben am Bildschirm. Dauert ca. 5 Minuten." },
+  { nr: "1", icon: "📖", titel: "Lesetest", text: "Dein Kind liest aus einem eigenen Buch laut vor — du beobachtest Augen, Haltung und Lesefluss." },
+  { nr: "2", icon: "👁️", titel: "Übungen", text: "3 kurze Eltern-Übungen (Konvergenz, Stift, Blicksprung) + 3 spielerische Mini-Aufgaben am Bildschirm. Dauert ca. 7 Minuten." },
   { nr: "3", icon: "📋", titel: "Fragebogen", text: "Du beantwortest ca. 25 kurze Fragen über Alltagsbeobachtungen deines Kindes. Dauert ca. 3–4 Minuten." },
 ];
 
