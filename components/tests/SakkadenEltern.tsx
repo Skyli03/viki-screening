@@ -8,8 +8,8 @@ interface Props {
   onFertig: (ergebnis: SakkadenErgebnis) => void;
 }
 
-const SPRUNGE = 12;
-const INTERVALL_MS = 4000;
+const SPRUNGE = 6;
+const INTERVALL_MS = 3000;
 
 type Phase = "anleitung" | "sprunge" | "bewertung";
 
@@ -63,7 +63,7 @@ export default function SakkadenEltern({ kindName, onFertig }: Props) {
         </div>
 
         <p className="text-sm text-gray-600 mb-4 max-w-lg mx-auto text-center">
-          Beide Zeigefinger oder 2 Stifte auf Augenhöhe halten; ca. <strong>30 cm auseinander</strong> — {kindName} springt <strong>nur mit den Augen</strong> von Stift zu Stift; Wechsel ca. alle <strong>4–5 Sekunden</strong>.
+          Beide Zeigefinger oder 2 Stifte auf Augenhöhe halten; ca. <strong>30 cm auseinander</strong> — {kindName} springt <strong>nur mit den Augen</strong> von Stift zu Stift; Wechsel alle <strong>3 Sekunden</strong>, jeweils <strong>3× pro Seite</strong>.
         </p>
 
         <VideoEmbed src="/videos/blicksprung.mp4" />
@@ -162,7 +162,7 @@ export default function SakkadenEltern({ kindName, onFertig }: Props) {
       <div className="text-center mb-5">
         <div className="text-4xl mb-2">📋</div>
         <h3 className="text-xl font-bold text-gray-900">Was hast du beobachtet?</h3>
-        <p className="text-sm text-gray-400 mt-1">12 Blicksprünge zwischen zwei Fingern</p>
+        <p className="text-sm text-gray-400 mt-1">6 Blicksprünge zwischen zwei Fingern</p>
       </div>
 
       <div className="bg-white rounded-2xl border border-gray-100 p-4 mb-4 shadow-sm">
