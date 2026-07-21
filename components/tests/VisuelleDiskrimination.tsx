@@ -21,13 +21,18 @@ const SETS_LEICHT = [
   { basis: "▷", aehnlich: "◁" },  // Rechts vs. links
 ];
 
-// Klasse 3-4: ähnlichere Symbole
+// Klasse 3-4: nur Richtungs-/Spiegelunterschiede — kein Größen- oder Füllungsunterschied
 const SETS_SCHWER = [
-  { basis: "⬟", aehnlich: "⬡" }, { basis: "⬡", aehnlich: "⬠" },
-  { basis: "◻", aehnlich: "▫" }, { basis: "▿", aehnlich: "△" },
-  { basis: "⬟", aehnlich: "⬠" }, { basis: "◇", aehnlich: "◈" },
-  { basis: "⬡", aehnlich: "⬟" }, { basis: "▿", aehnlich: "▽" },
-  { basis: "◻", aehnlich: "□" }, { basis: "⬠", aehnlich: "⬡" },
+  { basis: "∩", aehnlich: "∪" },   // Bogen oben vs. unten
+  { basis: "⊂", aehnlich: "⊃" },   // C links vs. rechts
+  { basis: "∧", aehnlich: "∨" },   // Pfeil oben vs. unten
+  { basis: "△", aehnlich: "▽" },   // Dreieck oben vs. unten
+  { basis: "◁", aehnlich: "▷" },   // Dreieck links vs. rechts
+  { basis: "⌐", aehnlich: "¬" },   // Winkel gespiegelt
+  { basis: "↑", aehnlich: "↓" },   // Pfeil hoch vs. runter
+  { basis: "←", aehnlich: "→" },   // Pfeil links vs. rechts
+  { basis: "∪", aehnlich: "⊂" },   // Bogen unten vs. C links
+  { basis: "∨", aehnlich: "▽" },   // Winkel unten vs. Dreieck unten
 ];
 
 const RUNDEN = 10;

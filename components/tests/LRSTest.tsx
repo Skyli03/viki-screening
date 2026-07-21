@@ -30,6 +30,8 @@ const PAARE_K3PLUS: Array<[string, string, boolean]> = [
 const RUNDEN_PRO_KLASSE: Record<number, number> = { 1: 8, 2: 10, 3: 12, 4: 12 };
 const SCHRIFTGROESSE: Record<number, number> = { 1: 110, 2: 96, 3: 64, 4: 52 };
 const ZEITLIMIT_MS: Record<number, number> = { 1: 4500, 2: 3500, 3: 2200, 4: 1800 };
+// Klasse 3-4: Buchstaben nur kurz sichtbar → Kind muss aus dem Gedächtnis antworten
+const FLASH_MS: Partial<Record<number, number>> = { 3: 1000, 4: 700 };
 
 function getKonfig(klasse: number) {
   const k = Math.min(4, Math.max(1, klasse));
@@ -39,11 +41,12 @@ function getKonfig(klasse: number) {
     runden: RUNDEN_PRO_KLASSE[k] ?? 10,
     schriftgroesse: SCHRIFTGROESSE[k] ?? 64,
     zeitlimit: ZEITLIMIT_MS[k] ?? 2200,
+    flashDauer: FLASH_MS[k] ?? null,
   };
 }
 
 export default function LRSTest({ klasse, onFertig }: Props) {
-  const { paare, runden: RUNDEN, schriftgroesse, zeitlimit } = getKonfig(klasse);
+  const { paare, runden: RUNDEN, schriftgroesse, zeitlimit, flashDauer } = getKonfig(klasse);
 
   const [runde, setRunde] = useState(0);
   const [verwechslungen, setVerwechslungen] = useState(0);
@@ -52,9 +55,21 @@ export default function LRSTest({ klasse, onFertig }: Props) {
   const [bewertet, setBewertet] = useState(false);
   const [letzteAntwort, setLetzteAntwort] = useState<boolean | null>(null);
   const [verstricheneMs, setVerstricheneMs] = useState(0);
+  const [sichtbar, setSichtbar] = useState(true);
   const timerRef = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
+  const flashTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const [links, rechts, gleich] = paare[runde % paare.length];
+
+  // Flash: Buchstaben nach flashDauer ms ausblenden
+  useEffect(() => {
+    setSichtbar(true);
+    if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
+    if (flashDauer) {
+      flashTimerRef.current = setTimeout(() => setSichtbar(false), flashDauer);
+    }
+    return () => { if (flashTimerRef.current) clearTimeout(flashTimerRef.current); };
+  }, [runde, flashDauer]);
 
   useEffect(() => {
     if (bewertet) {
@@ -121,18 +136,32 @@ export default function LRSTest({ klasse, onFertig }: Props) {
         </div>
       )}
 
+      {flashDauer && !sichtbar && !bewertet && (
+        <div className="text-center text-xs font-semibold mb-1" style={{ color: "#8DCDC5" }}>
+          Aus dem Gedächtnis antworten!
+        </div>
+      )}
+
       <div className="flex items-center justify-center gap-12 mb-10" style={{ minHeight: "160px" }}>
         <span
-          className="font-mono font-bold text-gray-900 select-none"
-          style={{ fontSize: `${schriftgroesse}px`, lineHeight: 1 }}
+          className="font-mono font-bold select-none transition-all duration-150"
+          style={{
+            fontSize: `${schriftgroesse}px`,
+            lineHeight: 1,
+            color: sichtbar || bewertet ? "#111827" : "#D1D5DB",
+          }}
         >
-          {links}
+          {sichtbar || bewertet ? links : "?"}
         </span>
         <span
-          className="font-mono font-bold text-gray-900 select-none"
-          style={{ fontSize: `${schriftgroesse}px`, lineHeight: 1 }}
+          className="font-mono font-bold select-none transition-all duration-150"
+          style={{
+            fontSize: `${schriftgroesse}px`,
+            lineHeight: 1,
+            color: sichtbar || bewertet ? "#111827" : "#D1D5DB",
+          }}
         >
-          {rechts}
+          {sichtbar || bewertet ? rechts : "?"}
         </span>
       </div>
 
