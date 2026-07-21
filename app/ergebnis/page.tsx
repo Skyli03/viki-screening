@@ -286,28 +286,7 @@ export default function ErgebnisPage() {
           </div>
         </div>
 
-        {/* 5. Blinzelverhalten */}
-        {(() => {
-          const b = profil.blinzelinfo;
-          const farbe = AMPEL_FARBEN[b.ampel];
-          return (
-            <div className={`rounded-xl border-2 p-4 ${farbe.bg} ${farbe.border}`}>
-              <div className="flex items-center gap-3 mb-2">
-                <span className="text-2xl">👁️</span>
-                <div>
-                  <div className={`font-semibold text-sm ${farbe.text}`}>Blinzelverhalten am Bildschirm</div>
-                  <div className="text-xs text-gray-500">Entspannung der Augen beim PC-Lesetest</div>
-                </div>
-                <div className={`ml-auto text-xs font-semibold px-2 py-0.5 rounded-full ${farbe.bg} ${farbe.text}`}>
-                  {b.label}
-                </div>
-              </div>
-              <p className={`text-sm ${farbe.text}`}>{b.elternText}</p>
-            </div>
-          );
-        })()}
-
-        {/* 6. Email-Gate */}
+        {/* 5. Email-Gate */}
         {!emailFreigegeben && (
           <div className="bg-white rounded-2xl border-2 p-6 shadow-lg" style={{ borderColor: "#8DCDC5" }}>
             <div className="text-center mb-5">
@@ -407,7 +386,7 @@ export default function ErgebnisPage() {
             <div className="rounded-2xl p-6 text-center" style={{ background: "#FEF3E2", border: "2px solid #F5943A" }}>
               <h3 className="text-xl font-bold text-gray-900 mb-2">Der VIKI Superblick Kurs</h3>
               <p className="text-sm text-gray-600 mb-4 leading-relaxed">
-                Gezieltes Augentraining für zuhause — speziell für Kinder wie {kindName !== "dein Kind" ? kindName : "dein Kind"}.
+                Mit Visualtraining die Basis für müheloses Lesen & entspanntes Lernen legen — speziell für Kinder wie {kindName !== "dein Kind" ? kindName : "dein Kind"}.
               </p>
               <p className="text-xs text-gray-500 mb-4">Entwickelt von Dr. Sarah Kopetzky, Funktionaloptometristin.</p>
               <div className="space-y-2 mb-5 text-left max-w-xs mx-auto">
@@ -439,7 +418,7 @@ export default function ErgebnisPage() {
               <ol className="space-y-4">
                 {[
                   { color: "#8DCDC5", text: "Du hast den vollständigen Screening-Bericht per E-Mail erhalten — lies ihn in Ruhe durch." },
-                  { color: "#F5943A", text: "Starte jetzt mit dem VIKI Superblick Kurs — gezieltes Augentraining für zuhause, speziell für Kinder wie deines." },
+                  { color: "#F5943A", text: "Starte jetzt mit dem VIKI Superblick Kurs — und lege die Basis für müheloses Lesen & entspanntes Lernen." },
                   { color: "#EE6B85", text: "Schon wenige Minuten Training täglich machen einen Unterschied. Viele Eltern merken erste Verbesserungen nach kurzer Zeit." },
                 ].map((s, i) => (
                   <li key={i} className="flex gap-3 text-sm text-gray-700">

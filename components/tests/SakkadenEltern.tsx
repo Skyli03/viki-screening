@@ -9,7 +9,7 @@ interface Props {
 }
 
 const SPRUNGE = 12;
-const INTERVALL_MS = 1000;
+const INTERVALL_MS = 4000;
 
 type Phase = "anleitung" | "sprunge" | "bewertung";
 
@@ -63,7 +63,7 @@ export default function SakkadenEltern({ kindName, onFertig }: Props) {
         </div>
 
         <p className="text-sm text-gray-600 mb-4 max-w-lg mx-auto text-center">
-          Beide Zeigefinger ca. <strong>40 cm auseinander</strong> auf Augenhöhe — {kindName} springt <strong>nur mit den Augen</strong>, Kopf bleibt still.
+          Beide Zeigefinger oder 2 Stifte auf Augenhöhe halten; ca. <strong>30 cm auseinander</strong> — {kindName} springt <strong>nur mit den Augen</strong> von Stift zu Stift; Wechsel ca. alle <strong>4–5 Sekunden</strong>.
         </p>
 
         <VideoEmbed src="/videos/blicksprung.mp4" />

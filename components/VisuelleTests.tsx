@@ -30,8 +30,8 @@ function IntroCard({
       <div className="rounded-xl px-4 py-3 mb-4 text-sm text-center max-w-sm mx-auto" style={{ background: "#E4F5F3", color: "#2D7A73" }}>
         💡 {warum}
       </div>
-      <div className="bg-teal-50 border border-teal-200 rounded-xl p-4 text-sm text-teal-800 text-left mb-6 max-w-sm mx-auto">
-        {hinweis}
+      <div className="rounded-xl p-4 text-sm text-left mb-6 max-w-sm mx-auto border-l-4" style={{ background: "#FFF8F0", borderLeftColor: "#F5943A", color: "#374151" }}>
+        🎯 {hinweis}
       </div>
       <button
         onClick={onStart}
