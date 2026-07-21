@@ -281,9 +281,9 @@ export default function BuchLesetest({ kindName, onFertig }: Props) {
         <p className="font-semibold text-sm text-gray-900 mb-3">Ergebnis des Augen-Vergleichs:</p>
         <div className="space-y-2">
           {([
-            { val: "besser", label: "Ja — mit einem Auge ist der Lesefluss ruhiger / flüssiger", color: "#DC2626", bg: "#FEF2F2", border: "#FCA5A5", sub: "Wichtiges Zeichen: Beide Augen arbeiten nicht gut als Team" },
-            { val: "gleich", label: "Gleich — kein Unterschied", color: "#D97706", bg: "#FFFBEB", border: "#FCD34D", sub: "Kein klares binokulares Signal" },
-            { val: "schlechter", label: "Schlechter — mit beiden Augen liest es besser", color: "#16A34A", bg: "#F0FDF4", border: "#86EFAC", sub: "Beide Augen arbeiten gut zusammen" },
+            { val: "besser", label: "Mit einem Auge ruhiger / flüssiger — Unterschied deutlich", color: "#DC2626", bg: "#FEF2F2", border: "#FCA5A5", sub: "Mögliches Zeichen: Beide Augen arbeiten nicht gut als Team" },
+            { val: "gleich", label: "Kein Unterschied erkennbar", color: "#D97706", bg: "#FFFBEB", border: "#FCD34D", sub: "Kein klares binokulares Signal" },
+            { val: "schlechter", label: "Mit beiden Augen liest es besser — kein Unterschied", color: "#16A34A", bg: "#F0FDF4", border: "#86EFAC", sub: "Beide Augen arbeiten gut zusammen" },
             { val: "nicht_getestet", label: "Konnte ich nicht testen", color: "#6B7280", bg: "#F9FAFB", border: "#E5E7EB", sub: "" },
           ] as const).map(opt => (
             <button key={opt.val} onClick={() => setMonokular(opt.val)}

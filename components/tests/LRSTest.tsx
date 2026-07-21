@@ -19,12 +19,20 @@ const PAARE_K2: Array<[string, string, boolean]> = [
   ["d", "b", false], ["p", "d", false],
 ];
 
-// Klasse 3+: alle konfundierbaren Paare
-const PAARE_K3PLUS: Array<[string, string, boolean]> = [
+// Klasse 3: alle konfundierbaren Paare
+const PAARE_K3: Array<[string, string, boolean]> = [
   ["b", "d", false], ["p", "q", false], ["b", "b", true], ["d", "d", true],
   ["p", "p", true], ["b", "p", false], ["d", "q", false], ["b", "q", false],
   ["n", "u", false], ["m", "w", false], ["n", "n", true], ["m", "m", true],
   ["u", "n", false], ["w", "m", false], ["p", "d", false], ["q", "q", true],
+];
+
+// Klasse 4: schwerpunkt b/d/p/q — die härtesten LRS-Paare
+const PAARE_K4: Array<[string, string, boolean]> = [
+  ["b", "d", false], ["p", "q", false], ["b", "p", false], ["d", "q", false],
+  ["b", "q", false], ["p", "d", false], ["q", "b", false], ["d", "p", false],
+  ["b", "b", true],  ["p", "p", true],  ["d", "d", true],  ["q", "q", true],
+  ["b", "d", false], ["p", "b", false], ["q", "d", false], ["p", "q", false],
 ];
 
 const RUNDEN_PRO_KLASSE: Record<number, number> = { 1: 8, 2: 10, 3: 12, 4: 12 };
@@ -35,7 +43,7 @@ const FLASH_MS: Partial<Record<number, number>> = { 3: 1000, 4: 700 };
 
 function getKonfig(klasse: number) {
   const k = Math.min(4, Math.max(1, klasse));
-  const paare = k === 1 ? PAARE_K1 : k === 2 ? PAARE_K2 : PAARE_K3PLUS;
+  const paare = k === 1 ? PAARE_K1 : k === 2 ? PAARE_K2 : k === 4 ? PAARE_K4 : PAARE_K3;
   return {
     paare,
     runden: RUNDEN_PRO_KLASSE[k] ?? 10,
@@ -136,32 +144,28 @@ export default function LRSTest({ klasse, onFertig }: Props) {
         </div>
       )}
 
-      {flashDauer && !sichtbar && !bewertet && (
-        <div className="text-center text-xs font-semibold mb-1" style={{ color: "#8DCDC5" }}>
-          Aus dem Gedächtnis antworten!
-        </div>
-      )}
-
       <div className="flex items-center justify-center gap-12 mb-10" style={{ minHeight: "160px" }}>
         <span
-          className="font-mono font-bold select-none transition-all duration-150"
+          className="font-mono font-bold select-none"
           style={{
             fontSize: `${schriftgroesse}px`,
             lineHeight: 1,
-            color: sichtbar || bewertet ? "#111827" : "#D1D5DB",
+            color: "#111827",
+            visibility: (sichtbar || bewertet) ? "visible" : "hidden",
           }}
         >
-          {sichtbar || bewertet ? links : "?"}
+          {links}
         </span>
         <span
-          className="font-mono font-bold select-none transition-all duration-150"
+          className="font-mono font-bold select-none"
           style={{
             fontSize: `${schriftgroesse}px`,
             lineHeight: 1,
-            color: sichtbar || bewertet ? "#111827" : "#D1D5DB",
+            color: "#111827",
+            visibility: (sichtbar || bewertet) ? "visible" : "hidden",
           }}
         >
-          {sichtbar || bewertet ? rechts : "?"}
+          {rechts}
         </span>
       </div>
 
