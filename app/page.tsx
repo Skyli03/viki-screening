@@ -51,7 +51,7 @@ export default function Startseite() {
           <h2 className="text-center text-lg font-bold text-gray-700 mb-4 tracking-wide uppercase" style={{ letterSpacing: "0.05em" }}>
             So funktioniert der Test
           </h2>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {SCHRITTE.map((s, i) => (
               <div key={i} className={`bg-white rounded-2xl p-5 shadow-sm border-2 text-center select-none`}
                 style={{ borderColor: i === 0 ? "#8DCDC5" : i === 1 ? "#F5943A" : "#EE6B85" }}>
