@@ -47,10 +47,10 @@ function generiereRunde(pool: string[], aehnliche: Record<string, string[]>, run
 const RUNDEN = 8;
 
 // Zeigt-Dauer wird pro Runde kürzer: Runde 0 am längsten, Runde 7 am kürzesten
-function getZeigeDauer(runde: number, schwer: boolean): number {
-  const start = schwer ? 1000 : 1400;
-  const step = schwer ? 80 : 100;
-  return Math.max(schwer ? 440 : 600, start - runde * step);
+function getZeigeDauer(runde: number, klasse: number): number {
+  if (klasse >= 4) { const s = 650, step = 50; return Math.max(300, s - runde * step); }
+  if (klasse === 3) { const s = 850, step = 70; return Math.max(360, s - runde * step); }
+  const s = 1400, step = 100; return Math.max(600, s - runde * step);
 }
 
 export default function Merkspanne({ klasse, onFertig }: Props) {
@@ -67,7 +67,7 @@ export default function Merkspanne({ klasse, onFertig }: Props) {
   const [letzteRichtig, setLetzteRichtig] = useState<boolean | null>(null);
   const zeitRef = useRef(Date.now());
 
-  const zeigeDauer = getZeigeDauer(runde, schwer);
+  const zeigeDauer = getZeigeDauer(runde, klasse);
 
   useEffect(() => {
     if (displayPhase === "zeigen") {
