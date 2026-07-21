@@ -6,19 +6,32 @@ interface Props {
   onFertig: (result: { fehlerrate: number; geschwindigkeit: number }) => void;
 }
 
-// Klasse 1-2: Formenunterschiede (kein Gefüllt/Leer – das ist zu einfach)
-// 3 zeigen dasselbe Symbol, 1 zeigt eine andere Form/Richtung → Kind sucht das Andere
+// Klasse 1: klare Formenunterschiede
 const SETS_LEICHT = [
-  { basis: "△", aehnlich: "▽" },  // Dreieck oben vs. unten (gespiegelt)
+  { basis: "△", aehnlich: "▽" },  // Dreieck oben vs. unten
   { basis: "◁", aehnlich: "▷" },  // Dreieck links vs. rechts
-  { basis: "□", aehnlich: "◇" },  // Quadrat vs. rautenförmig (45° gedreht)
-  { basis: "▷", aehnlich: "△" },  // Rechts-Dreieck vs. Aufwärts-Dreieck
-  { basis: "▽", aehnlich: "△" },  // Unten vs. oben
-  { basis: "◁", aehnlich: "△" },  // Links vs. oben
+  { basis: "□", aehnlich: "◇" },  // Quadrat vs. Raute
+  { basis: "▷", aehnlich: "△" },  // Dreieck rechts vs. oben
+  { basis: "▽", aehnlich: "△" },  // Dreieck unten vs. oben
   { basis: "◇", aehnlich: "□" },  // Raute vs. Quadrat
   { basis: "○", aehnlich: "□" },  // Kreis vs. Quadrat
   { basis: "⬡", aehnlich: "○" },  // Hexagon vs. Kreis
-  { basis: "▷", aehnlich: "◁" },  // Rechts vs. links
+  { basis: "◁", aehnlich: "△" },  // Dreieck links vs. oben
+  { basis: "▷", aehnlich: "◁" },  // Dreieck rechts vs. links
+];
+
+// Klasse 2: Formen + konfundierbare Buchstaben (Kinder können schon lesen)
+const SETS_K2 = [
+  { basis: "b", aehnlich: "d" },   // LRS-Klassiker
+  { basis: "p", aehnlich: "q" },
+  { basis: "n", aehnlich: "u" },
+  { basis: "m", aehnlich: "w" },
+  { basis: "b", aehnlich: "p" },
+  { basis: "d", aehnlich: "q" },
+  { basis: "△", aehnlich: "▽" },  // Dreieck oben vs. unten
+  { basis: "◁", aehnlich: "▷" },  // Dreieck links vs. rechts
+  { basis: "∩", aehnlich: "∪" },  // Bogen oben vs. unten
+  { basis: "∧", aehnlich: "∨" },  // Winkel oben vs. unten
 ];
 
 // Klasse 3-4: nur Richtungs-/Spiegelunterschiede — kein Größen- oder Füllungsunterschied
@@ -46,7 +59,7 @@ function generiereRunde(sets: typeof SETS_LEICHT, runde: number) {
 }
 
 export default function VisuelleDiskrimination({ klasse, onFertig }: Props) {
-  const sets = klasse >= 3 ? SETS_SCHWER : SETS_LEICHT;
+  const sets = klasse >= 3 ? SETS_SCHWER : klasse === 2 ? SETS_K2 : SETS_LEICHT;
 
   const [runde, setRunde] = useState(0);
   const [fehler, setFehler] = useState(0);
