@@ -156,7 +156,8 @@ export default function SakkadenEltern({ kindName, onFertig }: Props) {
         </div>
 
         <div className="bg-teal-50 border border-teal-200 rounded-xl p-3 text-xs text-teal-800 text-center max-w-sm mx-auto">
-          Der leuchtende Punkt zeigt: <strong>welchen Finger soll {kindName} gerade ansehen?</strong>
+          Der leuchtende Punkt zeigt: <strong>welchen Finger soll {kindName} gerade ansehen?</strong><br />
+          <span className="text-teal-600">Hier siehst du die Geschwindigkeit der Blicksprünge.</span>
         </div>
 
         {fertig && (

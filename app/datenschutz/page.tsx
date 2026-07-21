@@ -26,35 +26,29 @@ export default function Datenschutz() {
                 <li><strong>Vorname des Kindes</strong> — nur lokal im Browser gespeichert, wird nicht übertragen</li>
                 <li><strong>Schulstufe</strong> — nur lokal im Browser gespeichert</li>
                 <li><strong>Testergebnisse</strong> — werden ausschließlich lokal im Browser verarbeitet und nicht auf unseren Servern gespeichert</li>
-                <li><strong>Kamerabild</strong> — wird ausschließlich lokal auf deinem Gerät verarbeitet. Kein Bild wird übertragen oder gespeichert.</li>
                 <li><strong>E-Mail-Adresse</strong> — wenn du den vollständigen Bericht anforderst, wird deine E-Mail-Adresse an unseren E-Mail-Marketing-Dienst systeme.io (EU) übermittelt.</li>
               </ul>
             </div>
 
             <div>
-              <h2 className="font-bold text-gray-900 text-base mb-2">3. Kamera & Eye-Tracking</h2>
-              <p>Das Eye-Tracking erfolgt ausschließlich lokal in deinem Browser mittels TensorFlow.js. Es werden keine Videodaten, Bilder oder Augenbewegungsdaten an externe Server übertragen. Du kannst die Kamera jederzeit über die Browsereinstellungen deaktivieren.</p>
-            </div>
-
-            <div>
-              <h2 className="font-bold text-gray-900 text-base mb-2">4. E-Mail-Marketing (systeme.io)</h2>
+              <h2 className="font-bold text-gray-900 text-base mb-2">3. E-Mail-Marketing (systeme.io)</h2>
               <p>Wenn du deine E-Mail-Adresse eingibst, um den vollständigen Bericht zu erhalten, stimmst du zu, dass diese Adresse an systeme.io (Frankreich/EU) übermittelt und dort gespeichert wird. Du erhältst dann den Bericht sowie hilfreiche Informationen rund um das Thema visuelle Verarbeitung bei Kindern. Du kannst dich jederzeit über den Abmeldelink in jeder E-Mail abmelden.</p>
               <p className="mt-2">Rechtsgrundlage: Art. 6 Abs. 1 lit. a DSGVO (Einwilligung)</p>
             </div>
 
             <div>
-              <h2 className="font-bold text-gray-900 text-base mb-2">5. Hosting</h2>
+              <h2 className="font-bold text-gray-900 text-base mb-2">4. Hosting</h2>
               <p>Diese Website wird über Vercel Inc. (San Francisco, USA) gehostet. Vercel verarbeitet beim Aufruf der Seite technische Daten (IP-Adresse, Browsertyp, Zeitstempel). Vercel ist unter dem EU-U.S. Data Privacy Framework zertifiziert.</p>
             </div>
 
             <div>
-              <h2 className="font-bold text-gray-900 text-base mb-2">6. Deine Rechte</h2>
+              <h2 className="font-bold text-gray-900 text-base mb-2">5. Deine Rechte</h2>
               <p>Du hast das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung und Datenübertragbarkeit. Wende dich dazu an: <a href="mailto:hallo@vikitraining.at" className="underline" style={{ color: "#F5943A" }}>hallo@vikitraining.at</a></p>
               <p className="mt-2">Du hast außerdem das Recht, Beschwerde bei der österreichischen Datenschutzbehörde einzulegen: <a href="https://www.dsb.gv.at" className="underline" style={{ color: "#F5943A" }}>dsb.gv.at</a></p>
             </div>
 
             <div>
-              <h2 className="font-bold text-gray-900 text-base mb-2">7. Cookies</h2>
+              <h2 className="font-bold text-gray-900 text-base mb-2">6. Cookies</h2>
               <p>Diese Website verwendet keine Tracking-Cookies. Es werden ausschließlich technisch notwendige Session-Daten im Browser-Speicher (sessionStorage) abgelegt, die beim Schließen des Tabs automatisch gelöscht werden.</p>
             </div>
 

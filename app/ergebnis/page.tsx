@@ -56,11 +56,6 @@ const TYP_DATEN: Record<string, {
   },
 };
 
-const TESTIMONIALS = [
-  { name: "Sabine K.", details: "Mama von Lukas, 9 Jahre, 3. Klasse", text: "Wir machen gerade den Online-Kurs und Lukas merkt langsam selber, dass alles leichter fällt. Die Hausaufgabensituation war immer ein Kampf, alleine bis er angefangen hat, dauerte es schon ewig. Ich bin sowas von happy, dass wir endlich wissen, was Sache ist." },
-  { name: "Thomas M.", details: "Papa von Emma, 8 Jahre, 2. Klasse", text: "Wir haben schon so viel ausprobiert — Kinderarzt, Legasthenietraining, alles Mögliche. Aber an die Augen hat niemand gedacht. Jetzt geht vieles viel leichter für Emma." },
-  { name: "Maria L.", details: "Mama von Noah, 10 Jahre, 4. Klasse", text: "Noah sagt jetzt selbst: 'Mama, Lesen geht jetzt leichter!' — Das hat er noch nie gesagt. Die Lehrerin hat gefragt, was wir anders machen." },
-];
 
 function demoScreeningDaten(): ScreeningDaten {
   return {
@@ -429,7 +424,7 @@ export default function ErgebnisPage() {
                 ))}
               </div>
               <a
-                href="https://kurse.vikitraining.at/superblick"
+                href="https://kurse.vikitraining.at/superblick-kurs"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-block w-full font-bold text-lg py-4 rounded-xl shadow-lg transition-all hover:opacity-90"
@@ -437,20 +432,6 @@ export default function ErgebnisPage() {
               >
                 JETZT KURS ANSEHEN
               </a>
-              <p className="text-xs text-gray-500 mt-3">Kostenlos</p>
-            </div>
-
-            <div>
-              <h3 className="text-base font-bold text-gray-900 mb-4">Was andere Eltern sagen</h3>
-              <div className="space-y-4">
-                {TESTIMONIALS.map((t, i) => (
-                  <div key={i} className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
-                    <p className="text-sm text-gray-800 leading-relaxed mb-3">{t.text}</p>
-                    <div className="text-xs text-gray-500 font-semibold">— {t.name} · {t.details}</div>
-                  </div>
-                ))}
-              </div>
-              <p className="text-xs text-gray-400 text-center mt-3 italic">* Namen geändert.</p>
             </div>
 
             <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
@@ -471,7 +452,7 @@ export default function ErgebnisPage() {
 
             <div className="text-center pb-4">
               <a
-                href="https://kurse.vikitraining.at/superblick"
+                href="https://kurse.vikitraining.at/superblick-kurs"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-block w-full font-bold text-lg py-4 rounded-xl shadow-lg transition-all hover:opacity-90"
@@ -479,7 +460,6 @@ export default function ErgebnisPage() {
               >
                 JETZT KURS ANSEHEN
               </a>
-              <p className="text-xs text-gray-500 mt-2">Kostenlos</p>
             </div>
           </>
         )}
