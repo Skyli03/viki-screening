@@ -148,7 +148,6 @@ function generateReportEmail(
     </div>
 
     ${musterHtml}
-    ${blinzelHtml}
 
     <!-- Alle Bereiche -->
     <div style="margin-bottom:28px;">
@@ -167,8 +166,7 @@ function generateReportEmail(
       <h3 style="color:#92400E;font-size:15px;font-weight:700;margin:0 0 10px;">Was tun mit diesen Ergebnissen?</h3>
       <ol style="margin:0;padding-left:18px;font-size:13px;color:#78350F;line-height:1.8;">
         <li>Lies den Bericht in Ruhe durch — du wirst jetzt verstehen, warum manche Dinge für dein Kind schwieriger sind.</li>
-        <li>Bei deutlichen Auffälligkeiten (rot) ist eine Abklärung durch einen Funktionaloptometristen sinnvoll.</li>
-        <li>Gezieltes Visualtraining kann schon nach wenigen Wochen Verbesserungen erzielen.</li>
+        <li>Bei Auffälligkeiten unterstützt gezieltes Visualtraining inkl. Reflexintegration — es schafft die neuromotorische Basis für müheloses Lesen &amp; entspanntes Lernen.</li>
       </ol>
     </div>
 
@@ -177,13 +175,11 @@ function generateReportEmail(
       <div style="display:inline-block;background:#F5943A;color:white;font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.5px;">🚀 Startet bald</div>
       <h3 style="color:#1F2937;font-size:18px;font-weight:800;margin:0 0 8px;">Der VIKI Superblick Kurs</h3>
       <p style="color:#6B7280;font-size:13px;margin:0 0 16px;line-height:1.5;">
-        Gezieltes Augentraining für zuhause — entwickelt von Dr. Sarah Kopetzky, Funktionaloptometristin.<br>
-        Speziell für Schulkinder mit visuellen Lernschwierigkeiten.
+        Mit Visualtraining die Basis für müheloses Lesen &amp; entspanntes Lernen legen — entwickelt von Dr. Sarah Kopetzky, Funktionaloptometristin.
       </p>
-      <a href="https://kurse.vikitraining.at/superblick" style="display:inline-block;background:#F5943A;color:white;font-weight:700;font-size:15px;padding:14px 32px;border-radius:10px;text-decoration:none;">
+      <a href="https://kurse.vikitraining.at/superblick-kurs" style="display:inline-block;background:#F5943A;color:white;font-weight:700;font-size:15px;padding:14px 32px;border-radius:10px;text-decoration:none;">
         Zum Kurs ansehen →
       </a>
-      <p style="color:#9CA3AF;font-size:11px;margin:10px 0 0;">Kostenlos</p>
     </div>
   </div>
 
@@ -192,7 +188,7 @@ function generateReportEmail(
     <div style="background:#F9FAFB;border:1px solid #E5E7EB;border-radius:10px;padding:16px 18px;">
       <p style="font-size:11px;font-weight:700;color:#374151;margin:0 0 6px;">⚠️ Rechtlicher Hinweis</p>
       <p style="font-size:11px;color:#6B7280;line-height:1.6;margin:0 0 8px;">
-        Der VIKI Superblick Screening-Test dient ausschließlich der <strong>unverbindlichen Erstorientierung</strong> und stellt <strong>keine medizinische oder optometrische Diagnose</strong> dar. Die Ergebnisse basieren auf Elternbeobachtung und können Fehler enthalten. Eine professionelle Untersuchung kann durch dieses Tool nicht ersetzt werden.
+        Der VIKI Superblick Screening-Test dient ausschließlich der <strong>unverbindlichen Erstorientierung</strong> und stellt <strong>keine medizinische oder optometrische Diagnose</strong> dar. Die Ergebnisse basieren auf Elternbeobachtung und können Fehler enthalten. Eine professionelle Untersuchung kann durch dieses Tool nicht ersetzt werden. Bei deutlichen Auffälligkeiten (rote Bereiche) wird eine Vorstellung bei einem Funktionaloptometristen empfohlen.
       </p>
       <p style="font-size:11px;color:#6B7280;line-height:1.6;margin:0;">
         <strong>Datenschutz:</strong> Testergebnisse werden nicht auf Servern gespeichert. Deine E-Mail wird nur für diesen Bericht und VIKI-Informationen genutzt. Abmeldung jederzeit: <a href="mailto:hallo@vikitraining.at" style="color:#9CA3AF;">hallo@vikitraining.at</a>
