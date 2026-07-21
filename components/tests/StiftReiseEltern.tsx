@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import VideoEmbed from "@/components/VideoEmbed";
 import type { StiftReiseErgebnis } from "@/lib/screening-types";
 
 interface Props {
@@ -56,27 +57,15 @@ export default function StiftReiseEltern({ kindName, onFertig }: Props) {
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Stift-Reise</h2>
         <p className="text-sm text-gray-500 mb-1">Kann {kindName} einem Stift nur mit den Augen folgen?</p>
         <p className="text-xs font-semibold mb-3" style={{ color: "#8DCDC5" }}>Muster und Geschwindigkeit beobachten</p>
-        <div className="rounded-xl px-4 py-3 mb-5 text-sm text-center max-w-lg mx-auto" style={{ background: "#E4F5F3", color: "#2D7A73" }}>
+        <div className="rounded-xl px-4 py-3 mb-4 text-sm text-center max-w-lg mx-auto" style={{ background: "#E4F5F3", color: "#2D7A73" }}>
           💡 Flüssiges Lesen braucht Augen, die gleichmäßig gleiten können. Ruckeln sie statt zu gleiten, holpert auch das Gelesene — selbst wenn das Kind jeden Buchstaben kennt.
         </div>
 
-        <div className="bg-white rounded-2xl border-2 p-6 mb-5 text-left max-w-lg mx-auto" style={{ borderColor: "#8DCDC5" }}>
-          <p className="font-semibold text-gray-900 mb-4">So geht es:</p>
-          <ol className="space-y-3 text-sm text-gray-700">
-            <li className="flex gap-3">
-              <span className="w-6 h-6 rounded-full text-white text-xs flex items-center justify-center font-bold shrink-0 mt-0.5" style={{ background: "#F5943A" }}>1</span>
-              <span>Halte einen <strong>Stift</strong> ca. <strong>30 cm</strong> vor das Gesicht von {kindName}. {kindName} folgt <strong>nur mit den Augen</strong>, Kopf bleibt still.</span>
-            </li>
-            <li className="flex gap-3">
-              <span className="w-6 h-6 rounded-full text-white text-xs flex items-center justify-center font-bold shrink-0 mt-0.5" style={{ background: "#F5943A" }}>2</span>
-              <span>Du siehst gleich das <strong>Muster</strong> der Bewegung. Bewege den Stift <strong>langsam und gleichmäßig</strong> — ca. 2–3× pro Übung.</span>
-            </li>
-            <li className="flex gap-3">
-              <span className="w-6 h-6 rounded-full text-white text-xs flex items-center justify-center font-bold shrink-0 mt-0.5" style={{ background: "#F5943A" }}>3</span>
-              <span>Du führst <strong>2 Bewegungen</strong> durch — Links-Rechts und einmal Diagonal.</span>
-            </li>
-          </ol>
-        </div>
+        <p className="text-sm text-gray-600 mb-4 max-w-lg mx-auto text-center">
+          Stift ca. <strong>30 cm</strong> vor das Gesicht — {kindName} folgt <strong>nur mit den Augen</strong>, Kopf bleibt still. 2 Bewegungen: Links-Rechts und Diagonal.
+        </p>
+
+        <VideoEmbed src="/videos/augenbewegung.mp4" />
 
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 max-w-lg mx-auto mb-6 text-sm text-amber-800 text-left">
           <p className="font-semibold mb-2 text-base">🔍 Auffällig ist:</p>

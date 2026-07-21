@@ -201,15 +201,15 @@ export default function BuchLesetest({ kindName, onFertig }: Props) {
             <p className="font-semibold text-sm text-gray-900 mb-2">Abstand zum Buch?</p>
             <div className="grid grid-cols-2 gap-2">
               {([
-                { val: "normal", label: "Normal (30–40 cm)" },
-                { val: "zu_nah", label: "Zu nah (unter 20 cm)" },
-                { val: "zu_weit", label: "Zu weit (über 50 cm)" },
-                { val: "wechselnd", label: "Wechselt ständig" },
+                { val: "normal", label: "Normal (30–40 cm)", color: "#16A34A", bg: "#F0FDF4", border: "#86EFAC" },
+                { val: "zu_nah", label: "Zu nah (unter 20 cm)", color: "#DC2626", bg: "#FEF2F2", border: "#FCA5A5" },
+                { val: "zu_weit", label: "Zu weit (über 50 cm)", color: "#D97706", bg: "#FFFBEB", border: "#FCD34D" },
+                { val: "wechselnd", label: "Wechselt ständig", color: "#D97706", bg: "#FFFBEB", border: "#FCD34D" },
               ] as const).map(opt => (
                 <button key={opt.val} onClick={() => setLeseabstand(opt.val)}
                   className="p-3 rounded-xl border-2 text-sm font-semibold transition-all"
                   style={leseabstand === opt.val
-                    ? { background: "#FEF3E2", borderColor: "#F5943A", color: "#92400E" }
+                    ? { background: opt.bg, borderColor: opt.border, color: opt.color }
                     : { borderColor: "#E5E7EB", color: "#374151" }}>
                   {opt.label}
                 </button>

@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
+import VideoEmbed from "@/components/VideoEmbed";
 import type { SakkadenErgebnis } from "@/lib/screening-types";
 
 interface Props {
@@ -8,7 +9,7 @@ interface Props {
 }
 
 const SPRUNGE = 12;
-const INTERVALL_MS = 1500;
+const INTERVALL_MS = 1000;
 
 type Phase = "anleitung" | "sprunge" | "bewertung";
 
@@ -57,27 +58,15 @@ export default function SakkadenEltern({ kindName, onFertig }: Props) {
         <p className="text-sm text-gray-500 mb-1">Kann {kindName} präzise zwischen zwei Punkten hin- und herspringen?</p>
         <p className="text-xs font-semibold mb-3" style={{ color: "#8DCDC5" }}>Genauigkeit der Augenbewegungen beobachten</p>
 
-        <div className="rounded-xl px-4 py-3 mb-5 text-sm text-center max-w-lg mx-auto" style={{ background: "#E4F5F3", color: "#2D7A73" }}>
+        <div className="rounded-xl px-4 py-3 mb-4 text-sm text-center max-w-lg mx-auto" style={{ background: "#E4F5F3", color: "#2D7A73" }}>
           💡 Lesen besteht fast nur aus Blicksprüngen — von Wort zu Wort, von Zeile zu Zeile. Präzise Sprünge bedeuten ruhiges Lesen. Ungenau? Das Auge sucht — und kostet enorm viel Energie.
         </div>
 
-        <div className="bg-white rounded-2xl border-2 p-6 mb-5 text-left max-w-lg mx-auto" style={{ borderColor: "#8DCDC5" }}>
-          <p className="font-semibold text-gray-900 mb-4">So geht es:</p>
-          <ol className="space-y-3 text-sm text-gray-700">
-            <li className="flex gap-3">
-              <span className="w-6 h-6 rounded-full text-white text-xs flex items-center justify-center font-bold shrink-0 mt-0.5" style={{ background: "#F5943A" }}>1</span>
-              <span>Halte beide <strong>Zeigefinger</strong> ca. <strong>40 cm auseinander</strong> — auf Augenhöhe von {kindName}, ca. 30–40 cm vor dem Gesicht.</span>
-            </li>
-            <li className="flex gap-3">
-              <span className="w-6 h-6 rounded-full text-white text-xs flex items-center justify-center font-bold shrink-0 mt-0.5" style={{ background: "#F5943A" }}>2</span>
-              <span>Unten am Bildschirm siehst du, <strong>welchen Finger</strong> {kindName} anschauen soll — der leuchtende Punkt zeigt es an.</span>
-            </li>
-            <li className="flex gap-3">
-              <span className="w-6 h-6 rounded-full text-white text-xs flex items-center justify-center font-bold shrink-0 mt-0.5" style={{ background: "#F5943A" }}>3</span>
-              <span>{kindName} soll <strong>nur mit den Augen</strong> springen — <strong>Kopf bleibt still</strong>. Du beobachtest, wie präzise die Sprünge landen.</span>
-            </li>
-          </ol>
-        </div>
+        <p className="text-sm text-gray-600 mb-4 max-w-lg mx-auto text-center">
+          Beide Zeigefinger ca. <strong>40 cm auseinander</strong> auf Augenhöhe — {kindName} springt <strong>nur mit den Augen</strong>, Kopf bleibt still.
+        </p>
+
+        <VideoEmbed src="/videos/blicksprung.mp4" />
 
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 max-w-lg mx-auto mb-6 text-sm text-amber-800 text-left">
           <p className="font-semibold mb-2 text-base">🔍 Auffällig ist:</p>

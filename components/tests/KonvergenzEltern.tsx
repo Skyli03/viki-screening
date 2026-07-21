@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import VideoEmbed from "@/components/VideoEmbed";
 import type { KonvergenzErgebnis } from "@/lib/screening-types";
 
 interface Props {
@@ -59,7 +60,7 @@ function NahFernDot() {
           height: "48px",
           borderRadius: "50%",
           background: "#F5943A",
-          animation: "konv-nah 5s ease-in-out infinite",
+          animation: "konv-nah 3.5s ease-in-out infinite",
         }}
       />
       <p className="text-xs text-teal-700 font-semibold text-center px-3">
@@ -91,27 +92,15 @@ export default function KonvergenzEltern({ kindName, onFertig }: Props) {
         </div>
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Konvergenz-Test</h2>
         <p className="text-sm text-gray-500 mb-3">Du führst diesen Test durch — {kindName} macht mit.</p>
-        <div className="rounded-xl px-4 py-3 mb-5 text-sm text-center max-w-lg mx-auto" style={{ background: "#E4F5F3", color: "#2D7A73" }}>
+        <div className="rounded-xl px-4 py-3 mb-4 text-sm text-center max-w-lg mx-auto" style={{ background: "#E4F5F3", color: "#2D7A73" }}>
           💡 Beim Lesen drehen sich die Augen ständig ein und aus — für jede Zeile, jeden Tafel-Heft-Blick. Klappt das nicht reibungslos, verschwimmen Buchstaben, erscheinen doppelt, oder das Kind muss viel mehr Energie aufwenden als andere.
         </div>
 
-        <div className="bg-white rounded-2xl border-2 p-6 mb-5 text-left max-w-lg mx-auto" style={{ borderColor: "#8DCDC5" }}>
-          <p className="font-semibold text-gray-900 mb-4">So geht es:</p>
-          <ol className="space-y-4 text-sm text-gray-700">
-            <li className="flex gap-3">
-              <span className="w-6 h-6 rounded-full text-white text-xs flex items-center justify-center font-bold shrink-0 mt-0.5" style={{ background: "#F5943A" }}>1</span>
-              <span>Halte einen <strong>Stift oder Finger</strong> ca. <strong>30 cm</strong> vor die Nase von {kindName}. {kindName} schaut den Stift an.</span>
-            </li>
-            <li className="flex gap-3">
-              <span className="w-6 h-6 rounded-full text-white text-xs flex items-center justify-center font-bold shrink-0 mt-0.5" style={{ background: "#F5943A" }}>2</span>
-              <span>Bewege den Stift <strong>langsam auf die Nase zu</strong> (bis ca. 5–10 cm). Dann wieder zurück. <strong>3× wiederholen.</strong></span>
-            </li>
-            <li className="flex gap-3">
-              <span className="w-6 h-6 rounded-full text-white text-xs flex items-center justify-center font-bold shrink-0 mt-0.5" style={{ background: "#F5943A" }}>3</span>
-              <span><strong>Beobachte</strong> dabei die Augen von {kindName}: Folgen <em>beide</em> Augen gleichmäßig? Weicht ein Auge aus?</span>
-            </li>
-          </ol>
-        </div>
+        <p className="text-sm text-gray-600 mb-4 max-w-lg mx-auto text-center">
+          Stift ca. <strong>30 cm</strong> vor die Nase — <strong>3× langsam annähern</strong> und zurück. Beobachte dabei die Augen von {kindName}.
+        </p>
+
+        <VideoEmbed src="/videos/konvergenz.mp4" />
 
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 max-w-lg mx-auto mb-6 text-sm text-amber-800 text-left">
           <p className="font-semibold mb-2 text-base">👁️ Worauf du achtest:</p>
