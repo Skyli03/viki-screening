@@ -177,8 +177,8 @@ function generateReportEmail(
       <p style="color:#6B7280;font-size:13px;margin:0 0 16px;line-height:1.5;">
         Mit Visualtraining die Basis für müheloses Lesen &amp; entspanntes Lernen legen — entwickelt von Dr. Sarah Kopetzky, Funktionaloptometristin.
       </p>
-      <a href="https://kurse.vikitraining.at/superblick-kurs" style="display:inline-block;background:#F5943A;color:white;font-weight:700;font-size:15px;padding:14px 32px;border-radius:10px;text-decoration:none;">
-        Zum Kurs ansehen →
+      <a href="https://kurse.vikitraining.at/superblick-kurs" target="_blank" style="display:inline-block;background:#F5943A;color:white;font-weight:700;font-size:15px;padding:14px 32px;border-radius:10px;text-decoration:none;mso-padding-alt:0;line-height:48px;">
+        Kurs ansehen →
       </a>
     </div>
   </div>
