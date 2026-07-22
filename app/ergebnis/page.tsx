@@ -427,7 +427,7 @@ export default function ErgebnisPage() {
                 {[
                   { color: "#8DCDC5", text: `Du hast den vollständigen Screening-Bericht für ${kindNameAngezeigt} per E-Mail erhalten — lies ihn in Ruhe durch.` },
                   { color: "#F5943A", text: "Schau dir den VIKI Superblick Kurs an — und entscheide, ob das Training für dein Kind passt." },
-                  { color: "#EE6B85", text: "Bei konkreten Fragen zu den Ergebnissen: Wende dich an eine Optometristin oder Augenärztin für eine professionelle Einschätzung." },
+                  { color: "#EE6B85", text: "Bei konkreten Fragen zu den Ergebnissen: Wende dich an eine Funktionaloptometristin / einen Funktionaloptometristen oder eine Augenärztin / einen Augenarzt für eine professionelle Einschätzung." },
                 ].map((s, i) => (
                   <li key={i} className="flex gap-3 text-sm text-gray-700">
                     <span className="w-6 h-6 rounded-full text-white text-xs flex items-center justify-center font-bold shrink-0 mt-0.5" style={{ background: s.color }}>{i + 1}</span>

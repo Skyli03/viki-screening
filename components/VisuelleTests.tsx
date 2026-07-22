@@ -20,13 +20,15 @@ type Phase =
   | "merkspanne";
 
 function IntroCard({
-  emoji, name, beschreibung, warum, hinweis, kindName, onStart,
-}: { emoji: string; name: string; beschreibung: string; warum: string; hinweis: string; kindName: string; onStart: () => void }) {
+  emoji, name, beschreibung, warum, hinweis, kindName, ersteUebung, onStart,
+}: { emoji: string; name: string; beschreibung: string; warum: string; hinweis: string; kindName: string; ersteUebung?: boolean; onStart: () => void }) {
   return (
     <div className="text-center">
-      <div className="rounded-xl px-4 py-3 mb-5 text-sm font-semibold text-center max-w-sm mx-auto" style={{ background: "#FFF3CD", color: "#92400E", border: "1px solid #FCD34D" }}>
-        📱 Handy jetzt an <strong>{kindName}</strong> weitergeben — diese Aufgabe macht das Kind selbst!
-      </div>
+      {ersteUebung && (
+        <div className="rounded-xl px-4 py-3 mb-5 text-sm font-semibold text-center max-w-sm mx-auto" style={{ background: "#FFF3CD", color: "#92400E", border: "1px solid #FCD34D" }}>
+          👉 Die nächsten 3 Übungen soll bitte dein Kind machen.
+        </div>
+      )}
       <div className="text-6xl mb-3">{emoji}</div>
       <h2 className="text-2xl font-bold text-gray-900 mb-1">{name}</h2>
       <p className="text-gray-500 text-sm mb-3">{beschreibung}</p>
@@ -99,6 +101,7 @@ export default function VisuelleTests({ kindName, klasse, onFertig }: Props) {
           warum={`b, d, p, q sind spiegelverkehrt zum Verwechseln ähnlich. Wer sie nicht automatisch unterscheidet, muss beim Lesen jedes Mal kurz nachdenken statt sofort zu erkennen.`}
           hinweis={`Manche Buchstaben (b/d, p/q${klasse >= 3 ? ", n/u, m/w" : ""}) sehen sich sehr ähnlich. Schau genau hin — und antworte schnell!`}
           kindName={kindName}
+          ersteUebung
           onStart={() => setPhase("buchstaben")}
         />
       )}

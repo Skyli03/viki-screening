@@ -107,7 +107,7 @@ export default function StiftReiseEltern({ kindName, onFertig }: Props) {
               display: "inline-block",
             }}
           >
-            <span style={{ display: "inline-block", fontSize: "48px", transform: "rotate(45deg)" }}>✏️</span>
+            <span style={{ display: "inline-block", fontSize: "48px", transform: "rotate(90deg)" }}>✏️</span>
           </div>
         </div>
 
