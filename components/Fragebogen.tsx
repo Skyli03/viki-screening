@@ -53,15 +53,15 @@ export default function Fragebogen({ kindName, onFertig }: Props) {
       </div>
 
       {/* Fortschritt Abschnitte */}
-      <div className="flex gap-2 justify-center mb-8">
+      <div className="flex gap-2 justify-center mb-8 flex-wrap">
         {ABSCHNITTE.map((a, i) => (
           <div
             key={i}
-            className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
+            className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-semibold transition-all ${
               i === abschnitt ? "bg-primary text-white" : i < abschnitt ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-400"
             }`}
           >
-            {a.icon} {a.titel}
+            {a.icon} <span className="hidden sm:inline">{a.titel}</span>
           </div>
         ))}
       </div>
@@ -72,12 +72,12 @@ export default function Fragebogen({ kindName, onFertig }: Props) {
           return (
             <div key={frage.id} className="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm">
               <p className="text-gray-800 font-medium mb-4">{frage.text}</p>
-              <div className="grid grid-cols-4 gap-2">
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                 {ANTWORT_LABELS.map((label, i) => (
                   <button
                     key={i}
                     onClick={() => setAntwort(frage.id, i as Antwort)}
-                    className={`py-2.5 rounded-xl border-2 text-xs font-semibold transition-all ${
+                    className={`py-3 rounded-xl border-2 text-sm font-semibold transition-all ${
                       wert === i
                         ? `${FARBEN_BG[i]} ${FARBEN_BORDER[i]} ${FARBEN_TEXT[i]}`
                         : "border-gray-200 text-gray-500 hover:border-gray-300"

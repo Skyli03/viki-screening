@@ -34,7 +34,7 @@ export default function Startseite() {
         </div>
       </header>
 
-      <main className="max-w-3xl mx-auto px-6 py-10">
+      <main className="max-w-3xl mx-auto px-4 sm:px-6 py-10">
         {/* Hero */}
         <div className="text-center mb-10">
           <div className="text-6xl mb-4">👁️✨</div>
