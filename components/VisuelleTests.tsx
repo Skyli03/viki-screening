@@ -114,7 +114,7 @@ export default function VisuelleTests({ kindName, klasse, onFertig }: Props) {
         <IntroCard
           emoji="🔍"
           name="Spürnase"
-          beschreibung={`3 Symbole sind gleich — eines schleicht sich rein. ${kindName} tippt so schnell wie möglich das Sonderzeichen!`}
+          beschreibung={`3 Symbole sind gleich — eines ist anders. ${kindName} tippt so schnell wie möglich das nicht passende Zeichen!`}
           warum="Das Gehirn muss Formen blitzschnell sortieren und unterscheiden. Klappt das nicht automatisch, wird jedes Lesen zur Denkaufgabe statt zur Routine."
           hinweis="Schau dir alle 4 Symbole genau an. Drei davon sind identisch — welches passt nicht dazu? Schnell tippen!"
           kindName={kindName}
@@ -132,7 +132,7 @@ export default function VisuelleTests({ kindName, klasse, onFertig }: Props) {
           name="Blitzgedächtnis"
           beschreibung={`Ein Symbol blitzt kurz auf und verschwindet. ${kindName} tippt es aus dem Gedächtnis!`}
           warum="Wer ein Zeichen sieht und es sofort vergisst, kann aus Buchstaben kein Wort zusammensetzen. Visuelles Kurzzeitgedächtnis ist die unsichtbare Grundlage des Lesens."
-          hinweis={`${klasse <= 2 ? "Ein Symbol" : "Ein Buchstabe"} erscheint kurz — und ist dann weg. Welches war es? Schnell tippen!`}
+          hinweis={`${klasse <= 2 ? "Ein Symbol" : "Ein Buchstabe"} erscheint kurz — und ist dann weg. Welcher war es? Schnell tippen!`}
           kindName={kindName}
           onStart={() => setPhase("merkspanne")}
         />

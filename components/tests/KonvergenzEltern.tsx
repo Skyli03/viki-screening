@@ -92,8 +92,8 @@ export default function KonvergenzEltern({ kindName, onFertig }: Props) {
         </div>
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Konvergenz-Test</h2>
         <p className="text-sm text-gray-500 mb-3">Du führst diesen Test durch — {kindName} macht mit.</p>
-        <div className="rounded-xl px-4 py-3 mb-4 text-sm text-center max-w-lg mx-auto" style={{ background: "#E4F5F3", color: "#2D7A73" }}>
-          💡 Beim Lesen drehen sich die Augen ständig ein und aus — für jede Zeile, jeden Tafel-Heft-Blick. Klappt das nicht reibungslos, verschwimmen Buchstaben, erscheinen doppelt, oder das Kind muss viel mehr Energie aufwenden als andere.
+        <div className="rounded-xl px-4 py-3 mb-4 text-sm text-left max-w-lg mx-auto" style={{ background: "#E4F5F3", color: "#2D7A73" }}>
+          💡 Beim Lesen müssen beide Augen wie ein eingespieltes Team auf denselben Buchstaben schauen. Dafür bewegen sie sich leicht nach innen und richten sich gemeinsam auf den Text aus – das nennt man Konvergenz. Funktioniert diese Zusammenarbeit nicht optimal, können Buchstaben verschwimmen oder zeitweise doppelt erscheinen. Das Lesen wird anstrengender und kostet das Kind deutlich mehr Energie.
         </div>
 
         <p className="text-sm text-gray-600 mb-4 max-w-lg mx-auto text-center">

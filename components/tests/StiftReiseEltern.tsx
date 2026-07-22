@@ -107,7 +107,11 @@ export default function StiftReiseEltern({ kindName, onFertig }: Props) {
               display: "inline-block",
             }}
           >
-            <span style={{ display: "inline-block", fontSize: "48px", transform: "rotate(90deg)" }}>✏️</span>
+            <span style={{ display: "inline-flex", flexDirection: "column", alignItems: "center" }}>
+              <span style={{ width: "10px", height: "6px", background: "#9CA3AF", borderRadius: "3px 3px 0 0", display: "block" }} />
+              <span style={{ width: "10px", height: "52px", background: "linear-gradient(90deg, #FCD34D 40%, #F59E0B 60%)", display: "block" }} />
+              <span style={{ width: 0, height: 0, borderLeft: "5px solid transparent", borderRight: "5px solid transparent", borderTop: "10px solid #92400E", display: "block" }} />
+            </span>
           </div>
         </div>
 

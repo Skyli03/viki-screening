@@ -133,14 +133,14 @@ export default function BuchLesetest({ kindName, onFertig }: Props) {
         <div className="space-y-4">
           {/* Lesefluss */}
           <div className="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
-            <p className="font-semibold text-sm text-gray-900 mb-2">Wie hat {kindName} gelesen?</p>
+            <p className="font-semibold text-base text-gray-900 mb-2">Wie hat {kindName} gelesen?</p>
             <div className="grid grid-cols-2 gap-2">
               {([
                 { val: true, label: "Flüssig und sicher", color: "#16A34A", bg: "#F0FDF4", border: "#86EFAC" },
-                { val: false, label: "Holprig / mit Mühe", color: "#DC2626", bg: "#FEF2F2", border: "#FCA5A5" },
+                { val: false, label: "Holprig / mit Mühe", color: "#D97706", bg: "#FFFBEB", border: "#FCD34D" },
               ] as const).map(opt => (
                 <button key={String(opt.val)} onClick={() => setFluessig(opt.val)}
-                  className="p-3 rounded-xl border-2 text-sm font-semibold transition-all"
+                  className="p-3 rounded-xl border-2 text-base font-semibold transition-all"
                   style={fluessig === opt.val ? { background: opt.bg, borderColor: opt.border, color: opt.color } : { borderColor: "#E5E7EB", color: "#374151" }}>
                   {opt.label}
                 </button>
@@ -150,11 +150,11 @@ export default function BuchLesetest({ kindName, onFertig }: Props) {
 
           {/* Zeile verlieren */}
           <div className="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
-            <p className="font-semibold text-sm text-gray-900 mb-2">Hat {kindName} die Zeile verloren oder Wörter übersprungen?</p>
+            <p className="font-semibold text-base text-gray-900 mb-2">Hat {kindName} die Zeile verloren oder Wörter übersprungen?</p>
             <div className="grid grid-cols-2 gap-2">
               {([{ val: false, label: "Nein / kaum" }, { val: true, label: "Ja, deutlich" }] as const).map(opt => (
                 <button key={String(opt.val)} onClick={() => { setVerliertZeile(opt.val); setUeberspringtWoerter(opt.val); }}
-                  className="p-3 rounded-xl border-2 text-sm font-semibold transition-all"
+                  className="p-3 rounded-xl border-2 text-base font-semibold transition-all"
                   style={verliert_zeile === opt.val
                     ? { background: opt.val ? "#FEF2F2" : "#F0FDF4", borderColor: opt.val ? "#FCA5A5" : "#86EFAC", color: opt.val ? "#DC2626" : "#16A34A" }
                     : { borderColor: "#E5E7EB", color: "#374151" }}>
@@ -166,11 +166,11 @@ export default function BuchLesetest({ kindName, onFertig }: Props) {
 
           {/* Finger */}
           <div className="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
-            <p className="font-semibold text-sm text-gray-900 mb-2">Finger zum Zeilen-Verfolgen benutzt?</p>
+            <p className="font-semibold text-base text-gray-900 mb-2">Finger zum Zeilen-Verfolgen benutzt?</p>
             <div className="grid grid-cols-2 gap-2">
               {([{ val: false, label: "Nein" }, { val: true, label: "Ja" }] as const).map(opt => (
                 <button key={String(opt.val)} onClick={() => setBenutztFinger(opt.val)}
-                  className="p-3 rounded-xl border-2 text-sm font-semibold transition-all"
+                  className="p-3 rounded-xl border-2 text-base font-semibold transition-all"
                   style={benutzt_finger === opt.val
                     ? { background: opt.val ? "#FEF2F2" : "#F0FDF4", borderColor: opt.val ? "#FCA5A5" : "#86EFAC", color: opt.val ? "#DC2626" : "#16A34A" }
                     : { borderColor: "#E5E7EB", color: "#374151" }}>
@@ -182,11 +182,11 @@ export default function BuchLesetest({ kindName, onFertig }: Props) {
 
           {/* Fehler */}
           <div className="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
-            <p className="font-semibold text-sm text-gray-900 mb-2">Viele Fehler bei eigentlich bekannten Wörtern?</p>
+            <p className="font-semibold text-base text-gray-900 mb-2">Viele Fehler bei eigentlich bekannten Wörtern?</p>
             <div className="grid grid-cols-2 gap-2">
               {([{ val: false, label: "Nein / wenige" }, { val: true, label: "Ja, auffällig viele" }] as const).map(opt => (
                 <button key={String(opt.val)} onClick={() => setVieleFehler(opt.val)}
-                  className="p-3 rounded-xl border-2 text-sm font-semibold transition-all"
+                  className="p-3 rounded-xl border-2 text-base font-semibold transition-all"
                   style={viele_fehler === opt.val
                     ? { background: opt.val ? "#FEF2F2" : "#F0FDF4", borderColor: opt.val ? "#FCA5A5" : "#86EFAC", color: opt.val ? "#DC2626" : "#16A34A" }
                     : { borderColor: "#E5E7EB", color: "#374151" }}>
@@ -198,16 +198,16 @@ export default function BuchLesetest({ kindName, onFertig }: Props) {
 
           {/* Leseabstand */}
           <div className="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
-            <p className="font-semibold text-sm text-gray-900 mb-2">Abstand zum Buch?</p>
+            <p className="font-semibold text-base text-gray-900 mb-2">Abstand zum Buch?</p>
             <div className="grid grid-cols-2 gap-2">
               {([
                 { val: "normal", label: "Normal (30–40 cm)", color: "#16A34A", bg: "#F0FDF4", border: "#86EFAC" },
-                { val: "zu_nah", label: "Zu nah (unter 20 cm)", color: "#DC2626", bg: "#FEF2F2", border: "#FCA5A5" },
+                { val: "zu_nah", label: "Zu nah (unter 20 cm)", color: "#D97706", bg: "#FFFBEB", border: "#FCD34D" },
                 { val: "zu_weit", label: "Zu weit (über 50 cm)", color: "#D97706", bg: "#FFFBEB", border: "#FCD34D" },
                 { val: "wechselnd", label: "Wechselt ständig", color: "#D97706", bg: "#FFFBEB", border: "#FCD34D" },
               ] as const).map(opt => (
                 <button key={opt.val} onClick={() => setLeseabstand(opt.val)}
-                  className="p-3 rounded-xl border-2 text-sm font-semibold transition-all"
+                  className="p-3 rounded-xl border-2 text-base font-semibold transition-all"
                   style={leseabstand === opt.val
                     ? { background: opt.bg, borderColor: opt.border, color: opt.color }
                     : { borderColor: "#E5E7EB", color: "#374151" }}>
@@ -219,14 +219,14 @@ export default function BuchLesetest({ kindName, onFertig }: Props) {
 
           {/* Kopfhaltung */}
           <div className="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
-            <p className="font-semibold text-sm text-gray-900 mb-2">Kopfhaltung beim Lesen?</p>
+            <p className="font-semibold text-base text-gray-900 mb-2">Kopfhaltung beim Lesen?</p>
             <div className="grid grid-cols-2 gap-2">
               {([
                 { val: "gerade", label: "Kopf gerade" },
                 { val: "schief_oder_verdreht", label: "Kopf schief / Buch verdreht" },
               ] as const).map(opt => (
                 <button key={opt.val} onClick={() => setKopfhaltung(opt.val)}
-                  className="p-3 rounded-xl border-2 text-sm font-semibold transition-all"
+                  className="p-3 rounded-xl border-2 text-base font-semibold transition-all"
                   style={kopfhaltung === opt.val
                     ? { background: opt.val === "gerade" ? "#F0FDF4" : "#FEF2F2", borderColor: opt.val === "gerade" ? "#86EFAC" : "#FCA5A5", color: opt.val === "gerade" ? "#16A34A" : "#DC2626" }
                     : { borderColor: "#E5E7EB", color: "#374151" }}>

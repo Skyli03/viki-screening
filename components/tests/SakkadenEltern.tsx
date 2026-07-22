@@ -58,8 +58,8 @@ export default function SakkadenEltern({ kindName, onFertig }: Props) {
         <p className="text-sm text-gray-500 mb-1">Kann {kindName} präzise zwischen zwei Punkten hin- und herspringen?</p>
         <p className="text-xs font-semibold mb-3" style={{ color: "#8DCDC5" }}>Genauigkeit der Augenbewegungen beobachten</p>
 
-        <div className="rounded-xl px-4 py-3 mb-4 text-sm text-center max-w-lg mx-auto" style={{ background: "#E4F5F3", color: "#2D7A73" }}>
-          💡 Lesen besteht fast nur aus Blicksprüngen — von Wort zu Wort, von Zeile zu Zeile. Präzise Sprünge bedeuten ruhiges Lesen. Ungenau? Das Auge sucht — und kostet enorm viel Energie.
+        <div className="rounded-xl px-4 py-3 mb-4 text-sm text-left max-w-lg mx-auto" style={{ background: "#E4F5F3", color: "#2D7A73" }}>
+          💡 Beim Lesen springen die Augen ständig von Wort zu Wort und von Zeile zu Zeile. Sind diese Blicksprünge nicht präzise, verliert das Kind leichter die Zeile, muss häufiger zurückspringen – und Lesen wird unnötig anstrengend.
         </div>
 
         <p className="text-sm text-gray-600 mb-4 max-w-lg mx-auto text-center">
