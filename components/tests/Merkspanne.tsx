@@ -6,8 +6,11 @@ interface Props {
   onFertig: (result: { fehlerrate: number; reaktionszeit: number }) => void;
 }
 
-// Klasse 1-2: Formen
-const POOL_LEICHT = ["○", "□", "△", "★", "◇", "♡", "☆", "⬡"];
+// Klasse 1: nur neutrale geometrische Formen (keine emotional aufgeladenen Symbole —
+// Stern/Herz werden semantisch erkannt, nicht über Form, und verfälschen die Merkspanne)
+const POOL_K1 = ["○", "□", "△", "◇", "⬡", "▽", "▷", "◁"];
+// Klasse 2: jetzt auch emotional markierte Formen erlaubt
+const POOL_K2 = ["○", "□", "△", "★", "◇", "♡", "☆", "⬡"];
 // Klasse 3-4: konfundierbare Buchstaben
 const POOL_SCHWER = ["b", "d", "p", "q", "n", "u", "m", "w"];
 
@@ -15,12 +18,15 @@ const POOL_SCHWER = ["b", "d", "p", "q", "n", "u", "m", "w"];
 const AEHNLICHE_LEICHT: Record<string, string[]> = {
   "○": ["⬡", "◇", "□"],
   "□": ["◇", "△", "⬡"],
-  "△": ["◇", "□", "⬡"],
+  "△": ["▽", "□", "◇"],
   "★": ["☆", "♡", "◇"],
   "◇": ["□", "△", "⬡"],
   "♡": ["☆", "★", "◇"],
   "☆": ["★", "♡", "○"],
   "⬡": ["○", "◇", "□"],
+  "▽": ["△", "◇", "⬡"],
+  "▷": ["◁", "△", "▽"],
+  "◁": ["▷", "▽", "△"],
 };
 const AEHNLICHE_SCHWER: Record<string, string[]> = {
   "b": ["d", "p", "q"],
@@ -55,7 +61,7 @@ function getZeigeDauer(runde: number, klasse: number): number {
 
 export default function Merkspanne({ klasse, onFertig }: Props) {
   const schwer = klasse >= 3;
-  const pool = schwer ? POOL_SCHWER : POOL_LEICHT;
+  const pool = schwer ? POOL_SCHWER : klasse >= 2 ? POOL_K2 : POOL_K1;
   const aehnliche = schwer ? AEHNLICHE_SCHWER : AEHNLICHE_LEICHT;
   const anzeigeGroesse = schwer ? "56px" : "64px";
 

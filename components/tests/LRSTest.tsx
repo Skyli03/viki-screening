@@ -64,6 +64,7 @@ export default function LRSTest({ klasse, onFertig }: Props) {
   const [letzteAntwort, setLetzteAntwort] = useState<boolean | null>(null);
   const [verstricheneMs, setVerstricheneMs] = useState(0);
   const [sichtbar, setSichtbar] = useState(true);
+  const [gleichLinks, setGleichLinks] = useState(() => Math.random() < 0.5);
   const timerRef = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
   const flashTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
@@ -114,6 +115,7 @@ export default function LRSTest({ klasse, onFertig }: Props) {
         setZeitRef(Date.now());
         setBewertet(false);
         setLetzteAntwort(null);
+        setGleichLinks(Math.random() < 0.5);
       }, 500);
     }
   }, [bewertet, zeitRef, gleich, verwechslungen, zeiten, runde, onFertig, RUNDEN]);
@@ -176,20 +178,25 @@ export default function LRSTest({ klasse, onFertig }: Props) {
       )}
 
       <div className="flex gap-4 justify-center">
-        <button
-          onClick={() => antworten(true)}
-          disabled={bewertet}
-          className="flex-1 max-w-xs py-4 rounded-xl font-bold text-xl border-2 border-green-400 bg-green-50 text-green-800 hover:bg-green-100 active:scale-95 transition-all disabled:opacity-50"
-        >
-          👍 Gleich
-        </button>
-        <button
-          onClick={() => antworten(false)}
-          disabled={bewertet}
-          className="flex-1 max-w-xs py-4 rounded-xl font-bold text-xl border-2 border-orange-400 bg-orange-50 text-orange-800 hover:bg-orange-100 active:scale-95 transition-all disabled:opacity-50"
-        >
-          ✌️ Verschieden
-        </button>
+        {(gleichLinks
+          ? [
+              { gleich: true,  label: "👍 Gleich",     cls: "border-green-400 bg-green-50 text-green-800 hover:bg-green-100" },
+              { gleich: false, label: "✌️ Verschieden", cls: "border-orange-400 bg-orange-50 text-orange-800 hover:bg-orange-100" },
+            ]
+          : [
+              { gleich: false, label: "✌️ Verschieden", cls: "border-orange-400 bg-orange-50 text-orange-800 hover:bg-orange-100" },
+              { gleich: true,  label: "👍 Gleich",     cls: "border-green-400 bg-green-50 text-green-800 hover:bg-green-100" },
+            ]
+        ).map(btn => (
+          <button
+            key={btn.label}
+            onClick={() => antworten(btn.gleich)}
+            disabled={bewertet}
+            className={`flex-1 max-w-xs py-4 rounded-xl font-bold text-xl border-2 active:scale-95 transition-all disabled:opacity-50 ${btn.cls}`}
+          >
+            {btn.label}
+          </button>
+        ))}
       </div>
     </div>
   );

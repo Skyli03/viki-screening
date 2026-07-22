@@ -41,7 +41,7 @@ const SETS_SCHWER = [
   { basis: "∧", aehnlich: "∨" },   // Pfeil oben vs. unten
   { basis: "△", aehnlich: "▽" },   // Dreieck oben vs. unten
   { basis: "◁", aehnlich: "▷" },   // Dreieck links vs. rechts
-  { basis: "⌐", aehnlich: "¬" },   // Winkel gespiegelt
+  { basis: "┌", aehnlich: "┐" },   // L-Form oben links vs. oben rechts
   { basis: "↑", aehnlich: "↓" },   // Pfeil hoch vs. runter
   { basis: "←", aehnlich: "→" },   // Pfeil links vs. rechts
   { basis: "∪", aehnlich: "⊂" },   // Bogen unten vs. C links

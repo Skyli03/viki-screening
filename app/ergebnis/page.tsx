@@ -3,59 +3,79 @@ import { useEffect, useState } from "react";
 import { berechneScreeningProfil } from "@/lib/auswertung";
 import type { ScreeningProfil } from "@/lib/auswertung";
 import type { ScreeningDaten, Antwort } from "@/lib/screening-types";
-import { FRAGEN } from "@/data/fragebogen";
 
-const AMPEL_FARBEN = {
-  gruen: { bg: "bg-green-100", border: "border-green-400", text: "text-green-800", dot: "bg-green-500", label: "Unauffällig" },
-  gelb:  { bg: "bg-yellow-100", border: "border-yellow-400", text: "text-yellow-800", dot: "bg-yellow-400", label: "Auffällig" },
-  rot:   { bg: "bg-red-100",    border: "border-red-400",    text: "text-red-800",    dot: "bg-red-500",    label: "Förderbedarf" },
-};
+// 4-level Ampel — keine Zahlen für Eltern sichtbar
+function getAmpelLevel(score: number): 0 | 1 | 2 | 3 {
+  if (score >= 71) return 0;
+  if (score >= 56) return 1;
+  if (score >= 41) return 2;
+  return 3;
+}
 
-const TYP_DATEN: Record<string, {
-  warum: string; symptome: string[]; mechanismus: string; training: string; icon: string;
+const STUFEN = [
+  { emoji: "🟢", label: "Unauffällig",       bg: "#F0FDF4", border: "#86EFAC", text: "#166534" },
+  { emoji: "🟡", label: "Leichte Hinweise",  bg: "#FEFCE8", border: "#FDE047", text: "#854D0E" },
+  { emoji: "🟠", label: "Deutliche Hinweise",bg: "#FFF7ED", border: "#FDBA74", text: "#9A3412" },
+  { emoji: "🔴", label: "Starke Hinweise",   bg: "#FEF2F2", border: "#FCA5A5", text: "#991B1B" },
+];
+
+const ALLTAGS_TEXTE: Record<string, {
+  fachtitel: string;
+  beobachtet: string;
+  alltag: string;
+  disclaimer: string;
+  positiv: string;
 }> = {
-  A: {
-    icon: "👁️", warum: "Lesefluss & Augenbewegungen",
-    symptome: [
-      "Verliert die Zeile beim Lesen und muss mit dem Finger nachfahren",
-      "Liest langsam, obwohl es die Buchstaben kennt",
-      "Hausaufgaben dauern 3× so lang wie bei anderen Kindern",
-    ],
-    mechanismus: "Die Augen können nicht flüssig von Wort zu Wort springen. Statt gezielter Sakkaden macht das Gehirn viele kleine Korrekturbewegungen — das kostet viel Energie.",
-    training: "Augensprünge, Lesefluss-Training, visuelle Spurfolge-Übungen",
+  "Lesefluss": {
+    fachtitel: "Lesefluss & Augenbewegungen",
+    beobachtet: "Beim Lesetest zeigten sich Hinweise auf einen unruhigen Lesefluss — z. B. Stocken beim Vorlesen, Zeilenverluste oder Wörter überspringen.",
+    alltag: "Manche Kinder, bei denen sich in diesem Bereich Auffälligkeiten zeigen, brauchen beim Lesen deutlich länger als Gleichaltrige. Sie verlieren die Zeile, überspringen Wörter oder raten — obwohl sie die Buchstaben gut kennen. Hausaufgaben dauern oft deutlich länger als nötig.",
+    disclaimer: "Das ist kein Hinweis auf mangelnde Intelligenz oder fehlenden Fleiß — es kann auf eine visuelle Verarbeitungsstrategie hinweisen, die mit gezieltem Training verbessert werden kann.",
+    positiv: "Der Lesefluss war unauffällig — dein Kind liest flüssig und zeigt keine Auffälligkeiten beim Vorlesen.",
   },
-  B: {
-    icon: "🎯", warum: "Fokus & Augensteuerung",
-    symptome: [
-      "Klagt über Doppelbilder oder Verschwimmen beim Lesen",
-      "Bücher werden lieber weggelegt statt gelesen",
-      "Kann einem bewegten Stift nicht flüssig mit den Augen folgen",
-    ],
-    mechanismus: "Die Augensteuerung (Konvergenz, Fixation, Smooth Pursuit) ist eingeschränkt. Das kostet dem Gehirn enorm viel Kraft — sichtbar als Konzentrationsprobleme.",
-    training: "Konvergenztraining, Fixation, Stift-Folgeübungen",
+  "Augensteuerung": {
+    fachtitel: "Nahsehen & Augenkoordination",
+    beobachtet: "Bei den Übungen zu Konvergenz, Fixation und/oder Augenverfolgung zeigten sich Hinweise auf Auffälligkeiten in der Augensteuerung.",
+    alltag: "Manche Kinder mit Hinweisen in diesem Bereich klagen über Doppelbilder oder ein Verschwimmen beim Lesen, legen Bücher lieber weg oder berichten, dass die Buchstaben 'springen'. Lesen strengt schnell an — auch wenn das Kind eigentlich gut sehen kann.",
+    disclaimer: "Das ist kein Hinweis auf eine Sehschwäche im klassischen Sinn. Es betrifft die Teamarbeit beider Augen beim Nahsehen — und diese lässt sich gezielt trainieren.",
+    positiv: "Die Augenkoordination war unauffällig — Konvergenz, Fixation und Verfolgung zeigten keine Auffälligkeiten.",
   },
-  C: {
-    icon: "🔄", warum: "Frühkindliche Reflexe & Körpersteuerung",
-    symptome: [
-      "Sitzt auffällig schief oder verdreht beim Schreiben",
-      "Vermeidet Lesen und findet immer Ausreden",
-      "Konzentration bricht nach wenigen Minuten ein",
-    ],
-    mechanismus: "Nicht vollständig integrierte Frühreflexe (z. B. ATNR, MORO) stören die Augen-Körper-Koordination. Das Kind muss unbewusst so viel Energie für Körperkontrolle aufwenden, dass wenig für das Lernen bleibt.",
-    training: "Reflexintegration, Körper-Augen-Koordination, MORO/ATNR-Sequenzen",
+  "Visuelle Verarbeitung": {
+    fachtitel: "Buchstaben & Symbole unterscheiden",
+    beobachtet: "Beim Buchstabenjäger und/oder der Spürnase zeigten sich Hinweise auf Schwierigkeiten beim schnellen Unterscheiden ähnlicher Zeichen.",
+    alltag: "Manche Kinder, bei denen sich in diesem Bereich Auffälligkeiten zeigen, brauchen beim Lesen länger — weil das Gehirn bei ähnlichen Buchstaben (b/d, p/q) jedes Mal kurz nachdenken muss statt sofort zu erkennen. Das verlangsamt den Lesefluss, auch wenn das Kind die Buchstaben theoretisch kennt.",
+    disclaimer: "Das ist kein Hinweis auf Legasthenie oder eine Lernschwäche. Es betrifft die visuelle Verarbeitungsgeschwindigkeit — und diese ist gezielt trainierbar.",
+    positiv: "Buchstaben und Symbole werden sicher und schnell unterschieden — die visuelle Diskrimination ist unauffällig.",
   },
-  D: {
-    icon: "🧠", warum: "Kombinierte visuelle & neuronale Verarbeitung",
-    symptome: [
-      "In der Schule \"nicht dabei\", obwohl es zuhause alles versteht",
-      "Kann nicht vorlesen, aber versteht alles wenn man vorliest",
-      "Hausaufgaben: ewige Kämpfe, Tränen, kein Ende",
-    ],
-    mechanismus: "Mehrere visuelle Teilsysteme arbeiten nicht optimal zusammen. Das addiert sich — und das Kind wirkt \"unaufmerksam\" oder \"faul\", obwohl es das Gegenteil ist.",
-    training: "Ganzheitliches Augen-Hirn-Training, Reflexintegration, visuelles Gedächtnis",
+  "Visuelle Merkspanne": {
+    fachtitel: "Visuelles Kurzzeitgedächtnis",
+    beobachtet: "Beim Blitzgedächtnis-Test zeigten sich Hinweise auf eine eingeschränkte visuelle Merkspanne.",
+    alltag: "Manche Kinder mit Hinweisen in diesem Bereich haben Schwierigkeiten, kurz Gesehenes zu behalten — z. B. beim Abschreiben von der Tafel oder beim Merken von Buchstabenfolgen. Sie schauen öfter hin und können sich kürzere Einheiten auf einmal behalten.",
+    disclaimer: "Das ist kein Hinweis auf ein allgemeines Gedächtnisproblem. Es betrifft das visuelle Arbeitsgedächtnis — gezielte Übungen können hier spürbar helfen.",
+    positiv: "Das visuelle Kurzzeitgedächtnis ist unauffällig — kurz Gesehenes bleibt gut im Gedächtnis.",
+  },
+  "Konzentration": {
+    fachtitel: "Aufmerksamkeit & Fokus",
+    beobachtet: "Die Fragebogen-Antworten weisen auf häufige Konzentrationsschwierigkeiten hin.",
+    alltag: "Manche Kinder mit Hinweisen in diesem Bereich können sich beim Lernen nur kurz konzentrieren, sind schnell abgelenkt oder brauchen häufige Pausen. Oft ist das kein Willensproblem — sondern ein Zeichen, dass das Gehirn bei visuellen Aufgaben viel Energie aufwenden muss.",
+    disclaimer: "Konzentrationsschwierigkeiten haben viele mögliche Ursachen. Dieser Bereich zeigt, ob visuelle Belastung ein Faktor sein könnte — und ersetzt keine professionelle Abklärung.",
+    positiv: "Die Konzentration war laut Fragebogen unauffällig — keine Häufung von Aufmerksamkeitsschwierigkeiten.",
+  },
+  "Reflexintegration": {
+    fachtitel: "Frühkindliche Reflexe",
+    beobachtet: "Die Fragebogen-Antworten weisen auf mögliche aktive frühkindliche Reflexe hin (z. B. MORO, ATNR).",
+    alltag: "Manche Kinder mit Hinweisen in diesem Bereich sitzen beim Schreiben auffällig schief, haben Mühe beim Stillsitzen oder zeigen unwillkürliche Mitbewegungen. Das kostet unbewusst viel Energie — und kann Konzentration und Augensteuerung beeinflussen.",
+    disclaimer: "Frühkindliche Reflexe integrieren sich bei manchen Kindern langsamer. Das ist keine Entwicklungsstörung — gezielte Übungen können dabei helfen.",
+    positiv: "Die Reflexintegration zeigte keine Auffälligkeiten — keine Häufung typischer Reflex-Zeichen.",
   },
 };
 
+const TYP_DATEN: Record<string, { icon: string; warum: string; training: string }> = {
+  A: { icon: "👁️", warum: "Lesefluss & Augenbewegungen",                     training: "Augensprünge, Lesefluss-Training, visuelle Spurfolge-Übungen" },
+  B: { icon: "🎯", warum: "Fokus & Augensteuerung",                           training: "Konvergenztraining, Fixation, Stift-Folgeübungen" },
+  C: { icon: "🔄", warum: "Frühkindliche Reflexe & Körpersteuerung",          training: "Reflexintegration, Körper-Augen-Koordination, MORO/ATNR-Sequenzen" },
+  D: { icon: "🧠", warum: "Kombinierte visuelle & neuronale Verarbeitung",    training: "Ganzheitliches Augen-Hirn-Training, Reflexintegration, visuelles Gedächtnis" },
+};
 
 function demoScreeningDaten(): ScreeningDaten {
   return {
@@ -89,8 +109,6 @@ function demoScreeningDaten(): ScreeningDaten {
 export default function ErgebnisPage() {
   const [profil, setProfil] = useState<ScreeningProfil | null>(null);
   const [kindName, setKindName] = useState("dein Kind");
-  const [geschlecht, setGeschlecht] = useState<"m" | "f" | "">("");
-  const [auffaelligeFragen, setAuffaelligeFragen] = useState<string[]>([]);
   const [emailFreigegeben, setEmailFreigegeben] = useState(false);
   const [email, setEmail] = useState("");
   const [emailFehler, setEmailFehler] = useState("");
@@ -99,22 +117,11 @@ export default function ErgebnisPage() {
 
   useEffect(() => {
     const name = sessionStorage.getItem("kindName") ?? "dein Kind";
-    const g = sessionStorage.getItem("geschlecht") ?? "";
     const klasse = Number(sessionStorage.getItem("klasse") ?? "2");
     setKindName(name);
-    setGeschlecht(g as "m" | "f" | "");
 
     const rohdaten = sessionStorage.getItem("screening_daten");
     const daten: ScreeningDaten = rohdaten ? JSON.parse(rohdaten) : demoScreeningDaten();
-
-    if (daten.fragebogen) {
-      const auffaellig = FRAGEN
-        .filter(f => (daten.fragebogen[f.id] ?? 0) >= 2)
-        .map(f => f.text.replace(/^Mein Kind /, ""))
-        .slice(0, 4);
-      setAuffaelligeFragen(auffaellig);
-    }
-
     setProfil(berechneScreeningProfil(daten, daten.klasse ?? klasse));
   }, []);
 
@@ -163,17 +170,13 @@ export default function ErgebnisPage() {
     );
   }
 
-  const gesamtAmpel = profil.gesamtScore >= 71 ? "gruen" : profil.gesamtScore >= 41 ? "gelb" : "rot";
-  const gesamtFarbe = AMPEL_FARBEN[gesamtAmpel];
+  const gesamtLevel = getAmpelLevel(profil.gesamtScore);
+  const gesamtStufe = STUFEN[gesamtLevel];
   const typDaten = TYP_DATEN[profil.typ] ?? TYP_DATEN.D;
 
-  const isBub = geschlecht === "m";
-  const isMaedchen = geschlecht === "f";
-  const subj    = isBub ? "er"   : isMaedchen ? "sie"  : "es";
-  const erSubj  = isBub ? "Er"   : isMaedchen ? "Sie"  : "Es";
-  const nameOderKind = kindName !== "dein Kind" ? kindName : "Dein Kind";
-  const kindGenitivOderDein = kindName !== "dein Kind" ? `von ${kindName}` : "deines Kindes";
-  const hatAuffaelligkeiten = profil.auffaelligkeitenAnzahl >= 2;
+  const staerken = profil.kategorien.filter(k => k.ampel === "gruen");
+  const hinweise = profil.kategorien.filter(k => k.ampel !== "gruen");
+  const kindNameAngezeigt = kindName !== "dein Kind" ? kindName : "dein Kind";
 
   return (
     <div className="min-h-screen" style={{ background: "#F7F9FA" }}>
@@ -190,113 +193,133 @@ export default function ErgebnisPage() {
 
       <main className="max-w-2xl mx-auto px-5 py-8 space-y-6">
 
-        {/* 1. Empathie-Hook */}
+        {/* Prominenter Disclaimer */}
+        <div className="rounded-xl px-4 py-3 text-sm flex items-start gap-3" style={{ background: "#F0F9F8", border: "1px solid #8DCDC5", color: "#1F5C57" }}>
+          <span className="text-lg shrink-0">ℹ️</span>
+          <div>
+            <span className="font-semibold">Eltern-Screening — kein medizinisches Diagnoseinstrument.</span>{" "}
+            Dieses Screening gibt Hinweise auf mögliche visuelle Auffälligkeiten und ersetzt keine augenärztliche oder optometrische Diagnose. Bei Fragen wende dich an eine Fachperson.
+          </div>
+        </div>
+
+        {/* Empathie-Hook */}
         <div className="rounded-2xl p-6" style={{ background: "#FEF3E2", border: "2px solid #F5943A" }}>
           <p className="text-sm font-semibold uppercase tracking-wide mb-2" style={{ color: "#C47020" }}>Kennst du das?</p>
           <blockquote className="text-lg font-medium text-gray-900 leading-relaxed italic">
             „Eigentlich ist mein Kind ja schlau — aber Hausaufgaben dauern ewig, die Konzentration hält nicht lange und Lesen klappt einfach nicht so wie bei anderen Kindern."
           </blockquote>
           <p className="mt-3 text-sm text-gray-600">
-            Wenn dir das bekannt vorkommt: Du bist nicht allein. Und es liegt nicht am Willen {kindGenitivOderDein}.
+            Wenn dir das bekannt vorkommt: Du bist nicht allein. Und es liegt nicht am Willen {kindName !== "dein Kind" ? `von ${kindName}` : "deines Kindes"}.
           </p>
         </div>
 
-        {/* 2. Ergebnis-Karte */}
-        <div className={`rounded-2xl border-2 p-6 ${gesamtFarbe.bg} ${gesamtFarbe.border}`}>
+        {/* Ergebnis-Übersicht (ohne Zahlen) */}
+        <div className="rounded-2xl border-2 p-6" style={{ background: gesamtStufe.bg, borderColor: gesamtStufe.border }}>
           <div className="flex items-center gap-4">
-            <div className={`w-16 h-16 rounded-full flex items-center justify-center text-white text-2xl font-black shadow-lg ${gesamtFarbe.dot}`}>
-              {profil.gesamtScore}
-            </div>
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-1">
-                <span className={`text-xs font-bold uppercase tracking-wide px-2 py-0.5 rounded-full ${gesamtFarbe.bg} ${gesamtFarbe.text}`}>
-                  {gesamtFarbe.label}
-                </span>
-                <span className="text-xs text-gray-500">Gesamt-Score</span>
+            <div className="text-5xl">{gesamtStufe.emoji}</div>
+            <div>
+              <div className="text-xs font-bold uppercase tracking-wide mb-1" style={{ color: gesamtStufe.text }}>
+                Screening-Ergebnis für {kindNameAngezeigt}
               </div>
-              <h2 className={`text-xl font-bold ${gesamtFarbe.text}`}>
-                {profil.auffaelligkeitenAnzahl} von 6 Bereichen mit Auffälligkeiten
-              </h2>
-              <p className={`text-sm mt-1 font-medium ${gesamtFarbe.text}`}>
-                {typDaten.icon} Schwerpunkt: <strong>{typDaten.warum}</strong>
-              </p>
+              <div className="text-xl font-bold" style={{ color: gesamtStufe.text }}>
+                {gesamtStufe.label}
+              </div>
+              <div className="text-sm mt-1" style={{ color: gesamtStufe.text }}>
+                {hinweise.length === 0
+                  ? "Alle Bereiche unauffällig — gut gemacht!"
+                  : `${hinweise.length} Bereich${hinweise.length > 1 ? "e" : ""} mit Hinweisen · ${staerken.length} unauffällig`}
+              </div>
             </div>
           </div>
         </div>
 
-        {/* 3. Warum */}
-        <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
-          <p className="text-xs font-bold uppercase tracking-wide text-gray-400 mb-3">
-            Warum kämpft {kindName !== "dein Kind" ? kindName : "dein Kind"} gerade?
-          </p>
-          <div className="space-y-2 mb-4">
-            {(auffaelligeFragen.length > 0 ? auffaelligeFragen : typDaten.symptome).map((s, i) => (
-              <div key={i} className="flex items-start gap-2 text-sm text-gray-700">
-                <span className="text-orange-400 mt-0.5 flex-shrink-0">✓</span>
-                <span>{s}</span>
-              </div>
-            ))}
-          </div>
-          <div className="rounded-xl p-4 text-sm text-gray-700 leading-relaxed" style={{ background: "#F0F9F8" }}>
-            <span className="font-semibold" style={{ color: "#2D7A73" }}>Der mögliche Grund:</span>{" "}
-            {typDaten.mechanismus}
-          </div>
-          <div className="mt-4 rounded-xl p-4 text-sm" style={{ background: "#FEF3E2" }}>
-            <p className="font-semibold mb-2" style={{ color: "#C47020" }}>💡 Wichtig zu wissen:</p>
-            <ul className="space-y-2 text-gray-700">
-              <li>• Schwierigkeiten bei der visuellen Verarbeitung bleiben oft jahrelang unentdeckt — weil Kinder keinen Vergleich haben und gar nicht wissen, dass andere anders sehen als sie.</li>
-              <li>• Was wie Unaufmerksamkeit oder mangelnde Motivation wirkt, ist häufig eine unsichtbare visuelle Belastung.</li>
-            </ul>
-          </div>
-        </div>
-
-        {/* 4. Kategorien (erste 2 immer sichtbar) */}
-        <div>
-          <h3 className="text-base font-bold text-gray-900 mb-3">Auswertung — 6 Bereiche</h3>
-          <div className="space-y-3">
-            {profil.kategorien.map((kat, i) => {
-              const farbe = AMPEL_FARBEN[kat.ampel];
-              const istSichtbar = emailFreigegeben || i < 2;
-              return (
-                <div
-                  key={kat.name}
-                  className={`rounded-xl border-2 p-4 transition-all ${farbe.bg} ${farbe.border} ${!istSichtbar ? "blur-sm select-none pointer-events-none" : ""}`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <span className="text-2xl">{kat.icon}</span>
-                      <div>
-                        <div className={`font-semibold text-sm ${farbe.text}`}>{kat.name}</div>
-                        <div className="text-xs text-gray-500">{kat.beschreibung}</div>
-                      </div>
-                    </div>
-                    <div className="text-right flex-shrink-0">
-                      <div className={`font-bold text-lg ${farbe.text}`}>{kat.score}/100</div>
-                      <div className={`text-xs font-semibold px-2 py-0.5 rounded-full ${farbe.bg} ${farbe.text}`}>
-                        {farbe.label}
-                      </div>
+        {/* Stärken */}
+        {staerken.length > 0 && (
+          <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
+            <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
+              <span>💪</span> Das läuft gut
+            </h3>
+            <div className="space-y-2">
+              {staerken.map(kat => {
+                const txt = ALLTAGS_TEXTE[kat.name];
+                return (
+                  <div key={kat.name} className="flex items-start gap-3 text-sm">
+                    <span className="text-xl shrink-0">{kat.icon}</span>
+                    <div>
+                      <span className="font-semibold text-gray-800">{kat.name}</span>
+                      {txt && <span className="text-gray-500"> — {txt.positiv}</span>}
                     </div>
                   </div>
-                  {istSichtbar && (
-                    <p className={`text-sm mt-3 ${farbe.text}`}>{kat.elternText}</p>
-                  )}
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
-        </div>
+        )}
 
-        {/* 5. Email-Gate */}
+        {/* Hinweise-Kategorien */}
+        {hinweise.length > 0 && (
+          <div>
+            <h3 className="text-base font-bold text-gray-900 mb-3 flex items-center gap-2">
+              <span>👀</span> Hinweise aufgefallen
+            </h3>
+            <div className="space-y-4">
+              {hinweise.map((kat, i) => {
+                const level = getAmpelLevel(kat.score);
+                const stufe = STUFEN[level];
+                const txt = ALLTAGS_TEXTE[kat.name];
+                const istSichtbar = emailFreigegeben || i < 2;
+
+                return (
+                  <div
+                    key={kat.name}
+                    className={`rounded-2xl border-2 overflow-hidden transition-all ${!istSichtbar ? "blur-sm select-none pointer-events-none" : ""}`}
+                    style={{ borderColor: stufe.border }}
+                  >
+                    {/* Kategorie-Header */}
+                    <div className="flex items-center gap-3 px-5 py-3" style={{ background: stufe.bg }}>
+                      <span className="text-2xl">{kat.icon}</span>
+                      <div className="flex-1">
+                        <div className="font-bold text-sm" style={{ color: stufe.text }}>{kat.name}</div>
+                        {txt && <div className="text-xs text-gray-500">{txt.fachtitel}</div>}
+                      </div>
+                      <span className="text-xs font-bold px-2 py-1 rounded-full" style={{ background: stufe.border, color: stufe.text }}>
+                        {stufe.emoji} {stufe.label}
+                      </span>
+                    </div>
+
+                    {/* 3-Part Schema */}
+                    {istSichtbar && txt && (
+                      <div className="bg-white px-5 py-4 space-y-3">
+                        <div>
+                          <div className="text-xs font-bold uppercase tracking-wide text-gray-400 mb-1">Was beobachtet</div>
+                          <p className="text-sm text-gray-700">{txt.beobachtet}</p>
+                        </div>
+                        <div>
+                          <div className="text-xs font-bold uppercase tracking-wide text-gray-400 mb-1">Im Alltag kann das bedeuten</div>
+                          <p className="text-sm text-gray-700">{txt.alltag}</p>
+                        </div>
+                        <div className="rounded-xl px-3 py-2 text-xs" style={{ background: "#F0F9F8", color: "#1F5C57" }}>
+                          ℹ️ {txt.disclaimer}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Email-Gate */}
         {!emailFreigegeben && (
           <div className="bg-white rounded-2xl border-2 p-6 shadow-lg" style={{ borderColor: "#8DCDC5" }}>
             <div className="text-center mb-5">
               <div className="text-4xl mb-3">🔓</div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">
-                Alle 6 Bereiche + persönliche Empfehlungen freischalten
+                Alle Bereiche freischalten
               </h3>
               <p className="text-sm text-gray-600 leading-relaxed">
-                Du erhältst den <strong>vollständigen Bericht</strong> für {kindName !== "dein Kind" ? kindName : "dein Kind"} kostenlos per E-Mail —
-                inklusive konkreter Übungsempfehlungen passend zum erkannten Schwerpunkt.
+                Du erhältst den <strong>vollständigen Bericht</strong> für {kindNameAngezeigt} kostenlos per E-Mail — inklusive konkreter Hinweise passend zum erkannten Schwerpunkt.
               </p>
             </div>
             <div className="space-y-3">
@@ -317,7 +340,7 @@ export default function ErgebnisPage() {
                 className="w-full text-white font-bold text-lg py-4 rounded-xl transition-all shadow-md disabled:opacity-50 hover:opacity-90"
                 style={{ background: "#F5943A" }}
               >
-                {laden ? "Wird gesendet…" : `Vollständigen Bericht für ${kindName !== "dein Kind" ? kindName : "dein Kind"} erhalten →`}
+                {laden ? "Wird gesendet…" : `Vollständigen Bericht erhalten →`}
               </button>
               <p className="text-xs text-gray-400 text-center">
                 Kein Spam. Nur der Bericht und hilfreiche Tipps. Jederzeit abmeldbar.
@@ -326,21 +349,22 @@ export default function ErgebnisPage() {
           </div>
         )}
 
-        {/* 7. Nach Email-Freischaltung */}
+        {/* Nach Email-Freischaltung */}
         {emailFreigegeben && (
           <>
+            {/* Erkannte Zusammenhänge (Muster) */}
             {profil.musterHinweise.length > 0 && (
               <div className="space-y-3">
-                <h3 className="text-base font-bold text-gray-900">🔎 Erkannte Muster</h3>
+                <h3 className="text-base font-bold text-gray-900">🔎 Erkannte Zusammenhänge</h3>
                 {profil.musterHinweise.map((m, i) => (
-                  <div key={i} className={`rounded-xl border-2 p-4 ${m.staerke === "stark" ? "bg-red-50 border-red-300" : "bg-orange-50 border-orange-200"}`}>
+                  <div key={i} className={`rounded-xl border-2 p-4 ${m.staerke === "stark" ? "bg-orange-50 border-orange-300" : "bg-blue-50 border-blue-200"}`}>
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="text-lg">{m.staerke === "stark" ? "⚠️" : "💡"}</span>
-                      <span className={`font-semibold text-sm ${m.staerke === "stark" ? "text-red-800" : "text-orange-800"}`}>
+                      <span className="text-lg">{m.staerke === "stark" ? "💡" : "💡"}</span>
+                      <span className={`font-semibold text-sm ${m.staerke === "stark" ? "text-orange-800" : "text-blue-800"}`}>
                         {m.titel}
                       </span>
                     </div>
-                    <p className={`text-sm ${m.staerke === "stark" ? "text-red-700" : "text-orange-700"}`}>
+                    <p className={`text-sm ${m.staerke === "stark" ? "text-orange-700" : "text-blue-700"}`}>
                       {m.text}
                     </p>
                   </div>
@@ -348,78 +372,62 @@ export default function ErgebnisPage() {
               </div>
             )}
 
-            <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
-              <h3 className="font-bold text-gray-900 mb-4">Was passiert, wenn man nichts tut?</h3>
-              <div className="space-y-3">
-                {[
-                  { icon: "📚", text: `Der Rückstand in der Schule wächst — nicht weil ${nameOderKind} weniger kann, sondern weil ${subj} langsamer liest als alle anderen.` },
-                  { icon: "😔", text: `${erSubj} beginnt zu glauben, ${subj} sei „nicht so klug" — das Selbstbild leidet dauerhaft.` },
-                  { icon: "⏰", text: "Hausaufgaben bleiben ein täglicher Stressfaktor — für das Kind und für die ganze Familie." },
-                  { icon: "🔁", text: "Visuell bedingte Lernschwierigkeiten lösen sich nicht von selbst. Das Gehirn braucht gezieltes Training." },
-                ].map((item, i) => (
-                  <div key={i} className="flex items-start gap-3 text-sm text-gray-700">
-                    <span className="text-xl flex-shrink-0">{item.icon}</span>
-                    <span className="leading-relaxed">{item.text}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
+            {/* Schwerpunkt & CTA */}
             <div className="rounded-2xl p-6" style={{ background: "#FEF0E0", border: "2px solid #F5943A" }}>
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-12 h-12 rounded-full flex items-center justify-center text-2xl" style={{ background: "#F5943A" }}>
                   {typDaten.icon}
                 </div>
                 <div>
-                  <div className="text-xs font-bold uppercase tracking-wide" style={{ color: "#C47020" }}>Dein Screening-Schwerpunkt</div>
+                  <div className="text-xs font-bold uppercase tracking-wide" style={{ color: "#C47020" }}>Screening-Schwerpunkt</div>
                   <div className="font-bold text-gray-900">{typDaten.warum}</div>
                 </div>
               </div>
               <p className="text-sm text-gray-700 leading-relaxed mb-3">
-                Im VIKI-Kurs gibt es spezielle Inhalte und Übungen genau für diesen Schwerpunkt:
+                Der VIKI-Onlinekurs unterstützt Kinder spielerisch dabei, visuelle Verarbeitung, Augensteuerung und Konzentration zu stärken — mit Übungen, die speziell auf diesen Schwerpunkt abgestimmt sind:
               </p>
-              <div className="rounded-xl p-4 text-sm text-gray-800 font-medium" style={{ background: "white" }}>
+              <div className="rounded-xl p-3 text-sm text-gray-800 font-medium mb-5" style={{ background: "white" }}>
                 🎯 {typDaten.training}
               </div>
-            </div>
 
-            <div className="rounded-2xl p-6 text-center" style={{ background: "#FEF3E2", border: "2px solid #F5943A" }}>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Der VIKI Superblick Kurs</h3>
-              <p className="text-sm text-gray-600 mb-4 leading-relaxed">
-                Mit Visualtraining die Basis für müheloses Lesen & entspanntes Lernen legen — speziell für Kinder wie {kindName !== "dein Kind" ? kindName : "dein Kind"}.
-              </p>
-              <p className="text-xs text-gray-500 mb-4">Entwickelt von Dr. Sarah Kopetzky, Funktionaloptometristin.</p>
-              <div className="space-y-2 mb-5 text-left max-w-xs mx-auto">
-                {[
-                  "Flüssigeres Lesen & besseres Leseverständnis",
-                  "Abschreiben von der Tafel — schneller, ohne Zeilenverlust",
-                  "Mehr Ausdauer und Konzentration beim Lernen",
-                  "Entspanntere Hausaufgaben-Situation",
-                ].map((v, i) => (
-                  <div key={i} className="flex items-center gap-2 text-sm text-gray-700">
-                    <span className="font-bold" style={{ color: "#F5943A" }}>✓</span>
-                    <span>{v}</span>
-                  </div>
-                ))}
+              <div className="rounded-2xl p-5 text-center" style={{ background: "white" }}>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">Der VIKI Superblick Kurs</h3>
+                <p className="text-sm text-gray-600 mb-4 leading-relaxed">
+                  Spielerisches Visualtraining für Kinder — entwickelt von Dr. Sarah Kopetzky, Funktionaloptometristin.
+                </p>
+                <div className="space-y-2 mb-5 text-left max-w-xs mx-auto">
+                  {[
+                    "Flüssigeres Lesen & besseres Leseverständnis",
+                    "Abschreiben von der Tafel — schneller und entspannter",
+                    "Mehr Ausdauer und Konzentration beim Lernen",
+                    "Entspanntere Hausaufgaben-Situation",
+                  ].map((v, i) => (
+                    <div key={i} className="flex items-center gap-2 text-sm text-gray-700">
+                      <span className="font-bold" style={{ color: "#F5943A" }}>✓</span>
+                      <span>{v}</span>
+                    </div>
+                  ))}
+                </div>
+                <a
+                  href="https://kurse.vikitraining.at/superblick-kurs"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block w-full font-bold text-lg py-4 rounded-xl shadow-lg transition-all hover:opacity-90"
+                  style={{ background: "#F5943A", color: "white" }}
+                >
+                  Mehr über den Kurs erfahren →
+                </a>
               </div>
-              <a
-                href="https://kurse.vikitraining.at/superblick-kurs"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block w-full font-bold text-lg py-4 rounded-xl shadow-lg transition-all hover:opacity-90"
-                style={{ background: "#F5943A", color: "white" }}
-              >
-                JETZT KURS ANSEHEN
-              </a>
             </div>
 
+            {/* Nächste Schritte */}
             <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
-              <h3 className="font-bold text-gray-900 mb-4">Deine nächsten Schritte</h3>
+              <h3 className="font-bold text-gray-900 mb-4">📋 Deine nächsten Schritte</h3>
               <ol className="space-y-4">
                 {[
-                  { color: "#8DCDC5", text: "Du hast den vollständigen Screening-Bericht per E-Mail erhalten — lies ihn in Ruhe durch." },
-                  { color: "#F5943A", text: "Starte jetzt mit dem VIKI Superblick Kurs — und lege die Basis für müheloses Lesen & entspanntes Lernen." },
-                  { color: "#EE6B85", text: "Schon wenige Minuten Training täglich machen einen Unterschied. Viele Eltern merken erste Verbesserungen nach kurzer Zeit." },
+                  { color: "#8DCDC5", text: `Du hast den vollständigen Screening-Bericht für ${kindNameAngezeigt} per E-Mail erhalten — lies ihn in Ruhe durch.` },
+                  { color: "#F5943A", text: "Schau dir den VIKI Superblick Kurs an — und entscheide, ob das Training für dein Kind passt." },
+                  { color: "#EE6B85", text: "Bei konkreten Fragen zu den Ergebnissen: Wende dich an eine Optometristin oder Augenärztin für eine professionelle Einschätzung." },
                 ].map((s, i) => (
                   <li key={i} className="flex gap-3 text-sm text-gray-700">
                     <span className="w-6 h-6 rounded-full text-white text-xs flex items-center justify-center font-bold shrink-0 mt-0.5" style={{ background: s.color }}>{i + 1}</span>
@@ -437,7 +445,7 @@ export default function ErgebnisPage() {
                 className="inline-block w-full font-bold text-lg py-4 rounded-xl shadow-lg transition-all hover:opacity-90"
                 style={{ background: "#F5943A", color: "white" }}
               >
-                JETZT KURS ANSEHEN
+                Mehr über den Kurs erfahren →
               </a>
             </div>
           </>
