@@ -15,8 +15,13 @@
   --color-viki-gold: #F5A020;
 }
 
+html {
+  font-size: 18px;
+}
+
 body {
   background: #ffffff;
   color: #2D2D2D;
   font-family: Arial, Helvetica, sans-serif;
+  line-height: 1.6;
 }
