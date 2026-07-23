@@ -9,8 +9,8 @@ interface Props {
 // Klasse 1: nur neutrale geometrische Formen (keine emotional aufgeladenen Symbole —
 // Stern/Herz werden semantisch erkannt, nicht über Form, und verfälschen die Merkspanne)
 const POOL_K1 = ["○", "□", "△", "◇", "⬡", "▽", "▷", "◁"];
-// Klasse 2: jetzt auch emotional markierte Formen erlaubt
-const POOL_K2 = ["○", "□", "△", "★", "◇", "♡", "☆", "⬡"];
+// Klasse 2: neutrale geometrische Formen (wie K1 — emotionale Symbole verfälschen die Messung)
+const POOL_K2 = ["○", "□", "△", "◇", "⬡", "▽", "▷", "◁"];
 // Klasse 3-4: konfundierbare Buchstaben
 const POOL_SCHWER = ["b", "d", "p", "q", "n", "u", "m", "w"];
 

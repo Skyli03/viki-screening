@@ -156,7 +156,7 @@ export default function BuchLesetest({ kindName, onFertig }: Props) {
                 <button key={String(opt.val)} onClick={() => { setVerliertZeile(opt.val); setUeberspringtWoerter(opt.val); }}
                   className="p-3 rounded-xl border-2 text-base font-semibold transition-all"
                   style={verliert_zeile === opt.val
-                    ? { background: opt.val ? "#FEF2F2" : "#F0FDF4", borderColor: opt.val ? "#FCA5A5" : "#86EFAC", color: opt.val ? "#DC2626" : "#16A34A" }
+                    ? { background: opt.val ? "#FFFBEB" : "#F0FDF4", borderColor: opt.val ? "#FCD34D" : "#86EFAC", color: opt.val ? "#D97706" : "#16A34A" }
                     : { borderColor: "#E5E7EB", color: "#374151" }}>
                   {opt.label}
                 </button>
@@ -172,7 +172,7 @@ export default function BuchLesetest({ kindName, onFertig }: Props) {
                 <button key={String(opt.val)} onClick={() => setBenutztFinger(opt.val)}
                   className="p-3 rounded-xl border-2 text-base font-semibold transition-all"
                   style={benutzt_finger === opt.val
-                    ? { background: opt.val ? "#FEF2F2" : "#F0FDF4", borderColor: opt.val ? "#FCA5A5" : "#86EFAC", color: opt.val ? "#DC2626" : "#16A34A" }
+                    ? { background: opt.val ? "#FFFBEB" : "#F0FDF4", borderColor: opt.val ? "#FCD34D" : "#86EFAC", color: opt.val ? "#D97706" : "#16A34A" }
                     : { borderColor: "#E5E7EB", color: "#374151" }}>
                   {opt.label}
                 </button>
@@ -188,7 +188,7 @@ export default function BuchLesetest({ kindName, onFertig }: Props) {
                 <button key={String(opt.val)} onClick={() => setVieleFehler(opt.val)}
                   className="p-3 rounded-xl border-2 text-base font-semibold transition-all"
                   style={viele_fehler === opt.val
-                    ? { background: opt.val ? "#FEF2F2" : "#F0FDF4", borderColor: opt.val ? "#FCA5A5" : "#86EFAC", color: opt.val ? "#DC2626" : "#16A34A" }
+                    ? { background: opt.val ? "#FFFBEB" : "#F0FDF4", borderColor: opt.val ? "#FCD34D" : "#86EFAC", color: opt.val ? "#D97706" : "#16A34A" }
                     : { borderColor: "#E5E7EB", color: "#374151" }}>
                   {opt.label}
                 </button>
@@ -228,7 +228,7 @@ export default function BuchLesetest({ kindName, onFertig }: Props) {
                 <button key={opt.val} onClick={() => setKopfhaltung(opt.val)}
                   className="p-3 rounded-xl border-2 text-base font-semibold transition-all"
                   style={kopfhaltung === opt.val
-                    ? { background: opt.val === "gerade" ? "#F0FDF4" : "#FEF2F2", borderColor: opt.val === "gerade" ? "#86EFAC" : "#FCA5A5", color: opt.val === "gerade" ? "#16A34A" : "#DC2626" }
+                    ? { background: opt.val === "gerade" ? "#F0FDF4" : "#FFFBEB", borderColor: opt.val === "gerade" ? "#86EFAC" : "#FCD34D", color: opt.val === "gerade" ? "#16A34A" : "#D97706" }
                     : { borderColor: "#E5E7EB", color: "#374151" }}>
                   {opt.label}
                 </button>
@@ -281,7 +281,7 @@ export default function BuchLesetest({ kindName, onFertig }: Props) {
         <p className="font-semibold text-sm text-gray-900 mb-3">Ergebnis des Augen-Vergleichs:</p>
         <div className="space-y-2">
           {([
-            { val: "besser", label: "Mit einem Auge ruhiger / flüssiger — Unterschied deutlich", color: "#DC2626", bg: "#FEF2F2", border: "#FCA5A5", sub: "Mögliches Zeichen: Beide Augen arbeiten nicht gut als Team" },
+            { val: "besser", label: "Mit einem Auge ruhiger / flüssiger — Unterschied deutlich", color: "#D97706", bg: "#FFFBEB", border: "#FCD34D", sub: "Mögliches Zeichen: Beide Augen arbeiten nicht gut als Team" },
             { val: "gleich", label: "Kein Unterschied erkennbar", color: "#D97706", bg: "#FFFBEB", border: "#FCD34D", sub: "Kein klares binokulares Signal" },
             { val: "schlechter", label: "Mit beiden Augen liest es besser — kein Unterschied", color: "#16A34A", bg: "#F0FDF4", border: "#86EFAC", sub: "Beide Augen arbeiten gut zusammen" },
             { val: "nicht_getestet", label: "Konnte ich nicht testen", color: "#6B7280", bg: "#F9FAFB", border: "#E5E7EB", sub: "" },
