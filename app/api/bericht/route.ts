@@ -83,8 +83,13 @@ function generateReportEmail(
   blinzelinfo?: { label: string; ampel: string; elternText: string }
 ): string {
   const name = kindName !== "dein Kind" ? kindName : "dein Kind";
-  const ampelFarbe = gesamtScore >= 71 ? "#16A34A" : gesamtScore >= 41 ? "#D97706" : "#DC2626";
-  const ampelLabel = gesamtScore >= 71 ? "Unauffällig" : gesamtScore >= 41 ? "Auffällig" : "Förderbedarf";
+  const ampelStufe =
+    gesamtScore >= 71 ? { emoji: "🟢", label: "Unauffällig",        farbe: "#16A34A", bg: "#F0FDF4", border: "#86EFAC" } :
+    gesamtScore >= 56 ? { emoji: "🟡", label: "Leichte Hinweise",   farbe: "#CA8A04", bg: "#FEFCE8", border: "#FDE047" } :
+    gesamtScore >= 41 ? { emoji: "🟠", label: "Deutliche Hinweise", farbe: "#D97706", bg: "#FFFBEB", border: "#FCD34D" } :
+                        { emoji: "🔴", label: "Starke Hinweise",    farbe: "#DC2626", bg: "#FEF2F2", border: "#FCA5A5" };
+  const ampelFarbe = ampelStufe.farbe;
+  const ampelLabel = ampelStufe.label;
   const auffaellig = kategorien.filter(k => k.ampel !== "gruen");
   const unauffaellig = kategorien.filter(k => k.ampel === "gruen");
 
@@ -139,12 +144,12 @@ function generateReportEmail(
       Danke, dass du dir die Zeit für diesen Test genommen hast — und dafür, dass du genau hinschaust.
     </p>
 
-    <!-- Gesamt-Score -->
-    <div style="background:#F9FAFB;border:2px solid ${ampelFarbe};border-radius:14px;padding:20px 24px;text-align:center;margin-bottom:28px;">
-      <div style="font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Gesamt-Ergebnis</div>
-      <div style="font-size:52px;font-weight:900;color:${ampelFarbe};line-height:1;">${gesamtScore}<span style="font-size:20px;font-weight:400;color:#9CA3AF;">/100</span></div>
-      <div style="display:inline-block;background:${ampelFarbe};color:white;font-size:12px;font-weight:700;padding:4px 14px;border-radius:20px;margin-top:10px;">${ampelLabel}</div>
-      <div style="font-size:13px;color:#6B7280;margin-top:8px;">${auffaelligkeiten} von 6 Bereichen auffällig · VIKI-Typ ${vikiTyp}</div>
+    <!-- Gesamt-Ergebnis (Ampel) -->
+    <div style="background:${ampelStufe.bg};border:2px solid ${ampelStufe.border};border-radius:14px;padding:24px;text-align:center;margin-bottom:28px;">
+      <div style="font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Screening-Ergebnis für ${name}</div>
+      <div style="font-size:48px;line-height:1;margin-bottom:10px;">${ampelStufe.emoji}</div>
+      <div style="font-size:22px;font-weight:800;color:${ampelFarbe};margin-bottom:8px;">${ampelLabel}</div>
+      <div style="font-size:13px;color:#6B7280;">${auffaelligkeiten > 0 ? `${auffaelligkeiten} Bereich${auffaelligkeiten > 1 ? "e" : ""} mit Hinweisen` : "Alle Bereiche unauffällig"}</div>
     </div>
 
     ${musterHtml}
@@ -188,7 +193,7 @@ function generateReportEmail(
     <div style="background:#F9FAFB;border:1px solid #E5E7EB;border-radius:10px;padding:16px 18px;">
       <p style="font-size:11px;font-weight:700;color:#374151;margin:0 0 6px;">⚠️ Rechtlicher Hinweis</p>
       <p style="font-size:11px;color:#6B7280;line-height:1.6;margin:0 0 8px;">
-        Der VIKI Superblick Screening-Test dient ausschließlich der <strong>unverbindlichen Erstorientierung</strong> und stellt <strong>keine medizinische oder optometrische Diagnose</strong> dar. Die Ergebnisse basieren auf Elternbeobachtung und können Fehler enthalten. Eine professionelle Untersuchung kann durch dieses Tool nicht ersetzt werden. Bei deutlichen Auffälligkeiten (rote Bereiche) wird eine Vorstellung bei einem Funktionaloptometristen empfohlen.
+        Der VIKI Superblick Screening-Test dient ausschließlich der <strong>unverbindlichen Erstorientierung</strong> und stellt <strong>keine medizinische oder optometrische Diagnose</strong> dar. Die Ergebnisse basieren auf Elternbeobachtung und können Fehler enthalten. Eine professionelle Untersuchung kann durch dieses Tool nicht ersetzt werden. Bei deutlichen Auffälligkeiten empfiehlt sich eine Vorstellung bei einer Funktionaloptometristin / einem Funktionaloptometristen oder einer Augenärztin / einem Augenarzt.
       </p>
       <p style="font-size:11px;color:#6B7280;line-height:1.6;margin:0;">
         <strong>Datenschutz:</strong> Testergebnisse werden nicht auf Servern gespeichert. Deine E-Mail wird nur für diesen Bericht und VIKI-Informationen genutzt. Abmeldung jederzeit: <a href="mailto:hallo@vikitraining.at" style="color:#9CA3AF;">hallo@vikitraining.at</a>
