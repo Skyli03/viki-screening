@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import nodemailer from "nodemailer";
+import { ALLTAGS_TEXTE } from "@/lib/alltags-texte";
 
 interface BerichtRequest {
   email: string;
@@ -90,17 +91,59 @@ function generateReportEmail(
                         { emoji: "🔴", label: "Starke Hinweise",    farbe: "#DC2626", bg: "#FEF2F2", border: "#FCA5A5" };
   const ampelFarbe = ampelStufe.farbe;
   const ampelLabel = ampelStufe.label;
-  const auffaellig = kategorien.filter(k => k.ampel !== "gruen");
-  const unauffaellig = kategorien.filter(k => k.ampel === "gruen");
+  const auffaelligKategorien = kategorien.filter(k => k.ampel !== "gruen");
+  const staerkenKategorien = kategorien.filter(k => k.ampel === "gruen");
 
-  const kategorienHtml = kategorien.map(k => `
-    <div style="border-left:4px solid ${AMPEL_COLOR[k.ampel] ?? "#9CA3AF"};padding:12px 16px;margin-bottom:12px;background:#FAFAFA;border-radius:0 8px 8px 0;">
-      <div style="font-weight:700;font-size:13px;color:#111827;margin-bottom:4px;">
-        ${AMPEL_LABEL[k.ampel] ?? ""} &nbsp; ${k.name}
-      </div>
-      <div style="font-size:13px;color:#374151;line-height:1.6;">${k.elternText}</div>
+  const staerkenHtml = staerkenKategorien.length > 0 ? `
+    <div style="margin-bottom:28px;">
+      <h3 style="color:#111827;font-size:15px;font-weight:700;margin:0 0 12px;">💪 Das läuft gut</h3>
+      ${staerkenKategorien.map(k => {
+        const txt = ALLTAGS_TEXTE[k.name];
+        return `<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid #F3F4F6;">
+          <div style="font-size:18px;line-height:1.3;">${k.icon}</div>
+          <div>
+            <span style="font-weight:700;font-size:13px;color:#111827;">${k.name}</span>
+            ${txt ? `<span style="font-size:13px;color:#6B7280;"> — ${txt.positiv}</span>` : ""}
+          </div>
+        </div>`;
+      }).join("")}
     </div>
-  `).join("");
+  ` : "";
+
+  const AMPEL_STUFE: Record<string, { farbe: string; bg: string; border: string; emoji: string }> = {
+    gruen: { farbe: "#166534", bg: "#F0FDF4", border: "#86EFAC", emoji: "🟢" },
+    gelb:  { farbe: "#854D0E", bg: "#FEFCE8", border: "#FDE047", emoji: "🟡" },
+    orange:{ farbe: "#9A3412", bg: "#FFF7ED", border: "#FDBA74", emoji: "🟠" },
+    rot:   { farbe: "#991B1B", bg: "#FEF2F2", border: "#FCA5A5", emoji: "🔴" },
+  };
+
+  const kategorienHtml = auffaelligKategorien.map(k => {
+    const txt = ALLTAGS_TEXTE[k.name];
+    const stufe = AMPEL_STUFE[k.ampel] ?? AMPEL_STUFE.gelb;
+    return `
+    <div style="border:2px solid ${stufe.border};border-radius:12px;overflow:hidden;margin-bottom:16px;">
+      <div style="background:${stufe.bg};padding:12px 16px;display:flex;align-items:center;gap:10px;">
+        <span style="font-size:20px;">${k.icon}</span>
+        <div style="flex:1;">
+          <div style="font-weight:700;font-size:14px;color:${stufe.farbe};">${k.name}</div>
+          ${txt ? `<div style="font-size:11px;color:#6B7280;">${txt.fachtitel}</div>` : ""}
+        </div>
+        <span style="font-size:12px;font-weight:700;color:${stufe.farbe};">${stufe.emoji} ${AMPEL_LABEL[k.ampel] ?? ""}</span>
+      </div>
+      ${txt ? `
+      <div style="background:white;padding:16px;">
+        <div style="margin-bottom:10px;">
+          <div style="font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Was beobachtet</div>
+          <div style="font-size:13px;color:#374151;line-height:1.6;">${txt.beobachtet}</div>
+        </div>
+        <div style="margin-bottom:10px;">
+          <div style="font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Im Alltag kann das bedeuten</div>
+          <div style="font-size:13px;color:#374151;line-height:1.6;">${txt.alltag}</div>
+        </div>
+        <div style="background:#F0F9F8;border-radius:8px;padding:10px 12px;font-size:12px;color:#1F5C57;line-height:1.6;">ℹ️ ${txt.disclaimer}</div>
+      </div>` : `<div style="background:white;padding:16px;font-size:13px;color:#374151;line-height:1.6;">${k.elternText}</div>`}
+    </div>`;
+  }).join("");
 
   const musterHtml = musterHinweise.length > 0 ? `
     <div style="margin-bottom:24px;">
@@ -154,13 +197,16 @@ function generateReportEmail(
 
     ${musterHtml}
 
-    <!-- Alle Bereiche -->
-    <div style="margin-bottom:28px;">
-      <h3 style="color:#111827;font-size:15px;font-weight:700;margin:0 0 14px;">Auswertung — alle 6 Bereiche</h3>
-      ${kategorienHtml}
-    </div>
+    ${staerkenHtml}
 
-    ${auffaellig.length === 0 ? `
+    <!-- Hinweise -->
+    ${auffaelligKategorien.length > 0 ? `
+    <div style="margin-bottom:28px;">
+      <h3 style="color:#111827;font-size:15px;font-weight:700;margin:0 0 14px;">👀 Hinweise aufgefallen</h3>
+      ${kategorienHtml}
+    </div>` : ""}
+
+    ${auffaelligKategorien.length === 0 ? `
     <div style="background:#F0FDF4;border-radius:12px;padding:16px;text-align:center;margin-bottom:24px;">
       <p style="color:#16A34A;font-weight:600;margin:0;">✅ Alle 6 Bereiche unauffällig — großartig!</p>
     </div>
