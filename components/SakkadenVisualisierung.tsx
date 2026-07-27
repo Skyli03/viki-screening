@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useMemo } from "react";
 import type { ZeilenAnalyse } from "@/lib/eyetracking";
 
@@ -130,7 +130,7 @@ function ZeileRow({
           key={i}
           cx={fix.x} cy={cy}
           r={fix.regression ? R_DOT + 1 : R_DOT}
-          fill={fix.regression ? "#EF4444" : ideal ? "#16A34A" : "#4A9E97"}
+          fill={fix.regression ? "#EF4444" : ideal ? "#16A34A" : "#1A5550"}
           stroke="white" strokeWidth={1.5}
         />
       ))}
@@ -233,9 +233,9 @@ export default function SakkadenVisualisierung({
       >
         {/* ── Legende ── */}
         <g transform={`translate(${X0}, ${Y_LEGENDE})`}>
-          <circle cx={8} cy={6} r={4} fill="#4A9E97" stroke="white" strokeWidth={1.5} />
+          <circle cx={8} cy={6} r={4} fill="#1A5550" stroke="white" strokeWidth={1.5} />
           <line x1={14} y1={6} x2={30} y2={6} stroke="#5BBDB5" strokeWidth={2} strokeLinecap="round" />
-          <circle cx={36} cy={6} r={4} fill="#4A9E97" stroke="white" strokeWidth={1.5} />
+          <circle cx={36} cy={6} r={4} fill="#1A5550" stroke="white" strokeWidth={1.5} />
           <text x={42} y={10} fontSize={10} fill="#6B7280" fontFamily={FONT}>Vorwärtssakkade</text>
 
           <circle cx={148} cy={6} r={5} fill="#EF4444" stroke="white" strokeWidth={1.5} />

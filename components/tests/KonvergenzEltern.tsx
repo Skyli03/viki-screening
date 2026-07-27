@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState } from "react";
 import VideoEmbed from "@/components/VideoEmbed";
 import type { KonvergenzErgebnis } from "@/lib/screening-types";
@@ -28,11 +28,11 @@ function KonvergenzIcon() {
     <svg viewBox="0 0 100 50" width="110" height="55" xmlns="http://www.w3.org/2000/svg">
       {/* Linkes Auge */}
       <circle cx="10" cy="25" r="9" fill="#8DCDC5"/>
-      <circle cx="10" cy="25" r="4.5" fill="#2D7A73"/>
+      <circle cx="10" cy="25" r="4.5" fill="#1A5550"/>
       <circle cx="12" cy="23" r="1.8" fill="white"/>
       {/* Rechtes Auge */}
       <circle cx="90" cy="25" r="9" fill="#8DCDC5"/>
-      <circle cx="90" cy="25" r="4.5" fill="#2D7A73"/>
+      <circle cx="90" cy="25" r="4.5" fill="#1A5550"/>
       <circle cx="92" cy="23" r="1.8" fill="white"/>
       {/* Linker Pfeil → Mitte */}
       <line x1="23" y1="25" x2="43" y2="25" stroke="#F5943A" strokeWidth="3" strokeLinecap="round"/>
@@ -51,7 +51,7 @@ function NahFernDot() {
   return (
     <div
       className="rounded-2xl flex flex-col items-center justify-center gap-3 mx-auto"
-      style={{ width: "220px", height: "160px", background: "#E4F5F3" }}
+      style={{ width: "220px", height: "160px", background: "#C8E8E4" }}
     >
       <style>{ANIMATION_CSS}</style>
       <div
@@ -63,7 +63,7 @@ function NahFernDot() {
           animation: "konv-nah 3.5s ease-in-out infinite",
         }}
       />
-      <p className="text-xs text-teal-700 font-semibold text-center px-3">
+      <p className="text-xs text-[#1A5550] font-semibold text-center px-3">
         Hier siehst du die Geschwindigkeit — Stift zur Nase
       </p>
     </div>
@@ -92,7 +92,7 @@ export default function KonvergenzEltern({ kindName, onFertig }: Props) {
         </div>
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Konvergenz-Test</h2>
         <p className="text-sm text-gray-500 mb-3">Du führst diesen Test durch — {kindName} macht mit.</p>
-        <div className="rounded-xl px-4 py-3 mb-4 text-sm text-left max-w-lg mx-auto" style={{ background: "#E4F5F3", color: "#2D7A73" }}>
+        <div className="rounded-xl px-4 py-3 mb-4 text-sm text-left max-w-lg mx-auto" style={{ background: "#C8E8E4", color: "#1A5550" }}>
           💡 Beim Lesen müssen beide Augen wie ein eingespieltes Team auf denselben Buchstaben schauen. Dafür bewegen sie sich leicht nach innen und richten sich gemeinsam auf den Text aus – das nennt man Konvergenz. Funktioniert diese Zusammenarbeit nicht optimal, können Buchstaben verschwimmen oder zeitweise doppelt erscheinen. Das Lesen wird anstrengender und kostet das Kind deutlich mehr Energie.
         </div>
 
@@ -135,7 +135,7 @@ export default function KonvergenzEltern({ kindName, onFertig }: Props) {
           <NahFernDot />
         </div>
 
-        <div className="bg-teal-50 border border-teal-200 rounded-xl p-4 mb-6 text-sm text-teal-800">
+        <div className="bg-[#C8E8E4] border border-[#8DCDC5] rounded-xl p-4 mb-6 text-sm text-[#1A5550]">
           <p className="font-semibold">Stift 3× langsam von 30 cm auf 5 cm annähern und zurück.</p>
           <p className="mt-1 text-xs">Wenn du fertig beobachtet hast → weiter.</p>
         </div>

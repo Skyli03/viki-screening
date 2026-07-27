@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import CookieHinweis from "./components/CookieHinweis";
 
 export const metadata: Metadata = {
   title: "VIKI Superblick — Kostenloser Sehtest für dein Kind",
@@ -11,6 +12,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="de">
       <body className="bg-white min-h-screen antialiased">
         {children}
+        <CookieHinweis />
       </body>
     </html>
   );

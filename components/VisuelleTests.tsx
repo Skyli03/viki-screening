@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState } from "react";
 import LRSTest from "@/components/tests/LRSTest";
 import VisuelleDiskrimination from "@/components/tests/VisuelleDiskrimination";
@@ -32,7 +32,7 @@ function IntroCard({
       <div className="text-6xl mb-3">{emoji}</div>
       <h2 className="text-2xl font-bold text-gray-900 mb-1">{name}</h2>
       <p className="text-gray-500 text-sm mb-3">{beschreibung}</p>
-      <div className="rounded-xl px-4 py-3 mb-4 text-sm text-center max-w-sm mx-auto" style={{ background: "#E4F5F3", color: "#2D7A73" }}>
+      <div className="rounded-xl px-4 py-3 mb-4 text-sm text-center max-w-sm mx-auto" style={{ background: "#C8E8E4", color: "#1A5550" }}>
         💡 {warum}
       </div>
       <div className="rounded-xl p-4 text-sm text-left mb-6 max-w-sm mx-auto border-l-4" style={{ background: "#FFF8F0", borderLeftColor: "#F5943A", color: "#374151" }}>

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState } from "react";
 
 // Sakkaden-Test nach ENWAKO-Protokoll
@@ -45,7 +45,7 @@ function QualitaetButtons({
           onClick={() => onChange(o.v)}
           className="p-3 rounded-xl border-2 text-left flex items-start gap-3 transition-all"
           style={wert === o.v
-            ? { borderColor: "#8DCDC5", background: "#E4F5F3" }
+            ? { borderColor: "#8DCDC5", background: "#C8E8E4" }
             : { borderColor: "#E5E7EB" }
           }
         >
@@ -128,7 +128,7 @@ export default function Sakkaden({ onFertig }: Props) {
 
         <VisualBlitzblick />
 
-        <div className="bg-teal-50 border border-teal-200 rounded-xl p-3 mb-5 text-sm text-teal-800">
+        <div className="bg-[#C8E8E4] border border-[#8DCDC5] rounded-xl p-3 mb-5 text-sm text-[#1A5550]">
           <p className="font-semibold mb-1">👀 Worauf du achtest:</p>
           <ul className="space-y-1 text-xs">
             <li>• Springen die Augen direkt zum Ziel, oder schießen sie vorbei?</li>
@@ -176,7 +176,7 @@ export default function Sakkaden({ onFertig }: Props) {
                 onClick={() => setKopfbewegung(opt.v)}
                 className="flex-1 p-3 rounded-xl border-2 text-sm font-semibold transition-all"
                 style={kopfbewegung === opt.v
-                  ? { borderColor: "#8DCDC5", background: "#E4F5F3", color: "#1D6E68" }
+                  ? { borderColor: "#8DCDC5", background: "#C8E8E4", color: "#1D6E68" }
                   : { borderColor: "#E5E7EB", color: "#374151" }
                 }
               >
@@ -227,7 +227,7 @@ export default function Sakkaden({ onFertig }: Props) {
                 onClick={() => setNahfern(opt.v)}
                 className="p-3 rounded-xl border-2 text-left flex items-center gap-3 transition-all"
                 style={nahfern === opt.v
-                  ? { borderColor: "#8DCDC5", background: "#E4F5F3" }
+                  ? { borderColor: "#8DCDC5", background: "#C8E8E4" }
                   : { borderColor: "#E5E7EB" }
                 }
               >

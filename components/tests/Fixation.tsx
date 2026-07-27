@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState, useEffect, useCallback } from "react";
 
 interface Props {
@@ -69,7 +69,7 @@ export default function Fixation({ onFertig }: Props) {
 
   return (
     <div>
-      <div className="text-center mb-3 px-4 py-2 rounded-xl text-sm font-medium" style={{ background: "#E4F5F3", color: "#4A9E97" }}>
+      <div className="text-center mb-3 px-4 py-2 rounded-xl text-sm font-medium" style={{ background: "#C8E8E4", color: "#1A5550" }}>
         👆 Klicke so schnell wie möglich auf den Superheldenstern 🌟 — oder drücke die <strong>Leertaste</strong>!
       </div>
       <div className="flex justify-between text-sm text-gray-500 mb-3">

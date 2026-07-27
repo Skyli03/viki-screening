@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState, useEffect, useRef, useCallback } from "react";
 
 interface Props {
@@ -103,7 +103,7 @@ export default function PeripheresSehen({ onFertig }: Props) {
     <div>
       {/* Anleitung oben — immer sichtbar während Spiel */}
       {(phase === "warten" || phase === "aktiv") && (
-        <div className="text-center mb-3 px-4 py-2 rounded-xl text-sm font-medium" style={{ background: "#E4F5F3", color: "#4A9E97" }}>
+        <div className="text-center mb-3 px-4 py-2 rounded-xl text-sm font-medium" style={{ background: "#C8E8E4", color: "#1A5550" }}>
           👁️ Schau auf den <strong>weißen Punkt</strong> in der Mitte — klicke auf ⚡ wenn du ihn siehst, oder drücke die <strong>Leertaste</strong>!
           <span className="ml-3 text-gray-400">Runde {Math.min(runde + 1, RUNDEN)} / {RUNDEN}</span>
         </div>

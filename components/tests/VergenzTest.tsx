@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState, useEffect, useRef } from "react";
 
 interface Props {
@@ -104,11 +104,11 @@ export default function VergenzTest({ onFertig }: Props) {
   if (phase === "anleitung") {
     return (
       <div>
-        <div className="bg-teal-50 border-2 border-teal-200 rounded-2xl p-5 mb-5">
-          <p className="text-sm font-semibold text-teal-800 mb-3">
+        <div className="bg-[#C8E8E4] border-2 border-[#8DCDC5] rounded-2xl p-5 mb-5">
+          <p className="text-sm font-semibold text-[#1A5550] mb-3">
             👀 Dieser Test prüft, ob beide Augen beim Nahsehen zusammenarbeiten (Konvergenz).
           </p>
-          <div className="space-y-3 text-sm text-teal-700">
+          <div className="space-y-3 text-sm text-[#1A5550]">
             <div className="flex gap-3">
               <span className="text-lg">1️⃣</span>
               <span>Setze dein Kind <strong>gerade vor den Bildschirm</strong> — ca. <strong>30–40 cm</strong> Abstand (etwas näher als sonst, damit die Augen gut sichtbar sind).</span>
@@ -148,7 +148,7 @@ export default function VergenzTest({ onFertig }: Props) {
       <div>
         <div
           className="text-center mb-3 px-4 py-2 rounded-xl text-sm font-medium"
-          style={{ background: "#E4F5F3", color: "#4A9E97" }}
+          style={{ background: "#C8E8E4", color: "#1A5550" }}
         >
           👀 Beobachte jetzt die <strong>Augen deines Kindes</strong> — folgen beide gleichmäßig dem Punkt?
         </div>
@@ -271,7 +271,7 @@ export default function VergenzTest({ onFertig }: Props) {
                 className="p-4 rounded-xl border-2 text-left transition-all flex gap-3 items-start"
                 style={
                   auswahl === opt.wert
-                    ? { borderColor: "#8DCDC5", background: "#E4F5F3" }
+                    ? { borderColor: "#8DCDC5", background: "#C8E8E4" }
                     : { borderColor: "#E5E7EB" }
                 }
               >

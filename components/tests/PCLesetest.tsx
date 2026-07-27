@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState, useRef, useEffect } from "react";
 import type { PCLeseErgebnis } from "@/lib/screening-types";
 
@@ -207,7 +207,7 @@ export default function PCLesetest({ kindName, klasse, onFertig }: Props) {
             return (
               <button key={opt.id} onClick={() => toggleQualitaet(opt.id)}
                 className="w-full p-3 rounded-xl border-2 text-left flex items-center gap-3 transition-all"
-                style={aktiv ? { borderColor: "#8DCDC5", background: "#E4F5F3" } : { borderColor: "#E5E7EB" }}>
+                style={aktiv ? { borderColor: "#8DCDC5", background: "#C8E8E4" } : { borderColor: "#E5E7EB" }}>
                 <span className="text-xl">{opt.emoji}</span>
                 <span className="text-sm font-semibold text-gray-900">{opt.label}</span>
               </button>
@@ -239,7 +239,7 @@ export default function PCLesetest({ kindName, klasse, onFertig }: Props) {
           {FEHLER_STUFEN.map(stufe => (
             <button key={stufe.wert} onClick={() => setFehlerAnzahl(stufe.wert)}
               className="w-full p-3 rounded-xl border-2 text-left font-semibold text-sm transition-all"
-              style={fehlerAnzahl === stufe.wert ? { borderColor: "#8DCDC5", background: "#E4F5F3", color: "#2D7A73" } : { borderColor: "#E5E7EB", color: "#374151" }}>
+              style={fehlerAnzahl === stufe.wert ? { borderColor: "#8DCDC5", background: "#C8E8E4", color: "#1A5550" } : { borderColor: "#E5E7EB", color: "#374151" }}>
               {stufe.label}
             </button>
           ))}

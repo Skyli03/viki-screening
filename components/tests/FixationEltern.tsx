@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState, useEffect, useRef } from "react";
 import type { FixationErgebnis } from "@/lib/screening-types";
 
@@ -121,7 +121,7 @@ export default function FixationEltern({ kindName, onFertig }: Props) {
           </div>
         </div>
 
-        <div className="max-w-sm mx-auto bg-teal-50 border border-teal-200 rounded-xl p-4 text-sm text-teal-800">
+        <div className="max-w-sm mx-auto bg-[#C8E8E4] border border-[#8DCDC5] rounded-xl p-4 text-sm text-[#1A5550]">
           <p className="font-semibold">Beobachte jetzt die Augen:</p>
           <p className="text-xs mt-1">Ruhig? Zitternd? Wegschauen?</p>
         </div>

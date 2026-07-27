@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useEffect, useState } from "react";
 import { berechneScreeningProfil } from "@/lib/auswertung";
 import type { ScreeningProfil } from "@/lib/auswertung";
@@ -145,7 +145,7 @@ export default function ErgebnisPage() {
       <main className="max-w-2xl mx-auto px-5 py-8 space-y-6">
 
         {/* Prominenter Disclaimer */}
-        <div className="rounded-xl px-4 py-3 text-sm flex items-start gap-3" style={{ background: "#F0F9F8", border: "1px solid #8DCDC5", color: "#1F5C57" }}>
+        <div className="rounded-xl px-4 py-3 text-sm flex items-start gap-3" style={{ background: "#C8E8E4", border: "1px solid #8DCDC5", color: "#1F5C57" }}>
           <span className="text-lg shrink-0">ℹ️</span>
           <div>
             <span className="font-semibold">Eltern-Screening — kein medizinisches Diagnoseinstrument.</span>{" "}
@@ -249,7 +249,7 @@ export default function ErgebnisPage() {
                           <div className="text-xs font-bold uppercase tracking-wide text-gray-400 mb-1">Im Alltag kann das bedeuten</div>
                           <p className="text-sm text-gray-700">{txt.alltag}</p>
                         </div>
-                        <div className="rounded-xl px-3 py-2 text-xs" style={{ background: "#F0F9F8", color: "#1F5C57" }}>
+                        <div className="rounded-xl px-3 py-2 text-xs" style={{ background: "#C8E8E4", color: "#1F5C57" }}>
                           ℹ️ {txt.disclaimer}
                         </div>
                       </div>

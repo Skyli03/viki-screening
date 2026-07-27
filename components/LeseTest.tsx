@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState, useRef, useEffect } from "react";
 import { getLesetextByKlasse } from "@/data/lesetexte";
 import type { TrackingErgebnis, LesequalitaetMerkmal } from "@/lib/eyetracking";
@@ -371,7 +371,7 @@ export default function LeseTest({ kindName, klasse, onFertig }: Props) {
           </div>
 
           {/* Eltern-Beobachtungs-Hinweis */}
-          <div className="mb-4 px-4 py-3 rounded-xl text-sm" style={{ background: "#E4F5F3", color: "#2D7A73" }}>
+          <div className="mb-4 px-4 py-3 rounded-xl text-sm" style={{ background: "#C8E8E4", color: "#1A5550" }}>
             <p className="font-semibold mb-1">👀 Jetzt beobachten:</p>
             <div className="grid grid-cols-2 gap-x-4 gap-y-0.5 text-xs">
               <span>• Fehler zählen</span>
@@ -422,7 +422,7 @@ export default function LeseTest({ kindName, klasse, onFertig }: Props) {
                     onClick={() => toggleQualitaet(opt.id)}
                     className="p-3 rounded-xl border-2 text-left flex items-start gap-3 transition-all"
                     style={aktiv
-                      ? { borderColor: "#8DCDC5", background: "#E4F5F3" }
+                      ? { borderColor: "#8DCDC5", background: "#C8E8E4" }
                       : { borderColor: "#E5E7EB" }
                     }
                   >
@@ -462,7 +462,7 @@ export default function LeseTest({ kindName, klasse, onFertig }: Props) {
                   onClick={() => setFehlerAnzahl(stufe.wert)}
                   className="p-3 rounded-xl border-2 text-left flex justify-between items-center transition-all"
                   style={fehlerAnzahl === stufe.wert
-                    ? { borderColor: "#8DCDC5", background: "#E4F5F3" }
+                    ? { borderColor: "#8DCDC5", background: "#C8E8E4" }
                     : { borderColor: "#E5E7EB" }
                   }
                 >

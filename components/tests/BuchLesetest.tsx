@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState } from "react";
 import type { BuchLeseErgebnis } from "@/lib/screening-types";
 
@@ -47,7 +47,7 @@ export default function BuchLesetest({ kindName, onFertig }: Props) {
         <div className="text-5xl mb-4">📚</div>
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Lesetest — Buch</h2>
         <p className="text-sm text-gray-500 mb-3">{kindName} liest aus einem eigenen Buch — du beobachtest.</p>
-        <div className="rounded-xl px-4 py-3 mb-5 text-sm text-center max-w-lg mx-auto" style={{ background: "#E4F5F3", color: "#2D7A73" }}>
+        <div className="rounded-xl px-4 py-3 mb-5 text-sm text-center max-w-lg mx-auto" style={{ background: "#C8E8E4", color: "#1A5550" }}>
           💡 Das echte Buch zeigt, was kein Bildschirmtest abbildet: wie die Augen Zeile für Zeile verarbeiten — mit echtem Papier, echtem Abstand, echtem Licht.
         </div>
 
@@ -98,7 +98,7 @@ export default function BuchLesetest({ kindName, onFertig }: Props) {
         <div className="text-5xl mb-4">📖</div>
         <h2 className="text-xl font-bold text-gray-900 mb-3">{kindName} liest gerade …</h2>
 
-        <div className="bg-teal-50 border border-teal-200 rounded-2xl p-5 max-w-lg mx-auto mb-6 text-left text-sm text-teal-800">
+        <div className="bg-[#C8E8E4] border border-[#8DCDC5] rounded-2xl p-5 max-w-lg mx-auto mb-6 text-left text-sm text-[#1A5550]">
           <p className="font-semibold mb-3">Jetzt beobachten:</p>
           <div className="space-y-2">
             <div className="flex items-center gap-2"><span>👁️</span><span>Folgen die Augen der Zeile oder springen sie?</span></div>

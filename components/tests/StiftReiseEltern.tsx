@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState } from "react";
 import VideoEmbed from "@/components/VideoEmbed";
 import type { StiftReiseErgebnis } from "@/lib/screening-types";
@@ -57,7 +57,7 @@ export default function StiftReiseEltern({ kindName, onFertig }: Props) {
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Stift-Reise</h2>
         <p className="text-sm text-gray-500 mb-1">Kann {kindName} einem Stift nur mit den Augen folgen?</p>
         <p className="text-xs font-semibold mb-3" style={{ color: "#8DCDC5" }}>Muster und Geschwindigkeit beobachten</p>
-        <div className="rounded-xl px-4 py-3 mb-4 text-sm text-center max-w-lg mx-auto" style={{ background: "#E4F5F3", color: "#2D7A73" }}>
+        <div className="rounded-xl px-4 py-3 mb-4 text-sm text-center max-w-lg mx-auto" style={{ background: "#C8E8E4", color: "#1A5550" }}>
           💡 Flüssiges Lesen braucht Augen, die gleichmäßig gleiten können. Ruckeln sie statt zu gleiten, holpert auch das Gelesene — selbst wenn das Kind jeden Buchstaben kennt.
         </div>
 
@@ -100,7 +100,7 @@ export default function StiftReiseEltern({ kindName, onFertig }: Props) {
           <p className="text-sm text-gray-500 mt-1">{bew.beschreibung}</p>
         </div>
 
-        <div className="rounded-2xl overflow-hidden mb-2 mx-auto max-w-sm flex items-center justify-center" style={{ height: "180px", background: "#E4F5F3" }}>
+        <div className="rounded-2xl overflow-hidden mb-2 mx-auto max-w-sm flex items-center justify-center" style={{ height: "180px", background: "#C8E8E4" }}>
           <div
             style={{
               animation: `${bew.animation} 4s ease-in-out infinite`,
@@ -115,7 +115,7 @@ export default function StiftReiseEltern({ kindName, onFertig }: Props) {
           </div>
         </div>
 
-        <p className="text-center text-xs font-semibold mb-4" style={{ color: "#2D7A73" }}>Siehst du die Geschwindigkeit?</p>
+        <p className="text-center text-xs font-semibold mb-4" style={{ color: "#1A5550" }}>Siehst du die Geschwindigkeit?</p>
 
         <div className="flex gap-3 mb-3">
           {BEWEGUNGEN.map((_, i) => (
@@ -127,7 +127,7 @@ export default function StiftReiseEltern({ kindName, onFertig }: Props) {
           ))}
         </div>
 
-        <div className="bg-teal-50 border border-teal-200 rounded-xl p-3 mb-5 text-xs text-teal-800 text-center">
+        <div className="bg-[#C8E8E4] border border-[#8DCDC5] rounded-xl p-3 mb-5 text-xs text-[#1A5550] text-center">
           Führe diese Bewegung 2–3× durch, dann weiter.
         </div>
 

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState, useEffect, useRef } from "react";
 import VideoEmbed from "@/components/VideoEmbed";
 import type { SakkadenErgebnis } from "@/lib/screening-types";
@@ -58,7 +58,7 @@ export default function SakkadenEltern({ kindName, onFertig }: Props) {
         <p className="text-sm text-gray-500 mb-1">Kann {kindName} präzise zwischen zwei Punkten hin- und herspringen?</p>
         <p className="text-xs font-semibold mb-3" style={{ color: "#8DCDC5" }}>Genauigkeit der Augenbewegungen beobachten</p>
 
-        <div className="rounded-xl px-4 py-3 mb-4 text-sm text-left max-w-lg mx-auto" style={{ background: "#E4F5F3", color: "#2D7A73" }}>
+        <div className="rounded-xl px-4 py-3 mb-4 text-sm text-left max-w-lg mx-auto" style={{ background: "#C8E8E4", color: "#1A5550" }}>
           💡 Beim Lesen springen die Augen ständig von Wort zu Wort und von Zeile zu Zeile. Sind diese Blicksprünge nicht präzise, verliert das Kind leichter die Zeile, muss häufiger zurückspringen – und Lesen wird unnötig anstrengend.
         </div>
 
@@ -144,7 +144,7 @@ export default function SakkadenEltern({ kindName, onFertig }: Props) {
           </div>
         </div>
 
-        <div className="bg-teal-50 border border-teal-200 rounded-xl p-3 text-xs text-teal-800 text-center max-w-sm mx-auto">
+        <div className="bg-[#C8E8E4] border border-[#8DCDC5] rounded-xl p-3 text-xs text-[#1A5550] text-center max-w-sm mx-auto">
           Der leuchtende Punkt zeigt: <strong>welchen Finger oder Stift soll {kindName} gerade ansehen?</strong><br />
           <span className="text-teal-600">Hier siehst du die Geschwindigkeit der Blicksprünge.</span>
         </div>
