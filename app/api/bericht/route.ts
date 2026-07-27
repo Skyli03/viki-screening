@@ -19,6 +19,15 @@ const AMPEL_LABEL: Record<string, string> = {
   rot:   "🔴 Förderbedarf",
 };
 
+const KATEGORIE_ICONS: Record<string, string> = {
+  "Lesefluss":           "📖",
+  "Augensteuerung":      "🎯",
+  "Visuelle Verarbeitung": "🔍",
+  "Visuelle Merkspanne": "⚡",
+  "Konzentration":       "🧠",
+  "Reflexintegration":   "🦺",
+};
+
 const AMPEL_COLOR: Record<string, string> = {
   gruen: "#16A34A",
   gelb:  "#D97706",
@@ -100,7 +109,7 @@ function generateReportEmail(
       ${staerkenKategorien.map(k => {
         const txt = ALLTAGS_TEXTE[k.name];
         return `<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid #F3F4F6;">
-          <div style="font-size:18px;line-height:1.3;">${k.icon}</div>
+          <div style="font-size:18px;line-height:1.3;">${KATEGORIE_ICONS[k.name] ?? "📋"}</div>
           <div>
             <span style="font-weight:700;font-size:13px;color:#111827;">${k.name}</span>
             ${txt ? `<span style="font-size:13px;color:#6B7280;"> — ${txt.positiv}</span>` : ""}
@@ -123,7 +132,7 @@ function generateReportEmail(
     return `
     <div style="border:2px solid ${stufe.border};border-radius:12px;overflow:hidden;margin-bottom:16px;">
       <div style="background:${stufe.bg};padding:12px 16px;display:flex;align-items:center;gap:10px;">
-        <span style="font-size:20px;">${k.icon}</span>
+        <span style="font-size:20px;">${KATEGORIE_ICONS[k.name] ?? "📋"}</span>
         <div style="flex:1;">
           <div style="font-weight:700;font-size:14px;color:${stufe.farbe};">${k.name}</div>
           ${txt ? `<div style="font-size:11px;color:#6B7280;">${txt.fachtitel}</div>` : ""}
