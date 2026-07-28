@@ -144,6 +144,18 @@ export default function ErgebnisPage() {
 
       <main className="max-w-2xl mx-auto px-5 py-8 space-y-6">
 
+        {/* Danke-Einstieg */}
+        <div className="rounded-2xl p-6 text-center bg-white" style={{ border: "2px solid #C8E8E4" }}>
+          <div className="text-3xl mb-2">❤️</div>
+          <h2 className="text-xl font-bold text-gray-900 mb-3">Danke!</h2>
+          <p className="text-sm text-gray-700 leading-relaxed mb-3">
+            Du hast dir gerade Zeit genommen, genauer hinzusehen. Allein das ist ein wichtiger Schritt, denn viele visuelle Herausforderungen bleiben im Alltag lange unentdeckt.
+          </p>
+          <p className="text-sm text-gray-600 leading-relaxed">
+            Die Ergebnisse zeigen eine Momentaufnahme der visuellen Fähigkeiten deines Kindes. Sie helfen dir besser zu verstehen, welche Bereiche bereits gut entwickelt sind und wo gezielte Unterstützung sinnvoll sein kann.
+          </p>
+        </div>
+
         {/* Prominenter Disclaimer */}
         <div className="rounded-xl px-4 py-3 text-sm flex items-start gap-3" style={{ background: "#C8E8E4", border: "1px solid #8DCDC5", color: "#1F5C57" }}>
           <span className="text-lg shrink-0">ℹ️</span>
@@ -157,10 +169,10 @@ export default function ErgebnisPage() {
         <div className="rounded-2xl p-6" style={{ background: "#FEF3E2", border: "2px solid #F5943A" }}>
           <p className="text-sm font-semibold uppercase tracking-wide mb-2" style={{ color: "#C47020" }}>Kennst du das?</p>
           <blockquote className="text-lg font-medium text-gray-900 leading-relaxed italic">
-            „Eigentlich ist mein Kind ja schlau — aber Hausaufgaben dauern ewig, die Konzentration hält nicht lange und Lesen klappt einfach nicht so wie bei anderen Kindern."
+            „Eigentlich weiß ich, dass mein Kind schlau ist. Trotzdem dauern Hausaufgaben ewig, Lesen ist anstrengend und die Konzentration hält oft nicht lange."
           </blockquote>
           <p className="mt-3 text-sm text-gray-600">
-            Wenn dir das bekannt vorkommt: Du bist nicht allein. Und es liegt nicht am Willen {kindName !== "dein Kind" ? `von ${kindName}` : "deines Kindes"}.
+            Wenn dir das bekannt vorkommt, bist du nicht allein. Und vor allem: Es liegt nicht an mangelnder Intelligenz oder fehlendem Willen {kindName !== "dein Kind" ? `von ${kindName}` : "deines Kindes"}. Manchmal spielen visuelle Fähigkeiten dabei eine größere Rolle, als viele Eltern vermuten.
           </p>
         </div>
 
@@ -374,18 +386,18 @@ export default function ErgebnisPage() {
             {/* Nächste Schritte */}
             <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
               <h3 className="font-bold text-gray-900 mb-4">📋 Deine nächsten Schritte</h3>
-              <ol className="space-y-4">
+              <div className="space-y-4">
                 {[
-                  { color: "#8DCDC5", text: `Du hast den vollständigen Screening-Bericht für ${kindNameAngezeigt} per E-Mail erhalten — lies ihn in Ruhe durch.` },
-                  { color: "#F5943A", text: "Schau dir den VIKI Superblick Kurs an — und entscheide, ob das Training für dein Kind passt." },
-                  { color: "#EE6B85", text: "Bei konkreten Fragen zu den Ergebnissen: Wende dich an eine Funktionaloptometristin / einen Funktionaloptometristen oder eine Augenärztin / einen Augenarzt für eine professionelle Einschätzung." },
-                ].map((s, i) => (
-                  <li key={i} className="flex gap-3 text-sm text-gray-700">
-                    <span className="w-6 h-6 rounded-full text-white text-xs flex items-center justify-center font-bold shrink-0 mt-0.5" style={{ background: s.color }}>{i + 1}</span>
-                    <span className="leading-relaxed">{s.text}</span>
-                  </li>
+                  "Lies den Bericht in Ruhe durch und vergleiche die Ergebnisse mit den Beobachtungen im Alltag.",
+                  "Erfahre im VIKI Superblick Kurs, wie du die einzelnen visuellen Fähigkeiten deines Kindes gezielt und spielerisch fördern kannst.",
+                  "Sollten dich einzelne Ergebnisse besonders verunsichern oder starke Beschwerden bestehen, empfiehlt sich zusätzlich eine Untersuchung bei einer Funktionaloptometristin bzw. einem Funktionaloptometristen oder einer Augenärztin bzw. einem Augenarzt.",
+                ].map((text, i) => (
+                  <div key={i} className="flex gap-3 text-sm text-gray-700">
+                    <span className="shrink-0 text-base">✅</span>
+                    <span className="leading-relaxed">{text}</span>
+                  </div>
                 ))}
-              </ol>
+              </div>
             </div>
 
             <div className="text-center pb-4">

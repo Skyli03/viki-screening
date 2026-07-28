@@ -246,8 +246,8 @@ function erkenneMuster(scores: Record<string, number>, daten: ScreeningDaten): M
     scores.lesefluss < 70
   ) {
     hinweise.push({
-      titel: "Hinweis auf Konvergenzinsuffizienz",
-      text: "Auffälligkeiten beim Konvergenztest kombiniert mit einem unruhigen Lesefluss sind ein typisches Muster. Die Augen arbeiten beim Nahsehen nicht präzise zusammen — Buchstaben können verschwimmen oder doppelt erscheinen.",
+      titel: "Zusammenarbeit der Augen beim Nahsehen",
+      text: "Die Kombination aus Auffälligkeiten bei den Übungen zum Nahsehen und einem unruhigen Lesefluss deutet darauf hin, dass die Zusammenarbeit beider Augen beim Lesen zusätzliche Energie kostet. Dadurch können Lesen, Abschreiben oder längeres Arbeiten im Nahbereich anstrengender werden. Ein gezieltes Visualtraining kann diese Fähigkeiten unterstützen.",
       staerke: k.beideAugen === "deutlich_auffaellig" ? "stark" : "mittel",
     });
   }
@@ -255,8 +255,8 @@ function erkenneMuster(scores: Record<string, number>, daten: ScreeningDaten): M
   // Monokularer Vergleich + Augensteuerung → klarer Binokularbefund
   if (daten.buchLese.monokular === "besser" && scores.augensteuerung < 70) {
     hinweise.push({
-      titel: "Binokulare Zusammenarbeit eingeschränkt",
-      text: "Das Kind liest mit einem Auge bedeckt flüssiger — ein starkes Zeichen, dass die Teamarbeit beider Augen nicht optimal funktioniert. Das ist trainierbar.",
+      titel: "Binokulare Zusammenarbeit",
+      text: "Beim Lesen mit einem abgedeckten Auge gelang die Aufgabe flüssiger als mit beiden Augen gemeinsam. Das kann darauf hindeuten, dass die Zusammenarbeit beider Augen noch nicht optimal abgestimmt ist. Genau diese Fähigkeiten stehen im Visualtraining im Mittelpunkt und lassen sich gezielt fördern.",
       staerke: "stark",
     });
   }
@@ -265,7 +265,7 @@ function erkenneMuster(scores: Record<string, number>, daten: ScreeningDaten): M
   if (scores.reflexintegration < 55 && scores.konzentration < 60 && scores.augensteuerung < 65) {
     hinweise.push({
       titel: "Reflexintegration beeinflusst Lernen",
-      text: "Aktive frühkindliche Reflexe kombiniert mit Konzentrationsschwierigkeiten und eingeschränkter Augensteuerung ist ein typisches Muster. Die Reflexe erzeugen eine Grundanspannung, die Energie für das Lernen raubt.",
+      text: "Die Kombination aus Auffälligkeiten bei Reflexintegration, Konzentration und Augensteuerung zeigt, dass mehrere Bereiche zusammenwirken können. Frühkindliche Reflexe können Haltung, Gleichgewicht, Blicksteuerung und Konzentration beeinflussen. Deshalb werden diese Bereiche im Visualtraining gemeinsam trainiert.",
       staerke: scores.reflexintegration < 40 ? "stark" : "mittel",
     });
   }
@@ -277,8 +277,8 @@ function erkenneMuster(scores: Record<string, number>, daten: ScreeningDaten): M
   const tlr1 = fragen["r3"] ?? 0;
   if (stnr1 + stnr2 >= 4 && tlr1 >= 2) {
     hinweise.push({
-      titel: "STNR/TLR-Muster: Sitzen und Schreiben",
-      text: "Unbewusste Mitbewegungen beim Schreiben und eine schlechte Sitzhaltung sind Zeichen eines noch aktiven STNR- und TLR-Reflexes.",
+      titel: "STNR-/TLR-Muster: Sitzen und Schreiben",
+      text: "Die Kombination aus einer auffälligen Sitzhaltung, unbewussten Mitbewegungen und Schwierigkeiten beim Schreiben wird häufig bei Kindern beobachtet, deren Haltungs- und Bewegungsentwicklung noch Unterstützung benötigt. Deshalb sind Übungen zur Reflexintegration ein wichtiger Bestandteil unseres Visualtrainings und können dazu beitragen, Bewegungsabläufe zu stabilisieren und das Lernen zu erleichtern.",
       staerke: "mittel",
     });
   }

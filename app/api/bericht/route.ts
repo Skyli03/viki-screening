@@ -226,7 +226,7 @@ function generateReportEmail(
       <h3 style="color:#92400E;font-size:15px;font-weight:700;margin:0 0 10px;">Was tun mit diesen Ergebnissen?</h3>
       <ol style="margin:0;padding-left:18px;font-size:13px;color:#78350F;line-height:1.8;">
         <li>Lies den Bericht in Ruhe durch — du wirst jetzt verstehen, warum manche Dinge für dein Kind schwieriger sind.</li>
-        <li>Bei Auffälligkeiten unterstützt gezieltes Visualtraining inkl. Reflexintegration — es schafft die neuromotorische Basis für müheloses Lesen &amp; entspanntes Lernen.</li>
+        <li>Bei Auffälligkeiten unterstützt gezieltes Visualtraining — es kombiniert Übungen zur Förderung visueller Fähigkeiten mit Elementen der Reflexintegration und unterstützt Kinder dabei, entspannter zu lesen und zu lernen.</li>
       </ol>
     </div>
 
@@ -243,12 +243,22 @@ function generateReportEmail(
     </div>
   </div>
 
+  <!-- Momentaufnahme -->
+  <div style="padding:0 40px 16px;">
+    <div style="background:#F0FDF4;border:1px solid #86EFAC;border-radius:10px;padding:16px 18px;">
+      <p style="font-size:13px;font-weight:700;color:#166534;margin:0 0 6px;">🌱 Was dein Kind heute gezeigt hat, ist keine feste Grenze.</p>
+      <p style="font-size:12px;color:#166534;line-height:1.6;margin:0;">
+        Visuelle Fähigkeiten entwickeln sich. Viele Bereiche können durch passende Übungen und regelmäßiges Training verbessert werden. Das Screening zeigt deshalb keine endgültigen Ergebnisse, sondern eine Momentaufnahme, die als Orientierung dienen soll.
+      </p>
+    </div>
+  </div>
+
   <!-- Disclaimer -->
   <div style="padding:0 40px 24px;">
     <div style="background:#F9FAFB;border:1px solid #E5E7EB;border-radius:10px;padding:16px 18px;">
       <p style="font-size:11px;font-weight:700;color:#374151;margin:0 0 6px;">⚠️ Rechtlicher Hinweis</p>
       <p style="font-size:11px;color:#6B7280;line-height:1.6;margin:0 0 8px;">
-        Der VIKI Superblick Screening-Test dient ausschließlich der <strong>unverbindlichen Erstorientierung</strong> und stellt <strong>keine medizinische oder optometrische Diagnose</strong> dar. Die Ergebnisse basieren auf Elternbeobachtung und können Fehler enthalten. Eine professionelle Untersuchung kann durch dieses Tool nicht ersetzt werden. Bei deutlichen Auffälligkeiten empfiehlt sich eine Vorstellung bei einer Funktionaloptometristin / einem Funktionaloptometristen oder einer Augenärztin / einem Augenarzt.
+        Der VIKI Superblick Screening-Test dient ausschließlich der <strong>unverbindlichen Erstorientierung</strong> und stellt <strong>keine medizinische oder optometrische Diagnose</strong> dar. Die Ergebnisse basieren auf Elternbeobachtung und können Fehler enthalten. Die Ergebnisse sollten deshalb immer im Zusammenhang mit dem gesamten Entwicklungs- und Lernverhalten des Kindes betrachtet werden. Eine professionelle Untersuchung kann durch dieses Tool nicht ersetzt werden. Bei deutlichen Auffälligkeiten empfiehlt sich eine Vorstellung bei einer Funktionaloptometristin / einem Funktionaloptometristen oder einer Augenärztin / einem Augenarzt.
       </p>
       <p style="font-size:11px;color:#6B7280;line-height:1.6;margin:0;">
         <strong>Datenschutz:</strong> Testergebnisse werden nicht auf Servern gespeichert. Deine E-Mail wird nur für diesen Bericht und VIKI-Informationen genutzt. Abmeldung jederzeit: <a href="mailto:hallo@vikitraining.at" style="color:#9CA3AF;">hallo@vikitraining.at</a>
