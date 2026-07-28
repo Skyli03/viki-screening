@@ -282,7 +282,7 @@ export default function BuchLesetest({ kindName, onFertig }: Props) {
         <div className="space-y-2">
           {([
             { val: "besser", label: "Mit einem Auge ruhiger / flüssiger — Unterschied deutlich", color: "#D97706", bg: "#FFFBEB", border: "#FCD34D", sub: "Mögliches Zeichen: Beide Augen arbeiten nicht gut als Team" },
-            { val: "gleich", label: "Kein Unterschied erkennbar", color: "#6B7280", bg: "#F9FAFB", border: "#E5E7EB", sub: "Kein klares binokulares Signal" },
+            { val: "gleich", label: "Kein Unterschied erkennbar", color: "#854D0E", bg: "#FEFCE8", border: "#FDE047", sub: "Kein klares binokulares Signal" },
             { val: "schlechter", label: "Mit beiden Augen liest es besser — kein Unterschied", color: "#16A34A", bg: "#F0FDF4", border: "#86EFAC", sub: "Beide Augen arbeiten gut zusammen" },
             { val: "nicht_getestet", label: "Konnte ich nicht testen", color: "#6B7280", bg: "#F9FAFB", border: "#E5E7EB", sub: "" },
           ] as const).map(opt => (
