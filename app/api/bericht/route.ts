@@ -232,7 +232,7 @@ function generateReportEmail(
 
     <!-- CTA -->
     <div style="background:#FEF3E2;border:2px solid #F5943A;border-radius:14px;padding:24px;text-align:center;">
-      <div style="display:inline-block;background:#F5943A;color:white;font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.5px;">🚀 Startet bald</div>
+      <div style="display:inline-block;background:#F5943A;color:white;font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.5px;">🚀 Jetzt durchstarten</div>
       <h3 style="color:#1F2937;font-size:18px;font-weight:800;margin:0 0 8px;">Der VIKI Superblick Kurs</h3>
       <p style="color:#6B7280;font-size:13px;margin:0 0 16px;line-height:1.5;">
         Mit Visualtraining die Basis für müheloses Lesen &amp; entspanntes Lernen legen — entwickelt von Dr. Sarah Kopetzky, Funktionaloptometristin.
