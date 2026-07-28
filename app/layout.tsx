@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import CookieHinweis from "./components/CookieHinweis";
 
@@ -13,6 +14,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="bg-white min-h-screen antialiased">
         {children}
         <CookieHinweis />
+        <Analytics />
       </body>
     </html>
   );
