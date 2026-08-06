@@ -13,6 +13,97 @@ interface BerichtRequest {
   blinzelinfo?: { label: string; ampel: string; elternText: string };
 }
 
+const SYSTEMEIO_TAG_NAME = "viki-screening";
+
+// systeme.io's POST /api/contacts does not accept a "tags" field — a tag must be
+// looked up (or created) by name to get its numeric id, then attached via a
+// separate POST /api/contacts/{id}/tags call. See developer.systeme.io/reference.
+async function systemeioHeaders(apiKey: string) {
+  return { "Content-Type": "application/json", "X-API-Key": apiKey };
+}
+
+async function ensureSystemeContactId(email: string, firstName: string, apiKey: string): Promise<number | null> {
+  const headers = await systemeioHeaders(apiKey);
+
+  const createRes = await fetch("https://api.systeme.io/api/contacts", {
+    method: "POST",
+    headers,
+    body: JSON.stringify({
+      email,
+      fields: firstName ? [{ slug: "first_name", value: firstName }] : [],
+    }),
+  });
+
+  if (createRes.status === 201) {
+    const data = await createRes.json();
+    return data.id ?? null;
+  }
+
+  if (createRes.status === 400 || createRes.status === 422) {
+    // Wahrscheinlich existiert der Kontakt schon (E-Mail bereits vorhanden) — nachschlagen.
+    const searchRes = await fetch(`https://api.systeme.io/api/contacts?email=${encodeURIComponent(email)}`, { headers });
+    if (searchRes.ok) {
+      const searchData = await searchRes.json();
+      return searchData.items?.[0]?.id ?? null;
+    }
+    console.error("Systeme.io Kontaktsuche fehlgeschlagen:", searchRes.status, await searchRes.text());
+    return null;
+  }
+
+  console.error("Systeme.io Kontakt anlegen fehlgeschlagen:", createRes.status, await createRes.text());
+  return null;
+}
+
+async function ensureSystemeTagId(tagName: string, apiKey: string): Promise<number | null> {
+  const headers = await systemeioHeaders(apiKey);
+
+  const searchRes = await fetch(`https://api.systeme.io/api/tags?query=${encodeURIComponent(tagName)}`, { headers });
+  if (searchRes.ok) {
+    const data = await searchRes.json();
+    const found = (data.items ?? []).find((t: { id: number; name: string }) => t.name === tagName);
+    if (found) return found.id;
+  } else {
+    console.error("Systeme.io Tag-Suche fehlgeschlagen:", searchRes.status, await searchRes.text());
+  }
+
+  const createRes = await fetch("https://api.systeme.io/api/tags", {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ name: tagName }),
+  });
+  if (createRes.status === 201) {
+    const data = await createRes.json();
+    return data.id ?? null;
+  }
+
+  console.error("Systeme.io Tag anlegen fehlgeschlagen:", createRes.status, await createRes.text());
+  return null;
+}
+
+async function taggeInSystemeio(email: string, kindName: string, apiKey: string): Promise<void> {
+  const contactId = await ensureSystemeContactId(email, kindName !== "dein Kind" ? kindName : "", apiKey);
+  if (!contactId) {
+    console.error("Systeme.io: Kontakt-ID konnte nicht ermittelt werden für", email);
+    return;
+  }
+
+  const tagId = await ensureSystemeTagId(SYSTEMEIO_TAG_NAME, apiKey);
+  if (!tagId) {
+    console.error("Systeme.io: Tag-ID konnte nicht ermittelt werden für", SYSTEMEIO_TAG_NAME);
+    return;
+  }
+
+  const headers = await systemeioHeaders(apiKey);
+  const tagRes = await fetch(`https://api.systeme.io/api/contacts/${contactId}/tags`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ tagId }),
+  });
+  if (!tagRes.ok) {
+    console.error("Systeme.io Tag-Zuweisung fehlgeschlagen:", tagRes.status, await tagRes.text());
+  }
+}
+
 const AMPEL_LABEL: Record<string, string> = {
   gruen: "✅ Unauffällig",
   gelb:  "🟡 Auffällig",
@@ -41,18 +132,7 @@ export async function POST(request: NextRequest) {
   const systemeioKey = process.env.SYSTEMEIO_API_KEY;
   if (systemeioKey) {
     try {
-      await fetch("https://api.systeme.io/api/contacts", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-API-Key": systemeioKey,
-        },
-        body: JSON.stringify({
-          email,
-          firstName: kindName !== "dein Kind" ? kindName : "",
-          tags: [{ name: "viki-screening" }],
-        }),
-      });
+      await taggeInSystemeio(email, kindName, systemeioKey);
     } catch (e) {
       console.error("Systeme.io Fehler:", e);
     }
