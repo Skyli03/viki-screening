@@ -4,8 +4,8 @@ import "./globals.css";
 import CookieHinweis from "./components/CookieHinweis";
 
 export const metadata: Metadata = {
-  title: "VIKI Superblick — Kostenloser Sehtest für dein Kind",
-  description: "Finde in 15 Minuten heraus, ob dein Kind visuelle Verarbeitungsprobleme hat. Kostenloser Online-Test von vikitraining.at",
+  title: "VIKI Superblick — Kostenloser Augen-Check für dein Kind",
+  description: "Erste Orientierung in 15 Minuten: Spielen visuelle Schwierigkeiten beim Lesen und Lernen deines Kindes eine Rolle? Kostenloser Online-Augen-Check von vikitraining.at",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

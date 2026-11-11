@@ -59,7 +59,7 @@ export default function Impressum() {
           </div>
 
           <div className="mt-8 pt-6 border-t border-gray-100">
-            <a href="/" className="text-sm font-semibold" style={{ color: "#F5943A" }}>← Zurück zum Sehtest</a>
+            <a href="/" className="text-sm font-semibold" style={{ color: "#F5943A" }}>← Zurück zum Augen-Check</a>
           </div>
         </div>
       </main>

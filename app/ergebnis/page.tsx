@@ -63,6 +63,7 @@ export default function ErgebnisPage() {
   const [emailFreigegeben, setEmailFreigegeben] = useState(false);
   const [email, setEmail] = useState("");
   const [emailFehler, setEmailFehler] = useState("");
+  const [einwilligung, setEinwilligung] = useState(false);
   const [laden, setLaden] = useState(false);
   const [emailGesendet, setEmailGesendet] = useState(false);
 
@@ -79,6 +80,10 @@ export default function ErgebnisPage() {
   async function emailAbschicken() {
     if (!email.includes("@") || !email.includes(".")) {
       setEmailFehler("Bitte gib eine gültige E-Mail-Adresse ein.");
+      return;
+    }
+    if (!einwilligung) {
+      setEmailFehler("Bitte bestätige die Einwilligung, damit wir dir den Bericht schicken dürfen.");
       return;
     }
     setEmailFehler("");
@@ -296,6 +301,18 @@ export default function ErgebnisPage() {
                 onFocus={e => e.currentTarget.style.borderColor = "#8DCDC5"}
                 onBlur={e => e.currentTarget.style.borderColor = "#D1D5DB"}
               />
+              <label className="flex items-start gap-2 text-xs text-gray-600 leading-relaxed text-left cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={einwilligung}
+                  onChange={e => setEinwilligung(e.target.checked)}
+                  className="mt-0.5 h-4 w-4 shrink-0"
+                />
+                <span>
+                  Ich willige ein, dass VIKI Training mir den Bericht mit den Ergebnissen meines Kindes per E-Mail schickt und mich danach per E-Mail über visuelle Wahrnehmung, Lernen und Angebote von VIKI Training informiert. Die Ergebnisse werden nur für diesen Bericht verwendet. Abmeldung jederzeit möglich. Mehr in der{" "}
+                  <a href="/datenschutz" target="_blank" rel="noopener noreferrer" className="underline font-semibold" style={{ color: "#F5943A" }}>Datenschutzerklärung</a>.
+                </span>
+              </label>
               {emailFehler && <p className="text-red-500 text-sm">{emailFehler}</p>}
               <button
                 onClick={emailAbschicken}
@@ -414,6 +431,14 @@ export default function ErgebnisPage() {
           </>
         )}
 
+        <div className="mt-8 text-center text-xs text-gray-400 space-y-1">
+          <p>Dieser Augen-Check stellt keine Diagnose und ersetzt keine augenärztliche oder optometrische Untersuchung.</p>
+          <p>
+            <a href="/impressum" className="hover:underline">Impressum</a>
+            {" · "}
+            <a href="/datenschutz" className="hover:underline">Datenschutz</a>
+          </p>
+        </div>
       </main>
     </div>
   );

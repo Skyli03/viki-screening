@@ -30,7 +30,7 @@ export default function Startseite() {
       <header className="bg-white shadow-sm py-2 px-6">
         <div className="max-w-3xl mx-auto flex items-center justify-between">
           <img src="/logo.png" alt="VIKI Training" className="h-14 w-auto" />
-          <div className="text-xs text-gray-400 font-medium uppercase tracking-wide">Kostenloser Sehtest</div>
+          <div className="text-xs text-gray-400 font-medium uppercase tracking-wide">Kostenloser Augen-Check</div>
         </div>
       </header>
 
@@ -42,7 +42,7 @@ export default function Startseite() {
             Wie gut sieht und lernt<br />dein Kind wirklich?
           </h1>
           <p className="text-lg text-gray-600 max-w-xl mx-auto">
-            Dieser kostenlose Test zeigt dir in <strong>15 Minuten</strong>, ob dein Kind visuelle Verarbeitungsprobleme hat — die häufigste unentdeckte Ursache für Lernschwierigkeiten.
+            Dieser kostenlose Augen-Check gibt dir in <strong>15 Minuten</strong> eine erste Orientierung, ob visuelle Schwierigkeiten beim Lesen und Lernen deines Kindes eine Rolle spielen könnten.
           </p>
         </div>
 

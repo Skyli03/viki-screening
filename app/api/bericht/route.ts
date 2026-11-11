@@ -81,7 +81,8 @@ async function ensureSystemeTagId(tagName: string, apiKey: string): Promise<numb
 }
 
 async function taggeInSystemeio(email: string, kindName: string, apiKey: string): Promise<void> {
-  const contactId = await ensureSystemeContactId(email, kindName !== "dein Kind" ? kindName : "", apiKey);
+  // Den Namen des Kindes bewusst NICHT an systeme.io übergeben (Datenschutz): nur die E-Mail-Adresse wird gespeichert.
+  const contactId = await ensureSystemeContactId(email, "", apiKey);
   if (!contactId) {
     console.error("Systeme.io: Kontakt-ID konnte nicht ermittelt werden für", email);
     return;
@@ -341,7 +342,7 @@ function generateReportEmail(
         Der VIKI Superblick Screening-Test dient ausschließlich der <strong>unverbindlichen Erstorientierung</strong> und stellt <strong>keine medizinische oder optometrische Diagnose</strong> dar. Die Ergebnisse basieren auf Elternbeobachtung und können Fehler enthalten. Die Ergebnisse sollten deshalb immer im Zusammenhang mit dem gesamten Entwicklungs- und Lernverhalten des Kindes betrachtet werden. Eine professionelle Untersuchung kann durch dieses Tool nicht ersetzt werden. Bei deutlichen Auffälligkeiten empfiehlt sich eine Vorstellung bei einer Funktionaloptometristin / einem Funktionaloptometristen oder einer Augenärztin / einem Augenarzt.
       </p>
       <p style="font-size:11px;color:#6B7280;line-height:1.6;margin:0;">
-        <strong>Datenschutz:</strong> Testergebnisse werden nicht auf Servern gespeichert. Deine E-Mail wird nur für diesen Bericht und VIKI-Informationen genutzt. Abmeldung jederzeit: <a href="mailto:hallo@vikitraining.at" style="color:#9CA3AF;">hallo@vikitraining.at</a>
+        <strong>Datenschutz:</strong> Testergebnisse werden nur für diesen Bericht verwendet. Deine E-Mail wird nur für diesen Bericht und VIKI-Informationen genutzt. Abmeldung jederzeit: <a href="mailto:hallo@vikitraining.at" style="color:#9CA3AF;">hallo@vikitraining.at</a>
       </p>
     </div>
   </div>
