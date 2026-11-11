@@ -64,6 +64,7 @@ export default function ErgebnisPage() {
   const [email, setEmail] = useState("");
   const [emailFehler, setEmailFehler] = useState("");
   const [einwilligung, setEinwilligung] = useState(false);
+  const [newsletter, setNewsletter] = useState(false);
   const [laden, setLaden] = useState(false);
   const [emailGesendet, setEmailGesendet] = useState(false);
 
@@ -95,6 +96,7 @@ export default function ErgebnisPage() {
         body: JSON.stringify({
           email,
           kindName,
+          newsletter,
           vikiTyp: profil?.typ ?? "D",
           gesamtScore: profil?.gesamtScore ?? 0,
           auffaelligkeiten: profil?.auffaelligkeitenAnzahl ?? 0,
@@ -309,8 +311,19 @@ export default function ErgebnisPage() {
                   className="mt-0.5 h-4 w-4 shrink-0"
                 />
                 <span>
-                  Ich willige ein, dass VIKI Training mir den Bericht mit den Ergebnissen meines Kindes per E-Mail schickt und mich danach per E-Mail über visuelle Wahrnehmung, Lernen und Angebote von VIKI Training informiert. Die Ergebnisse werden nur für diesen Bericht verwendet. Abmeldung jederzeit möglich. Mehr in der{" "}
-                  <a href="/datenschutz" target="_blank" rel="noopener noreferrer" className="underline font-semibold" style={{ color: "#F5943A" }}>Datenschutzerklärung</a>.
+                  Ich willige ein, dass VIKI Training mir den Bericht mit den Ergebnissen meines Kindes per E-Mail schickt. Die Ergebnisse werden nur für diesen Bericht verwendet. Mehr in der{" "}
+                  <a href="/datenschutz" target="_blank" rel="noopener noreferrer" className="underline font-semibold" style={{ color: "#F5943A" }}>Datenschutzerklärung</a>. <span className="text-gray-400">(nötig für den Bericht)</span>
+                </span>
+              </label>
+              <label className="flex items-start gap-2 text-xs text-gray-600 leading-relaxed text-left cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={newsletter}
+                  onChange={e => setNewsletter(e.target.checked)}
+                  className="mt-0.5 h-4 w-4 shrink-0"
+                />
+                <span>
+                  Ja, ich möchte außerdem hilfreiche Tipps zu Sehen, Lesen und Lernen sowie Infos zu Angeboten von VIKI Training per E-Mail bekommen. Abmeldung jederzeit möglich. <span className="text-gray-400">(freiwillig)</span>
                 </span>
               </label>
               {emailFehler && <p className="text-red-500 text-sm">{emailFehler}</p>}
@@ -323,7 +336,7 @@ export default function ErgebnisPage() {
                 {laden ? "Wird gesendet…" : `Vollständigen Bericht erhalten →`}
               </button>
               <p className="text-xs text-gray-400 text-center">
-                Kein Spam. Nur der Bericht und hilfreiche Tipps. Jederzeit abmeldbar.
+                Kein Spam. Tipps nur, wenn du das zweite Häkchen setzt.
               </p>
             </div>
           </div>

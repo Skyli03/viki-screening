@@ -11,6 +11,7 @@ interface BerichtRequest {
   kategorien: { name: string; ampel: string; elternText: string }[];
   musterHinweise?: { titel: string; text: string; staerke: string }[];
   blinzelinfo?: { label: string; ampel: string; elternText: string };
+  newsletter?: boolean;
 }
 
 const SYSTEMEIO_TAG_NAME = "viki-screening";
@@ -128,10 +129,11 @@ const AMPEL_COLOR: Record<string, string> = {
 
 export async function POST(request: NextRequest) {
   const body: BerichtRequest = await request.json();
-  const { email, kindName, vikiTyp, gesamtScore, auffaelligkeiten, kategorien, musterHinweise, blinzelinfo } = body;
+  const { email, kindName, vikiTyp, gesamtScore, auffaelligkeiten, kategorien, musterHinweise, blinzelinfo, newsletter } = body;
 
+  // Nur mit freiwilliger Newsletter-Einwilligung (zweites Häkchen) in systeme.io eintragen.
   const systemeioKey = process.env.SYSTEMEIO_API_KEY;
-  if (systemeioKey) {
+  if (systemeioKey && newsletter === true) {
     try {
       await taggeInSystemeio(email, kindName, systemeioKey);
     } catch (e) {
@@ -342,7 +344,7 @@ function generateReportEmail(
         Der VIKI Superblick Screening-Test dient ausschließlich der <strong>unverbindlichen Erstorientierung</strong> und stellt <strong>keine medizinische oder optometrische Diagnose</strong> dar. Die Ergebnisse basieren auf Elternbeobachtung und können Fehler enthalten. Die Ergebnisse sollten deshalb immer im Zusammenhang mit dem gesamten Entwicklungs- und Lernverhalten des Kindes betrachtet werden. Eine professionelle Untersuchung kann durch dieses Tool nicht ersetzt werden. Bei deutlichen Auffälligkeiten empfiehlt sich eine Vorstellung bei einer Funktionaloptometristin / einem Funktionaloptometristen oder einer Augenärztin / einem Augenarzt.
       </p>
       <p style="font-size:11px;color:#6B7280;line-height:1.6;margin:0;">
-        <strong>Datenschutz:</strong> Testergebnisse werden nur für diesen Bericht verwendet. Deine E-Mail wird nur für diesen Bericht und VIKI-Informationen genutzt. Abmeldung jederzeit: <a href="mailto:hallo@vikitraining.at" style="color:#9CA3AF;">hallo@vikitraining.at</a>
+        <strong>Datenschutz:</strong> Testergebnisse werden nur für diesen Bericht verwendet. Deine E-Mail wird für diesen Bericht genutzt und nur mit deiner Zustimmung für VIKI-Informationen. Abmeldung jederzeit: <a href="mailto:hallo@vikitraining.at" style="color:#9CA3AF;">hallo@vikitraining.at</a>
       </p>
     </div>
   </div>

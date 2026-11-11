@@ -25,7 +25,7 @@ export default function Datenschutz() {
               <ul className="list-disc list-inside space-y-1 text-gray-600">
                 <li><strong>Vorname des Kindes, Schulstufe und Antworten im Check</strong> — werden während des Checks nur lokal in deinem Browser gespeichert. Die Auswertung passiert ebenfalls in deinem Browser.</li>
                 <li><strong>Ergebnisbericht</strong> — nur wenn du den vollständigen Bericht per E-Mail anforderst, werden der Vorname deines Kindes und die Auswertung an unseren Server übermittelt, um daraus die Bericht-E-Mail zu erstellen und an dich zu senden (siehe Punkt 3). Wir legen dafür keine eigene Datenbank an.</li>
-                <li><strong>E-Mail-Adresse</strong> — wenn du den vollständigen Bericht anforderst, wird deine E-Mail-Adresse (ohne Namen und ohne Ergebnisse deines Kindes) an unseren E-Mail-Marketing-Dienst systeme.io übermittelt (siehe Punkt 4).</li>
+                <li><strong>E-Mail-Adresse</strong> — wird für den Versand des Berichts verwendet. Nur wenn du zusätzlich dem Erhalt von Tipps und Infos zustimmst (freiwilliges zweites Häkchen), wird sie (ohne Namen und ohne Ergebnisse deines Kindes) an unseren E-Mail-Marketing-Dienst systeme.io übermittelt (siehe Punkt 4).</li>
               </ul>
               <p className="mt-2">Die Ergebnisse des Checks betreffen die Entwicklung deines Kindes und können als Gesundheitsdaten gelten. Wir verarbeiten sie deshalb nur mit deiner ausdrücklichen Einwilligung (Art. 6 Abs. 1 lit. a und Art. 9 Abs. 2 lit. a DSGVO), die du beim Anfordern des Berichts erteilst.</p>
             </div>
@@ -38,7 +38,7 @@ export default function Datenschutz() {
 
             <div>
               <h2 className="font-bold text-gray-900 text-base mb-2">4. E-Mail-Marketing (systeme.io)</h2>
-              <p>Wenn du den Bericht anforderst und einwilligst, wird deine E-Mail-Adresse an systeme.io (Frankreich/EU) übermittelt und dort gespeichert. Du erhältst dann hilfreiche Informationen rund um visuelle Wahrnehmung, Lernen und Angebote von VIKI Training. Du kannst dich jederzeit über den Abmeldelink in jeder E-Mail abmelden.</p>
+              <p>Nur wenn du beim Anfordern des Berichts das freiwillige Häkchen für Tipps und Infos setzt, wird deine E-Mail-Adresse an systeme.io (Frankreich/EU) übermittelt und dort gespeichert. Den Bericht bekommst du auch ohne diese Zustimmung. Du erhältst dann hilfreiche Informationen rund um visuelle Wahrnehmung, Lernen und Angebote von VIKI Training. Du kannst dich jederzeit über den Abmeldelink in jeder E-Mail abmelden.</p>
               <p className="mt-2">Rechtsgrundlage: Art. 6 Abs. 1 lit. a DSGVO (Einwilligung)</p>
             </div>
 
