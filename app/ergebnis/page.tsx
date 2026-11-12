@@ -1,277 +1,174 @@
-﻿"use client";
-import { useEffect, useState } from "react";
-import { berechneScreeningProfil } from "@/lib/auswertung";
-import type { ScreeningProfil } from "@/lib/auswertung";
-import type { ScreeningDaten, Antwort } from "@/lib/screening-types";
-import { ALLTAGS_TEXTE } from "@/lib/alltags-texte";
+"use client";
+import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { berechneScreeningProfil, type ScreeningProfil } from "@/lib/auswertung";
+import type { ScreeningDaten } from "@/lib/screening-types";
+import { alsScreeningDaten, anzeigeName, ladeStand } from "@/lib/speicher";
+import { useImBrowser } from "@/lib/im-browser";
+import {
+  AUSDAUER_TEXT, BEREICH_TEXTE, STUFEN, UNTERSUCHUNG_TEXT, WARNZEICHEN_EMPFEHLUNG, kursLink,
+} from "@/lib/alltags-texte";
 
-// 4-level Ampel — keine Zahlen für Eltern sichtbar
-function getAmpelLevel(score: number): 0 | 1 | 2 | 3 {
-  if (score >= 71) return 0;
-  if (score >= 56) return 1;
-  if (score >= 41) return 2;
-  return 3;
-}
-
-const STUFEN = [
-  { emoji: "🟢", label: "Unauffällig",       bg: "#F0FDF4", border: "#86EFAC", text: "#166534" },
-  { emoji: "🟡", label: "Leichte Hinweise",  bg: "#FEFCE8", border: "#FDE047", text: "#854D0E" },
-  { emoji: "🟠", label: "Deutliche Hinweise",bg: "#FFF7ED", border: "#FDBA74", text: "#9A3412" },
-  { emoji: "🔴", label: "Starke Hinweise",   bg: "#FEF2F2", border: "#FCA5A5", text: "#991B1B" },
-];
-
-
-const TYP_DATEN: Record<string, { icon: string; warum: string; training: string }> = {
-  A: { icon: "👁️", warum: "Lesefluss & Augenbewegungen",                     training: "Augensprünge, Lesefluss-Training, visuelle Spurfolge-Übungen" },
-  B: { icon: "🎯", warum: "Fokus & Augensteuerung",                           training: "Konvergenztraining, Fixation, Stift-Folgeübungen" },
-  C: { icon: "🔄", warum: "Frühkindliche Reflexe & Körpersteuerung",          training: "Reflexintegration, Körper-Augen-Koordination, Reflex-Sequenzen (MORO, ATNR, STNR, TLR)" },
-  D: { icon: "🧠", warum: "Kombinierte visuelle & neuronale Verarbeitung",    training: "Ganzheitliches Augen-Hirn-Training, Reflexintegration, visuelles Gedächtnis" },
-};
-
-function demoScreeningDaten(): ScreeningDaten {
-  return {
-    konvergenz: { beideAugen: "leicht_auffaellig", zeichen: ["schaut_weg"] },
-    buchLese: {
-      verliert_zeile: true, ueberspringt_woerter: false, benutzt_finger: true,
-      viele_fehler_bekannte_woerter: false, fluessig: false,
-      leseabstand: "zu_nah", kopfhaltung: "gerade", monokular: "gleich",
-    },
-    pcLese: {
-      lesezeitSekunden: 65, lesequalitaet: ["holprig"],
-      fehlerAnzahl: 2, blinzeln: "selten", pc_leichter: null,
-    },
-    fixation: { qualitaet: "leicht_unruhig" },
-    sakkaden: { praezision: "ueberschiesst", kopf_mitbewegt: false },
-    stiftReise: { folgt: "ruckelig_mit_pausen", kopf_mitbewegt: false, konvergenz_nahfern: "nicht_getestet" },
-    miniTests: {
-      buchstaben: { verwechslungen: 3, reaktionszeit: 2200 },
-      formen: { fehlerrate: 0.2, geschwindigkeit: 2000 },
-      merkspanne: { fehlerrate: 0.25, reaktionszeit: 2800 },
-    },
-    fragebogen: {
-      l1: 2, l2: 1, l3: 2, l4: 1, l5: 2, l6: 1, l7: 1, l8: 2, l9: 1, l10: 1,
-      k1: 1, k2: 2, k3: 1, k4: 1, k5: 0, k6: 1, k7: 1, k8: 0,
-      r1: 1, r2: 0, r3: 1, r4: 1, r5: 1, r6: 1, r7: 0, r8: 1,
-    } as Record<string, Antwort>,
-    klasse: 2,
-  };
-}
+type Versand = "offen" | "laeuft" | "gesendet" | "fehler_versand";
 
 export default function ErgebnisPage() {
-  const [profil, setProfil] = useState<ScreeningProfil | null>(null);
-  const [kindName, setKindName] = useState("dein Kind");
-  const [emailFreigegeben, setEmailFreigegeben] = useState(false);
+  const router = useRouter();
+  const imBrowser = useImBrowser();
+  const ausgewertet = useMemo<{ daten: ScreeningDaten; profil: ScreeningProfil; kindName: string } | null>(() => {
+    if (!imBrowser) return null;
+    const stand = ladeStand();
+    const d = alsScreeningDaten(stand);
+    return d ? { daten: d, profil: berechneScreeningProfil(d), kindName: anzeigeName(stand) } : null;
+  }, [imBrowser]);
   const [email, setEmail] = useState("");
-  const [emailFehler, setEmailFehler] = useState("");
   const [einwilligung, setEinwilligung] = useState(false);
   const [newsletter, setNewsletter] = useState(false);
-  const [laden, setLaden] = useState(false);
-  const [emailGesendet, setEmailGesendet] = useState(false);
+  const [fehler, setFehler] = useState("");
+  const [versand, setVersand] = useState<Versand>("offen");
 
+  // Keine (vollständigen) Daten → zurück in den Check, statt ein Beispiel-Ergebnis zu zeigen
   useEffect(() => {
-    const name = sessionStorage.getItem("kindName") ?? "dein Kind";
-    const klasse = Number(sessionStorage.getItem("klasse") ?? "2");
-    setKindName(name);
+    if (imBrowser && !ausgewertet) router.replace("/screening");
+  }, [imBrowser, ausgewertet, router]);
 
-    const rohdaten = sessionStorage.getItem("screening_daten");
-    const daten: ScreeningDaten = rohdaten ? JSON.parse(rohdaten) : demoScreeningDaten();
-    setProfil(berechneScreeningProfil(daten, daten.klasse ?? klasse));
-  }, []);
-
-  async function emailAbschicken() {
-    if (!email.includes("@") || !email.includes(".")) {
-      setEmailFehler("Bitte gib eine gültige E-Mail-Adresse ein.");
+  async function berichtAnfordern() {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.trim())) {
+      setFehler("Bitte gib eine gültige E-Mail-Adresse ein.");
       return;
     }
     if (!einwilligung) {
-      setEmailFehler("Bitte bestätige die Einwilligung, damit wir dir den Bericht schicken dürfen.");
+      setFehler("Bitte setz das erste Häkchen, damit wir dir den Bericht schicken dürfen.");
       return;
     }
-    setEmailFehler("");
-    setLaden(true);
+    setFehler("");
+    setVersand("laeuft");
     try {
-      await fetch("/api/bericht", {
+      const res = await fetch("/api/bericht", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email,
-          kindName,
-          newsletter,
-          vikiTyp: profil?.typ ?? "D",
-          gesamtScore: profil?.gesamtScore ?? 0,
-          auffaelligkeiten: profil?.auffaelligkeitenAnzahl ?? 0,
-          kategorien: profil?.kategorien.map(k => ({
-            name: k.name,
-            ampel: k.ampel,
-            elternText: k.elternText,
-          })) ?? [],
-          musterHinweise: profil?.musterHinweise ?? [],
-          blinzelinfo: profil?.blinzelinfo,
-        }),
+        body: JSON.stringify({ email: email.trim(), einwilligung, newsletter, kindName: kindName === "dein Kind" ? "" : kindName, daten }),
       });
-    } catch (e) {
-      console.error("Bericht-API Fehler:", e);
+      if (res.ok) { setVersand("gesendet"); return; }
+      if (res.status === 400 || res.status === 429) {
+        const j = await res.json().catch(() => ({}));
+        setFehler(j.fehler ?? "Das hat leider nicht geklappt. Bitte versuch es noch einmal.");
+        setVersand("offen");
+        return;
+      }
+      setVersand("fehler_versand");
+    } catch {
+      setVersand("fehler_versand");
     }
-    setEmailGesendet(true);
-    setEmailFreigegeben(true);
-    setLaden(false);
   }
+
+  const daten = ausgewertet?.daten ?? null;
+  const profil = ausgewertet?.profil ?? null;
+  const kindName = ausgewertet?.kindName ?? "dein Kind";
 
   if (!profil) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center text-gray-500">
-          <div className="text-5xl mb-4">⏳</div>
-          <p className="font-semibold">Auswertung wird berechnet…</p>
-        </div>
-      </div>
-    );
+    return <div className="min-h-screen bg-gray-50 flex items-center justify-center text-gray-500">Auswertung wird berechnet…</div>;
   }
 
-  const gesamtLevel = getAmpelLevel(profil.gesamtScore);
-  const gesamtStufe = STUFEN[gesamtLevel];
-  const typDaten = TYP_DATEN[profil.typ] ?? TYP_DATEN.D;
-
-  const staerken = profil.kategorien.filter(k => k.ampel === "gruen");
-  const hinweise = profil.kategorien.filter(k => k.ampel !== "gruen");
-  const kindNameAngezeigt = kindName !== "dein Kind" ? kindName : "dein Kind";
+  const freigeschaltet = versand === "gesendet" || versand === "fehler_versand";
+  const gesamt = STUFEN[profil.gesamtStufe];
+  const unauffaellig = profil.bereiche.filter(b => b.stufe === 0);
+  const hinweise = profil.bereiche.filter(b => b.stufe > 0).sort((a, b) => a.score - b.score);
+  const schwerpunktText = profil.schwerpunkt ? BEREICH_TEXTE[profil.schwerpunkt] : null;
+  const vonKind = kindName === "dein Kind" ? "deines Kindes" : `von ${kindName}`;
 
   return (
     <div className="min-h-screen" style={{ background: "#F7F9FA" }}>
       <header className="bg-white shadow-sm">
-        <div className="max-w-2xl mx-auto px-5 py-4 flex items-center gap-2">
-          <span className="text-2xl">🦸</span>
-          <span className="font-bold text-gray-900">VIKI Superblick — Screening-Ergebnis</span>
-        </div>
-        <div className="max-w-2xl mx-auto px-5 pb-2 text-xs text-gray-400 flex items-center gap-1">
-          <span>🔒</span>
-          <span>Deine Testergebnisse werden nicht auf unseren Servern gespeichert.</span>
-        </div>
+        <div className="max-w-2xl mx-auto px-5 py-4 font-bold text-gray-900">👀 Augen-Check · Dein Ergebnis</div>
       </header>
 
       <main className="max-w-2xl mx-auto px-5 py-8 space-y-6">
-
-        {/* Danke-Einstieg */}
         <div className="rounded-2xl p-6 text-center bg-white" style={{ border: "2px solid #C8E8E4" }}>
           <div className="text-3xl mb-2">❤️</div>
-          <h2 className="text-xl font-bold text-gray-900 mb-3">Danke!</h2>
-          <p className="text-sm text-gray-700 leading-relaxed mb-3">
-            Du hast dir gerade Zeit genommen, genauer hinzusehen. Allein das ist ein wichtiger Schritt, denn viele visuelle Herausforderungen bleiben im Alltag lange unentdeckt.
-          </p>
-          <p className="text-sm text-gray-600 leading-relaxed">
-            Die Ergebnisse zeigen eine Momentaufnahme der visuellen Fähigkeiten deines Kindes. Sie helfen dir besser zu verstehen, welche Bereiche bereits gut entwickelt sind und wo gezielte Unterstützung sinnvoll sein kann.
+          <h2 className="text-xl font-bold text-gray-900 mb-2">Danke, dass du genau hingeschaut hast!</h2>
+          <p className="text-gray-700 leading-relaxed">
+            Das Ergebnis ist eine Momentaufnahme, keine Diagnose. Es hilft dir einzuschätzen, was schon gut klappt und wo es sich lohnen kann, genauer hinzuschauen.
           </p>
         </div>
 
-        {/* Prominenter Disclaimer */}
-        <div className="rounded-xl px-4 py-3 text-sm flex items-start gap-3" style={{ background: "#C8E8E4", border: "1px solid #8DCDC5", color: "#1F5C57" }}>
-          <span className="text-lg shrink-0">ℹ️</span>
-          <div>
-            <span className="font-semibold">Eltern-Screening — kein medizinisches Diagnoseinstrument.</span>{" "}
-            Dieses Screening gibt Hinweise auf mögliche visuelle Auffälligkeiten und ersetzt keine augenärztliche oder optometrische Diagnose. Bei Fragen wende dich an eine Fachperson.
+        {/* Warnzeichen haben Vorrang vor allem anderen */}
+        {profil.warnzeichen.length > 0 && (
+          <div className="rounded-2xl p-5 border-2" style={{ background: "#FEF2F2", borderColor: "#FCA5A5" }}>
+            <h3 className="font-bold text-red-900 mb-2">⚠️ Bitte abklären lassen</h3>
+            <ul className="space-y-1 text-red-900 mb-3">
+              {profil.warnzeichen.map(w => <li key={w.id}>• {w.text}</li>)}
+            </ul>
+            <p className="text-sm text-red-900">{WARNZEICHEN_EMPFEHLUNG}</p>
           </div>
-        </div>
+        )}
+        {profil.untersuchungEmpfohlen && profil.warnzeichen.length === 0 && (
+          <div className="rounded-2xl p-5 border-2 bg-white" style={{ borderColor: "#FCD34D" }}>
+            <h3 className="font-bold text-gray-900 mb-1">👓 Tipp vorab</h3>
+            <p className="text-gray-700">{UNTERSUCHUNG_TEXT}</p>
+          </div>
+        )}
 
-        {/* Empathie-Hook */}
-        <div className="rounded-2xl p-6" style={{ background: "#FEF3E2", border: "2px solid #F5943A" }}>
-          <p className="text-sm font-semibold uppercase tracking-wide mb-2" style={{ color: "#C47020" }}>Kennst du das?</p>
-          <blockquote className="text-lg font-medium text-gray-900 leading-relaxed italic">
-            „Eigentlich weiß ich, dass mein Kind schlau ist. Trotzdem dauern Hausaufgaben ewig, Lesen ist anstrengend und die Konzentration hält oft nicht lange."
-          </blockquote>
-          <p className="mt-3 text-sm text-gray-600">
-            Wenn dir das bekannt vorkommt, bist du nicht allein. Und vor allem: Es liegt nicht an mangelnder Intelligenz oder fehlendem Willen {kindName !== "dein Kind" ? `von ${kindName}` : "deines Kindes"}. Manchmal spielen visuelle Fähigkeiten dabei eine größere Rolle, als viele Eltern vermuten.
-          </p>
-        </div>
-
-        {/* Ergebnis-Übersicht (ohne Zahlen) */}
-        <div className="rounded-2xl border-2 p-6" style={{ background: gesamtStufe.bg, borderColor: gesamtStufe.border }}>
+        <div className="rounded-2xl border-2 p-6" style={{ background: gesamt.bg, borderColor: gesamt.border }}>
           <div className="flex items-center gap-4">
-            <div className="text-5xl">{gesamtStufe.emoji}</div>
+            <div className="text-5xl">{gesamt.emoji}</div>
             <div>
-              <div className="text-xs font-bold uppercase tracking-wide mb-1" style={{ color: gesamtStufe.text }}>
-                Screening-Ergebnis für {kindNameAngezeigt}
-              </div>
-              <div className="text-xl font-bold" style={{ color: gesamtStufe.text }}>
-                {gesamtStufe.label}
-              </div>
-              <div className="text-sm mt-1" style={{ color: gesamtStufe.text }}>
+              <div className="text-xs font-bold uppercase tracking-wide mb-1" style={{ color: gesamt.text }}>Ergebnis für {kindName}</div>
+              <div className="text-xl font-bold" style={{ color: gesamt.text }}>{gesamt.label}</div>
+              <div className="text-sm mt-1" style={{ color: gesamt.text }}>
                 {hinweise.length === 0
-                  ? "Alle Bereiche unauffällig — gut gemacht!"
-                  : `${hinweise.length} Bereich${hinweise.length > 1 ? "e" : ""} mit Hinweisen · ${staerken.length} unauffällig`}
+                  ? "In allen 4 Bereichen unauffällig."
+                  : `${hinweise.length} von 4 Bereichen mit Hinweisen`}
               </div>
             </div>
           </div>
         </div>
 
-        {/* Stärken */}
-        {staerken.length > 0 && (
+        {unauffaellig.length > 0 && (
           <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
-            <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
-              <span>💪</span> Das läuft gut
-            </h3>
+            <h3 className="font-bold text-gray-900 mb-3">💪 Das läuft gut</h3>
             <div className="space-y-2">
-              {staerken.map(kat => {
-                const txt = ALLTAGS_TEXTE[kat.name];
-                return (
-                  <div key={kat.name} className="flex items-start gap-3 text-sm">
-                    <span className="text-xl shrink-0">{kat.icon}</span>
-                    <div>
-                      <span className="font-semibold text-gray-800">{kat.name}</span>
-                      {txt && <span className="text-gray-500"> — {txt.positiv}</span>}
-                    </div>
-                  </div>
-                );
-              })}
+              {unauffaellig.map(b => (
+                <div key={b.id} className="flex items-start gap-3">
+                  <span className="text-xl shrink-0">{BEREICH_TEXTE[b.id].icon}</span>
+                  <div><span className="font-semibold text-gray-800">{b.name}</span> <span className="text-gray-600">· {BEREICH_TEXTE[b.id].positiv}</span></div>
+                </div>
+              ))}
             </div>
           </div>
         )}
 
-        {/* Hinweise-Kategorien */}
         {hinweise.length > 0 && (
           <div>
-            <h3 className="text-base font-bold text-gray-900 mb-3 flex items-center gap-2">
-              <span>👀</span> Hinweise aufgefallen
-            </h3>
+            <h3 className="font-bold text-gray-900 mb-3">👀 Hier lohnt sich ein genauerer Blick</h3>
             <div className="space-y-4">
-              {hinweise.map((kat, i) => {
-                const level = getAmpelLevel(kat.score);
-                const stufe = STUFEN[level];
-                const txt = ALLTAGS_TEXTE[kat.name];
-                const istSichtbar = emailFreigegeben || i < 2;
-
+              {hinweise.map((b, i) => {
+                const stufe = STUFEN[b.stufe];
+                const txt = BEREICH_TEXTE[b.id];
+                const sichtbar = freigeschaltet || i < 2;
                 return (
-                  <div
-                    key={kat.name}
-                    className={`rounded-2xl border-2 overflow-hidden transition-all ${!istSichtbar ? "blur-sm select-none pointer-events-none" : ""}`}
-                    style={{ borderColor: stufe.border }}
-                  >
-                    {/* Kategorie-Header */}
+                  <div key={b.id} className="rounded-2xl border-2 overflow-hidden" style={{ borderColor: stufe.border }}>
                     <div className="flex items-center gap-3 px-5 py-3" style={{ background: stufe.bg }}>
-                      <span className="text-2xl">{kat.icon}</span>
-                      <div className="flex-1">
-                        <div className="font-bold text-sm" style={{ color: stufe.text }}>{kat.name}</div>
-                        {txt && <div className="text-xs text-gray-500">{txt.fachtitel}</div>}
-                      </div>
-                      <span className="text-xs font-bold px-2 py-1 rounded-full" style={{ background: stufe.border, color: stufe.text }}>
+                      <span className="text-2xl">{txt.icon}</span>
+                      <div className="flex-1 font-bold" style={{ color: stufe.text }}>{b.name}</div>
+                      <span className="text-xs font-bold px-2 py-1 rounded-full whitespace-nowrap" style={{ background: stufe.border, color: stufe.text }}>
                         {stufe.emoji} {stufe.label}
                       </span>
                     </div>
-
-                    {/* 3-Part Schema */}
-                    {istSichtbar && txt && (
-                      <div className="bg-white px-5 py-4 space-y-3">
+                    {sichtbar ? (
+                      <div className="bg-white px-5 py-4 space-y-3 text-gray-700">
                         <div>
-                          <div className="text-xs font-bold uppercase tracking-wide text-gray-400 mb-1">Was beobachtet</div>
-                          <p className="text-sm text-gray-700">{txt.beobachtet}</p>
+                          <div className="text-xs font-bold uppercase tracking-wide text-gray-400 mb-1">Was aufgefallen ist</div>
+                          <p>{txt.beobachtet}</p>
                         </div>
                         <div>
                           <div className="text-xs font-bold uppercase tracking-wide text-gray-400 mb-1">Im Alltag kann das bedeuten</div>
-                          <p className="text-sm text-gray-700">{txt.alltag}</p>
+                          <p>{txt.alltag}</p>
                         </div>
-                        <div className="rounded-xl px-3 py-2 text-xs" style={{ background: "#C8E8E4", color: "#1F5C57" }}>
-                          ℹ️ {txt.disclaimer}
-                        </div>
+                        <div className="rounded-xl px-3 py-2 text-sm" style={{ background: "#C8E8E4", color: "#1F5C57" }}>ℹ️ {txt.hinweis}</div>
                       </div>
+                    ) : (
+                      <div className="bg-white px-5 py-4 text-sm text-gray-500">🔒 Die Erklärung zu diesem Bereich steht im Bericht per E-Mail.</div>
                     )}
                   </div>
                 );
@@ -280,175 +177,143 @@ export default function ErgebnisPage() {
           </div>
         )}
 
-        {/* Email-Gate */}
-        {!emailFreigegeben && (
+        {profil.ausdauerHinweis && (
+          <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
+            <h3 className="font-bold text-gray-900 mb-1">🧠 Ausdauer</h3>
+            <p className="text-gray-700">{AUSDAUER_TEXT}</p>
+          </div>
+        )}
+
+        {/* E-Mail-Bericht */}
+        {!freigeschaltet && (
           <div className="bg-white rounded-2xl border-2 p-6 shadow-lg" style={{ borderColor: "#8DCDC5" }}>
             <div className="text-center mb-5">
-              <div className="text-4xl mb-3">🔓</div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">
-                Alle Bereiche freischalten
-              </h3>
-              <p className="text-sm text-gray-600 leading-relaxed">
-                Du erhältst den <strong>vollständigen Bericht</strong> für {kindNameAngezeigt} kostenlos per E-Mail — inklusive konkreter Hinweise passend zum erkannten Schwerpunkt.
+              <div className="text-4xl mb-2">📩</div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Deinen Bericht per E-Mail bekommen</h3>
+              <p className="text-gray-600 leading-relaxed">
+                Kostenlos: alle Bereiche mit Erklärung, erkannte Zusammenhänge und konkrete nächste Schritte für {kindName === "dein Kind" ? "dein Kind" : kindName}. So kannst du alles in Ruhe nachlesen.
               </p>
             </div>
             <div className="space-y-3">
               <input
                 type="email"
+                autoComplete="email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
-                onKeyDown={e => e.key === "Enter" && emailAbschicken()}
+                onKeyDown={e => e.key === "Enter" && berichtAnfordern()}
                 placeholder="deine@email.at"
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-lg focus:outline-none"
-                onFocus={e => e.currentTarget.style.borderColor = "#8DCDC5"}
-                onBlur={e => e.currentTarget.style.borderColor = "#D1D5DB"}
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-lg focus:outline-none focus:border-[#8DCDC5]"
               />
-              <label className="flex items-start gap-2 text-xs text-gray-600 leading-relaxed text-left cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={einwilligung}
-                  onChange={e => setEinwilligung(e.target.checked)}
-                  className="mt-0.5 h-4 w-4 shrink-0"
-                />
+              <label className="flex items-start gap-2 text-sm text-gray-600 leading-relaxed cursor-pointer">
+                <input type="checkbox" checked={einwilligung} onChange={e => setEinwilligung(e.target.checked)} className="mt-1 h-4 w-4 shrink-0" />
                 <span>
                   Ich willige ein, dass VIKI Training mir den Bericht mit den Ergebnissen meines Kindes per E-Mail schickt. Die Ergebnisse werden nur für diesen Bericht verwendet. Mehr in der{" "}
                   <a href="/datenschutz" target="_blank" rel="noopener noreferrer" className="underline font-semibold" style={{ color: "#F5943A" }}>Datenschutzerklärung</a>. <span className="text-gray-400">(nötig für den Bericht)</span>
                 </span>
               </label>
-              <label className="flex items-start gap-2 text-xs text-gray-600 leading-relaxed text-left cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={newsletter}
-                  onChange={e => setNewsletter(e.target.checked)}
-                  className="mt-0.5 h-4 w-4 shrink-0"
-                />
+              <label className="flex items-start gap-2 text-sm text-gray-600 leading-relaxed cursor-pointer">
+                <input type="checkbox" checked={newsletter} onChange={e => setNewsletter(e.target.checked)} className="mt-1 h-4 w-4 shrink-0" />
                 <span>
                   Ja, ich möchte außerdem hilfreiche Tipps zu Sehen, Lesen und Lernen sowie Infos zu Angeboten von VIKI Training per E-Mail bekommen. Abmeldung jederzeit möglich. <span className="text-gray-400">(freiwillig)</span>
                 </span>
               </label>
-              {emailFehler && <p className="text-red-500 text-sm">{emailFehler}</p>}
+              {fehler && <p className="text-red-600 text-sm">{fehler}</p>}
               <button
-                onClick={emailAbschicken}
-                disabled={laden}
-                className="w-full text-white font-bold text-lg py-4 rounded-xl transition-all shadow-md disabled:opacity-50 hover:opacity-90"
+                onClick={berichtAnfordern}
+                disabled={versand === "laeuft"}
+                className="w-full text-white font-bold text-lg py-4 rounded-xl shadow-md disabled:opacity-50"
                 style={{ background: "#F5943A" }}
               >
-                {laden ? "Wird gesendet…" : `Vollständigen Bericht erhalten →`}
+                {versand === "laeuft" ? "Wird gesendet…" : "Bericht kostenlos zuschicken →"}
               </button>
-              <p className="text-xs text-gray-400 text-center">
-                Kein Spam. Tipps nur, wenn du das zweite Häkchen setzt.
-              </p>
+              <p className="text-xs text-gray-400 text-center">Kein Spam. Tipps nur, wenn du das zweite Häkchen setzt.</p>
             </div>
+            <p className="text-sm text-gray-500 text-center mt-5">
+              Du möchtest dich zuerst nur umschauen?{" "}
+              <a href={kursLink("ergebnis-ohne-mail")} target="_blank" rel="noopener noreferrer" className="underline font-semibold" style={{ color: "#F5943A" }}>Zum Superblick-Kurs</a>
+            </p>
           </div>
         )}
 
-        {/* Nach Email-Freischaltung */}
-        {emailFreigegeben && (
+        {versand === "gesendet" && (
+          <div className="rounded-2xl p-5 border-2 text-center" style={{ background: "#F0FDF4", borderColor: "#86EFAC" }}>
+            <p className="font-bold text-green-900 mb-1">✅ Dein Bericht ist unterwegs!</p>
+            <p className="text-sm text-green-900">Er kommt in den nächsten Minuten an {email.trim()}. Schau bitte auch im Spam- oder Werbung-Ordner nach.</p>
+          </div>
+        )}
+        {versand === "fehler_versand" && (
+          <div className="rounded-2xl p-5 border-2 text-center" style={{ background: "#FFFBEB", borderColor: "#FCD34D" }}>
+            <p className="font-bold text-amber-900 mb-1">Die E-Mail konnte gerade nicht verschickt werden.</p>
+            <p className="text-sm text-amber-900">Das liegt an uns, nicht an dir. Hier siehst du trotzdem alles. Wenn du den Bericht als E-Mail möchtest, schreib uns gern an hallo@vikitraining.at.</p>
+          </div>
+        )}
+
+        {freigeschaltet && (
           <>
-            {/* Erkannte Zusammenhänge (Muster) */}
-            {profil.musterHinweise.length > 0 && (
+            {profil.zusammenhaenge.length > 0 && (
               <div className="space-y-3">
-                <h3 className="text-base font-bold text-gray-900">🔎 Erkannte Zusammenhänge</h3>
-                {profil.musterHinweise.map((m, i) => (
-                  <div key={i} className={`rounded-xl border-2 p-4 ${m.staerke === "stark" ? "bg-orange-50 border-orange-300" : "bg-blue-50 border-blue-200"}`}>
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-lg">{m.staerke === "stark" ? "💡" : "💡"}</span>
-                      <span className={`font-semibold text-sm ${m.staerke === "stark" ? "text-orange-800" : "text-blue-800"}`}>
-                        {m.titel}
-                      </span>
-                    </div>
-                    <p className={`text-sm ${m.staerke === "stark" ? "text-orange-700" : "text-blue-700"}`}>
-                      {m.text}
-                    </p>
+                <h3 className="font-bold text-gray-900">🔎 Erkannte Zusammenhänge</h3>
+                {profil.zusammenhaenge.map(z => (
+                  <div key={z.titel} className="rounded-xl border-2 p-4 bg-blue-50 border-blue-200">
+                    <div className="font-semibold text-blue-900 mb-1">💡 {z.titel}</div>
+                    <p className="text-sm text-blue-900">{z.text}</p>
                   </div>
                 ))}
               </div>
             )}
 
-            {/* Schwerpunkt & CTA */}
             <div className="rounded-2xl p-6" style={{ background: "#FEF0E0", border: "2px solid #F5943A" }}>
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 rounded-full flex items-center justify-center text-2xl" style={{ background: "#F5943A" }}>
-                  {typDaten.icon}
-                </div>
-                <div>
-                  <div className="text-xs font-bold uppercase tracking-wide" style={{ color: "#C47020" }}>Screening-Schwerpunkt</div>
-                  <div className="font-bold text-gray-900">{typDaten.warum}</div>
-                </div>
-              </div>
-              <p className="text-sm text-gray-700 leading-relaxed mb-3">
-                Der VIKI-Onlinekurs unterstützt Kinder spielerisch dabei, visuelle Verarbeitung, Augensteuerung und Konzentration zu stärken — mit Übungen, die speziell auf diesen Schwerpunkt abgestimmt sind:
-              </p>
-              <div className="rounded-xl p-3 text-sm text-gray-800 font-medium mb-5" style={{ background: "white" }}>
-                🎯 {typDaten.training}
-              </div>
-
-              <div className="rounded-2xl p-5 text-center" style={{ background: "white" }}>
-                <h3 className="text-lg font-bold text-gray-900 mb-2">Der VIKI Superblick Kurs</h3>
-                <p className="text-sm text-gray-600 mb-4 leading-relaxed">
-                  Spielerisches Visualtraining für Kinder — entwickelt von Dr. Sarah Kopetzky, Funktionaloptometristin.
+              {schwerpunktText ? (
+                <>
+                  <div className="text-xs font-bold uppercase tracking-wide mb-1" style={{ color: "#C47020" }}>Dein Schwerpunkt</div>
+                  <div className="font-bold text-gray-900 text-lg mb-3">{schwerpunktText.icon} {profil.bereiche.find(b => b.id === profil.schwerpunkt)?.name}</div>
+                  <p className="text-gray-700 leading-relaxed mb-4">
+                    Im Superblick-Kurs gibt es dazu: <strong>{schwerpunktText.training}</strong>.
+                  </p>
+                </>
+              ) : (
+                <>
+                  <div className="font-bold text-gray-900 text-lg mb-2">🌟 Kein Schwerpunkt aufgefallen</div>
+                  <p className="text-gray-700 leading-relaxed mb-4">
+                    Super! Im Augen-Check gab es keine Hinweise. Wenn Lesen {vonKind} trotzdem schwerfällt, sprich mit der Lehrkraft oder lass die Augen fachlich untersuchen. Der Check kann nicht alles erfassen.
+                  </p>
+                </>
+              )}
+              <div className="rounded-2xl p-5 bg-white">
+                <h3 className="text-lg font-bold text-gray-900 mb-2">Der Superblick-Kurs</h3>
+                <p className="text-sm text-gray-600 mb-3 leading-relaxed">
+                  Spielerisches Visualtraining für zu Hause, entwickelt von Dr. Sarah Kopetzky, Funktionaloptometristin.
                 </p>
-                <div className="space-y-2 mb-5 text-left max-w-xs mx-auto">
-                  {[
-                    "Flüssigeres Lesen & besseres Leseverständnis",
-                    "Abschreiben von der Tafel — schneller und entspannter",
-                    "Mehr Ausdauer und Konzentration beim Lernen",
-                    "Entspanntere Hausaufgaben-Situation",
-                  ].map((v, i) => (
-                    <div key={i} className="flex items-center gap-2 text-sm text-gray-700">
-                      <span className="font-bold" style={{ color: "#F5943A" }}>✓</span>
-                      <span>{v}</span>
-                    </div>
-                  ))}
-                </div>
-                <a
-                  href="https://kurse.vikitraining.at/superblick-kurs"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-block w-full font-bold text-lg py-4 rounded-xl shadow-lg transition-all hover:opacity-90"
-                  style={{ background: "#F5943A", color: "white" }}
-                >
+                <ul className="space-y-1.5 mb-5 text-sm text-gray-700">
+                  <li>✓ Kurze Übungen für Augen-Teamarbeit, Blicksprünge und Buchstaben</li>
+                  <li>✓ Bewegungsübungen zur Reflexintegration</li>
+                  <li>✓ Schritt für Schritt mit Videos erklärt</li>
+                </ul>
+                <a href={kursLink("ergebnis")} target="_blank" rel="noopener noreferrer"
+                  className="block w-full text-center font-bold text-lg py-4 rounded-xl shadow-lg text-white" style={{ background: "#F5943A" }}>
                   Mehr über den Kurs erfahren →
                 </a>
               </div>
             </div>
 
-            {/* Nächste Schritte */}
             <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
-              <h3 className="font-bold text-gray-900 mb-4">📋 Deine nächsten Schritte</h3>
-              <div className="space-y-4">
-                {[
-                  "Lies den Bericht in Ruhe durch und vergleiche die Ergebnisse mit den Beobachtungen im Alltag.",
-                  "Erfahre im VIKI Superblick Kurs, wie du die einzelnen visuellen Fähigkeiten deines Kindes gezielt und spielerisch fördern kannst.",
-                  "Sollten dich einzelne Ergebnisse besonders verunsichern oder starke Beschwerden bestehen, empfiehlt sich zusätzlich eine Untersuchung bei einer Funktionaloptometristin bzw. einem Funktionaloptometristen oder einer Augenärztin bzw. einem Augenarzt.",
-                ].map((text, i) => (
-                  <div key={i} className="flex gap-3 text-sm text-gray-700">
-                    <span className="shrink-0 text-base">✅</span>
-                    <span className="leading-relaxed">{text}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="text-center pb-4">
-              <a
-                href="https://kurse.vikitraining.at/superblick-kurs"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block w-full font-bold text-lg py-4 rounded-xl shadow-lg transition-all hover:opacity-90"
-                style={{ background: "#F5943A", color: "white" }}
-              >
-                Mehr über den Kurs erfahren →
-              </a>
+              <h3 className="font-bold text-gray-900 mb-3">📋 Deine nächsten Schritte</h3>
+              <ol className="space-y-2 text-gray-700 list-decimal pl-5">
+                {(profil.warnzeichen.length > 0 || profil.untersuchungEmpfohlen) && (
+                  <li>Lass die Augen fachlich untersuchen (siehe Hinweis oben).</li>
+                )}
+                <li>Lies den Bericht in Ruhe und vergleiche ihn mit deinen Beobachtungen im Alltag.</li>
+                <li>Wenn du gezielt üben möchtest: Schau dir den Superblick-Kurs an.</li>
+              </ol>
             </div>
           </>
         )}
 
-        <div className="mt-8 text-center text-xs text-gray-400 space-y-1">
-          <p>Dieser Augen-Check stellt keine Diagnose und ersetzt keine augenärztliche oder optometrische Untersuchung.</p>
+        <div className="mt-8 text-center text-xs text-gray-500 space-y-1">
+          <p>Der Augen-Check ist eine erste Orientierung, keine Diagnose. Er ersetzt keine Untersuchung bei einer Augenärztin, einem Augenarzt oder in der Optometrie.</p>
           <p>
-            <a href="/impressum" className="hover:underline">Impressum</a>
-            {" · "}
+            <Link href="/" className="hover:underline">Neuen Check starten</Link>{" · "}
+            <a href="/impressum" className="hover:underline">Impressum</a>{" · "}
             <a href="/datenschutz" className="hover:underline">Datenschutz</a>
           </p>
         </div>

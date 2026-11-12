@@ -1,66 +1,47 @@
-// ─── Neue Typen nach Umbau (kamera-frei, elternbasiert) ──────────────────────
+// ─── Datenmodell Augen-Check (Kurzfassung, Stand 11/2026) ─────────────────────
+// Alles bleibt im Browser (sessionStorage). Nur für den Bericht per E-Mail wird
+// dieses Paket an /api/bericht geschickt und dort ausgewertet.
+
+/** 0 = nie, 1 = manchmal, 2 = oft, 3 = immer, null = weiß nicht */
+export type Antwort = 0 | 1 | 2 | 3 | null;
+
+export interface Vorfragen {
+  brille: "ja" | "nein" | "weiss_nicht";
+  untersuchung: "unter_1_jahr" | "laenger" | "nie" | "weiss_nicht";
+}
+
+export interface LeseErgebnis {
+  fluessig: boolean;
+  zeile_verloren: boolean;
+  finger: boolean;
+  /** Sehr nah am Buch, Kopf schief oder Abstand wechselt ständig */
+  haltung: "unauffaellig" | "auffaellig";
+}
+
+export type KonvergenzZeichen = "doppelbilder" | "schaut_weg" | "anstrengend";
 
 export interface KonvergenzErgebnis {
-  /** Wie folgen beide Augen dem Stift beim Annähern? */
-  beideAugen: "unauffaellig" | "leicht_auffaellig" | "deutlich_auffaellig";
-  /** Zeichen: Doppelbilder, Auge springt raus, Kind schaut weg */
-  zeichen: string[]; // z.B. ["doppelbilder", "auge_springt", "schaut_weg"]
+  augen: "gleichmaessig" | "weicht_kurz_aus" | "weicht_deutlich_aus";
+  zeichen: KonvergenzZeichen[];
 }
 
-export interface BuchLeseErgebnis {
-  verliert_zeile: boolean;
-  ueberspringt_woerter: boolean;
-  benutzt_finger: boolean;
-  viele_fehler_bekannte_woerter: boolean;
-  fluessig: boolean;
-  leseabstand: "normal" | "zu_nah" | "zu_weit" | "wechselnd";
-  kopfhaltung: "gerade" | "schief_oder_verdreht";
-  /** Monokularer Vergleich: wird Lesen mit einem Auge besser? */
-  monokular: "besser" | "gleich" | "schlechter" | "nicht_getestet";
-}
-
-export interface PCLeseErgebnis {
-  lesezeitSekunden: number;
-  lesequalitaet: ("fluessig" | "holprig" | "endungen" | "langsam" | "vertauscht")[];
-  fehlerAnzahl: number;
-  blinzeln: "selten" | "normal" | "oft" | "nicht_beobachtet";
-  pc_leichter: boolean | null; // Vergleich mit Buch
-}
-
-export interface FixationErgebnis {
-  /** Konnten die Augen 10 Sekunden ruhig auf einen Punkt schauen? */
-  qualitaet: "ruhig" | "leicht_unruhig" | "stark_unruhig_oder_abgelenkt";
-}
-
-export interface SakkadenErgebnis {
-  /** Wie präzise sind die Blicksprünge von Ziel zu Ziel? */
-  praezision: "praezise" | "ueberschiesst" | "ungenau_sucht";
+export interface AugenReiseErgebnis {
+  folgen: "fluessig" | "ruckelig" | "verliert";
+  springen: "praezise" | "korrigiert" | "sucht";
   kopf_mitbewegt: boolean;
 }
 
-export interface StiftReiseErgebnis {
-  folgt: "fluessig" | "ruckelig_mit_pausen" | "verliert_stift";
-  kopf_mitbewegt: boolean;
-  konvergenz_nahfern: "gleichmaessig" | "ein_auge_langsamer" | "ruckelt" | "kann_nicht_fixieren" | "nicht_getestet";
+export interface BuchstabenErgebnis {
+  fehler: number;
+  runden: number;
 }
-
-export interface MiniTestErgebnis {
-  buchstaben: { verwechslungen: number; reaktionszeit: number };
-  formen: { fehlerrate: number; geschwindigkeit: number };
-  merkspanne: { fehlerrate: number; reaktionszeit: number };
-}
-
-// ─── Gesamtpaket für die Auswertung ──────────────────────────────────────────
-export type Antwort = 0 | 1 | 2 | 3;
 
 export interface ScreeningDaten {
-  konvergenz: KonvergenzErgebnis;
-  buchLese: BuchLeseErgebnis;
-  pcLese: PCLeseErgebnis;
-  fixation: FixationErgebnis;
-  sakkaden: SakkadenErgebnis;
-  stiftReise: StiftReiseErgebnis;
-  miniTests: MiniTestErgebnis;
-  fragebogen: Record<string, Antwort>;
   klasse: number;
+  vorfragen: Vorfragen;
+  fragebogen: Record<string, Antwort>;
+  lesen: LeseErgebnis;
+  konvergenz: KonvergenzErgebnis;
+  augenReise: AugenReiseErgebnis;
+  buchstaben: BuchstabenErgebnis;
 }

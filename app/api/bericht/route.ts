@@ -1,365 +1,315 @@
 import { NextRequest, NextResponse } from "next/server";
 import nodemailer from "nodemailer";
-import { ALLTAGS_TEXTE } from "@/lib/alltags-texte";
+import { berechneScreeningProfil, type ScreeningProfil } from "@/lib/auswertung";
+import {
+  AUSDAUER_TEXT, BEREICH_TEXTE, STUFEN, UNTERSUCHUNG_TEXT, WARNZEICHEN_EMPFEHLUNG, kursLink,
+} from "@/lib/alltags-texte";
+import type { Antwort, KonvergenzZeichen, ScreeningDaten } from "@/lib/screening-types";
+import { FRAGEN } from "@/data/fragebogen";
 
-interface BerichtRequest {
-  email: string;
-  kindName: string;
-  vikiTyp: string;
-  gesamtScore: number;
-  auffaelligkeiten: number;
-  kategorien: { name: string; ampel: string; elternText: string }[];
-  musterHinweise?: { titel: string; text: string; staerke: string }[];
-  blinzelinfo?: { label: string; ampel: string; elternText: string };
-  newsletter?: boolean;
+// ─── Schutz ───────────────────────────────────────────────────────────────────
+// Der Client schickt nur Rohantworten (feste Auswahlwerte). Alle Texte der Mail
+// entstehen hier auf dem Server. So kann niemand eigene Inhalte über unser
+// Postfach verschicken.
+
+const ERLAUBTE_HERKUNFT = [/^https:\/\/viki-screening[a-z0-9-]*\.vercel\.app$/, /^https:\/\/(www\.)?vikitraining\.at$/, /^http:\/\/localhost(:\d+)?$/];
+const LIMIT = 5;              // Berichte pro IP …
+const FENSTER_MS = 60 * 60 * 1000; // … pro Stunde (pro Server-Instanz, als Bremse gedacht)
+const anfragen = new Map<string, number[]>();
+
+function zuVieleAnfragen(ip: string): boolean {
+  const jetzt = Date.now();
+  const liste = (anfragen.get(ip) ?? []).filter(t => jetzt - t < FENSTER_MS);
+  liste.push(jetzt);
+  anfragen.set(ip, liste);
+  if (anfragen.size > 5000) anfragen.clear();
+  return liste.length > LIMIT;
 }
 
-const SYSTEMEIO_TAG_NAME = "viki-screening";
-
-// systeme.io's POST /api/contacts does not accept a "tags" field — a tag must be
-// looked up (or created) by name to get its numeric id, then attached via a
-// separate POST /api/contacts/{id}/tags call. See developer.systeme.io/reference.
-async function systemeioHeaders(apiKey: string) {
-  return { "Content-Type": "application/json", "X-API-Key": apiKey };
+function escapeHtml(s: string): string {
+  return s.replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]!));
 }
 
-async function ensureSystemeContactId(email: string, firstName: string, apiKey: string): Promise<number | null> {
-  const headers = await systemeioHeaders(apiKey);
+function eines<T extends string>(wert: unknown, erlaubt: readonly T[]): T | null {
+  return typeof wert === "string" && (erlaubt as readonly string[]).includes(wert) ? (wert as T) : null;
+}
 
-  const createRes = await fetch("https://api.systeme.io/api/contacts", {
-    method: "POST",
-    headers,
-    body: JSON.stringify({
-      email,
-      fields: firstName ? [{ slug: "first_name", value: firstName }] : [],
-    }),
-  });
+/** Baut aus der Anfrage ein sauberes Datenpaket oder gibt null zurück. */
+function pruefeDaten(roh: unknown): ScreeningDaten | null {
+  if (!roh || typeof roh !== "object") return null;
+  const d = roh as Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
+  const klasse = Number(d.klasse);
+  if (![1, 2, 3, 4].includes(klasse)) return null;
 
-  if (createRes.status === 201) {
-    const data = await createRes.json();
-    return data.id ?? null;
-  }
-
-  if (createRes.status === 400 || createRes.status === 422) {
-    // Wahrscheinlich existiert der Kontakt schon (E-Mail bereits vorhanden) — nachschlagen.
-    const searchRes = await fetch(`https://api.systeme.io/api/contacts?email=${encodeURIComponent(email)}`, { headers });
-    if (searchRes.ok) {
-      const searchData = await searchRes.json();
-      return searchData.items?.[0]?.id ?? null;
-    }
-    console.error("Systeme.io Kontaktsuche fehlgeschlagen:", searchRes.status, await searchRes.text());
+  const brille = eines(d.vorfragen?.brille, ["ja", "nein", "weiss_nicht"] as const);
+  const untersuchung = eines(d.vorfragen?.untersuchung, ["unter_1_jahr", "laenger", "nie", "weiss_nicht"] as const);
+  const haltung = eines(d.lesen?.haltung, ["unauffaellig", "auffaellig"] as const);
+  const augen = eines(d.konvergenz?.augen, ["gleichmaessig", "weicht_kurz_aus", "weicht_deutlich_aus"] as const);
+  const folgen = eines(d.augenReise?.folgen, ["fluessig", "ruckelig", "verliert"] as const);
+  const springen = eines(d.augenReise?.springen, ["praezise", "korrigiert", "sucht"] as const);
+  const fehler = Number(d.buchstaben?.fehler);
+  if (!brille || !untersuchung || !haltung || !augen || !folgen || !springen || !Number.isInteger(fehler) || fehler < 0 || fehler > 8) {
     return null;
   }
 
-  console.error("Systeme.io Kontakt anlegen fehlgeschlagen:", createRes.status, await createRes.text());
+  const fragebogen: Record<string, Antwort> = {};
+  for (const f of FRAGEN) {
+    const v = d.fragebogen?.[f.id];
+    fragebogen[f.id] = v === 0 || v === 1 || v === 2 || v === 3 ? v : null;
+  }
+
+  const alleZeichen: KonvergenzZeichen[] = ["doppelbilder", "schaut_weg", "anstrengend"];
+  const zeichen = Array.isArray(d.konvergenz?.zeichen)
+    ? alleZeichen.filter(z => d.konvergenz.zeichen.includes(z))
+    : [];
+
+  return {
+    klasse,
+    vorfragen: { brille, untersuchung },
+    fragebogen,
+    lesen: { fluessig: d.lesen?.fluessig === true, zeile_verloren: d.lesen?.zeile_verloren === true, finger: d.lesen?.finger === true, haltung },
+    konvergenz: { augen, zeichen },
+    augenReise: { folgen, springen, kopf_mitbewegt: d.augenReise?.kopf_mitbewegt === true },
+    buchstaben: { fehler, runden: 8 },
+  };
+}
+
+// ─── systeme.io (nur mit Newsletter-Einwilligung, nur E-Mail-Adresse) ─────────
+// POST /api/contacts nimmt keine Tags an: Tag per Name suchen/anlegen und dann
+// separat über POST /api/contacts/{id}/tags zuweisen.
+
+const SYSTEMEIO_TAG_NAME = "viki-screening";
+
+async function systemeioKontaktId(email: string, headers: Record<string, string>): Promise<number | null> {
+  const res = await fetch("https://api.systeme.io/api/contacts", { method: "POST", headers, body: JSON.stringify({ email }) });
+  if (res.status === 201) return (await res.json()).id ?? null;
+  if (res.status === 400 || res.status === 422) {
+    // Kontakt existiert vermutlich schon → nachschlagen
+    const suche = await fetch(`https://api.systeme.io/api/contacts?email=${encodeURIComponent(email)}`, { headers });
+    if (suche.ok) return (await suche.json()).items?.[0]?.id ?? null;
+    console.error("systeme.io Kontaktsuche fehlgeschlagen:", suche.status);
+    return null;
+  }
+  console.error("systeme.io Kontakt anlegen fehlgeschlagen:", res.status, await res.text());
   return null;
 }
 
-async function ensureSystemeTagId(tagName: string, apiKey: string): Promise<number | null> {
-  const headers = await systemeioHeaders(apiKey);
-
-  const searchRes = await fetch(`https://api.systeme.io/api/tags?query=${encodeURIComponent(tagName)}`, { headers });
-  if (searchRes.ok) {
-    const data = await searchRes.json();
-    const found = (data.items ?? []).find((t: { id: number; name: string }) => t.name === tagName);
-    if (found) return found.id;
-  } else {
-    console.error("Systeme.io Tag-Suche fehlgeschlagen:", searchRes.status, await searchRes.text());
+async function systemeioTagId(headers: Record<string, string>): Promise<number | null> {
+  const suche = await fetch(`https://api.systeme.io/api/tags?query=${encodeURIComponent(SYSTEMEIO_TAG_NAME)}`, { headers });
+  if (suche.ok) {
+    const gefunden = ((await suche.json()).items ?? []).find((t: { id: number; name: string }) => t.name === SYSTEMEIO_TAG_NAME);
+    if (gefunden) return gefunden.id;
   }
-
-  const createRes = await fetch("https://api.systeme.io/api/tags", {
-    method: "POST",
-    headers,
-    body: JSON.stringify({ name: tagName }),
-  });
-  if (createRes.status === 201) {
-    const data = await createRes.json();
-    return data.id ?? null;
-  }
-
-  console.error("Systeme.io Tag anlegen fehlgeschlagen:", createRes.status, await createRes.text());
+  const neu = await fetch("https://api.systeme.io/api/tags", { method: "POST", headers, body: JSON.stringify({ name: SYSTEMEIO_TAG_NAME }) });
+  if (neu.status === 201) return (await neu.json()).id ?? null;
+  console.error("systeme.io Tag anlegen fehlgeschlagen:", neu.status);
   return null;
 }
 
-async function taggeInSystemeio(email: string, kindName: string, apiKey: string): Promise<void> {
-  // Den Namen des Kindes bewusst NICHT an systeme.io übergeben (Datenschutz): nur die E-Mail-Adresse wird gespeichert.
-  const contactId = await ensureSystemeContactId(email, "", apiKey);
-  if (!contactId) {
-    console.error("Systeme.io: Kontakt-ID konnte nicht ermittelt werden für", email);
-    return;
-  }
-
-  const tagId = await ensureSystemeTagId(SYSTEMEIO_TAG_NAME, apiKey);
-  if (!tagId) {
-    console.error("Systeme.io: Tag-ID konnte nicht ermittelt werden für", SYSTEMEIO_TAG_NAME);
-    return;
-  }
-
-  const headers = await systemeioHeaders(apiKey);
-  const tagRes = await fetch(`https://api.systeme.io/api/contacts/${contactId}/tags`, {
-    method: "POST",
-    headers,
-    body: JSON.stringify({ tagId }),
-  });
-  if (!tagRes.ok) {
-    console.error("Systeme.io Tag-Zuweisung fehlgeschlagen:", tagRes.status, await tagRes.text());
-  }
+async function inSystemeioEintragen(email: string, apiKey: string) {
+  const headers = { "Content-Type": "application/json", "X-API-Key": apiKey };
+  const kontakt = await systemeioKontaktId(email, headers);
+  const tag = kontakt ? await systemeioTagId(headers) : null;
+  if (!kontakt || !tag) return;
+  const res = await fetch(`https://api.systeme.io/api/contacts/${kontakt}/tags`, { method: "POST", headers, body: JSON.stringify({ tagId: tag }) });
+  if (!res.ok) console.error("systeme.io Tag-Zuweisung fehlgeschlagen:", res.status);
 }
 
-const AMPEL_LABEL: Record<string, string> = {
-  gruen: "✅ Unauffällig",
-  gelb:  "🟡 Auffällig",
-  rot:   "🔴 Förderbedarf",
-};
-
-const KATEGORIE_ICONS: Record<string, string> = {
-  "Lesefluss":           "📖",
-  "Augensteuerung":      "🎯",
-  "Visuelle Verarbeitung": "🔍",
-  "Visuelle Merkspanne": "⚡",
-  "Konzentration":       "🧠",
-  "Reflexintegration":   "🦺",
-};
-
-const AMPEL_COLOR: Record<string, string> = {
-  gruen: "#16A34A",
-  gelb:  "#D97706",
-  rot:   "#DC2626",
-};
+// ─── Route ────────────────────────────────────────────────────────────────────
 
 export async function POST(request: NextRequest) {
-  const body: BerichtRequest = await request.json();
-  const { email, kindName, vikiTyp, gesamtScore, auffaelligkeiten, kategorien, musterHinweise, blinzelinfo, newsletter } = body;
+  const herkunft = request.headers.get("origin");
+  if (herkunft && !ERLAUBTE_HERKUNFT.some(r => r.test(herkunft))) {
+    return NextResponse.json({ fehler: "Nicht erlaubt." }, { status: 403 });
+  }
 
-  // Nur mit freiwilliger Newsletter-Einwilligung (zweites Häkchen) in systeme.io eintragen.
+  const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unbekannt";
+  if (zuVieleAnfragen(ip)) {
+    return NextResponse.json({ fehler: "Du hast schon mehrere Berichte angefordert. Bitte versuch es in einer Stunde noch einmal." }, { status: 429 });
+  }
+
+  let body: Record<string, unknown>;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ fehler: "Ungültige Anfrage." }, { status: 400 });
+  }
+
+  const email = typeof body.email === "string" ? body.email.trim() : "";
+  if (email.length > 254 || !/^[^\s@<>"]+@[^\s@<>"]+\.[^\s@<>"]{2,}$/.test(email)) {
+    return NextResponse.json({ fehler: "Bitte gib eine gültige E-Mail-Adresse ein." }, { status: 400 });
+  }
+  if (body.einwilligung !== true) {
+    return NextResponse.json({ fehler: "Ohne Einwilligung können wir den Bericht nicht schicken." }, { status: 400 });
+  }
+  const daten = pruefeDaten(body.daten);
+  if (!daten) {
+    return NextResponse.json({ fehler: "Die Angaben aus dem Check sind unvollständig. Bitte mach den Check noch einmal." }, { status: 400 });
+  }
+  // Nur Buchstaben, Leerzeichen und Bindestrich, max. 30 Zeichen
+  const kindName = typeof body.kindName === "string" ? body.kindName.replace(/[^\p{L}\s'-]/gu, "").trim().slice(0, 30) : "";
+
+  const profil = berechneScreeningProfil(daten);
+
   const systemeioKey = process.env.SYSTEMEIO_API_KEY;
-  if (systemeioKey && newsletter === true) {
+  if (systemeioKey && body.newsletter === true) {
     try {
-      await taggeInSystemeio(email, kindName, systemeioKey);
+      await inSystemeioEintragen(email, systemeioKey);
     } catch (e) {
-      console.error("Systeme.io Fehler:", e);
+      console.error("systeme.io Fehler:", e);
     }
   }
 
   const smtpUser = process.env.SMTP_USER;
   const smtpPass = process.env.SMTP_PASS;
-  if (smtpUser && smtpPass) {
-    try {
-      const transporter = nodemailer.createTransport({
-        host: "smtp.gmail.com",
-        port: 587,
-        secure: false,
-        auth: { user: smtpUser, pass: smtpPass },
-      });
-      const emailHtml = generateReportEmail(kindName, vikiTyp, gesamtScore, auffaelligkeiten, kategorien, musterHinweise ?? [], blinzelinfo);
-      await transporter.sendMail({
-        from: `"VIKI Superblick" <${smtpUser}>`,
-        to: email,
-        subject: `Dein VIKI Superblick Bericht${kindName !== "dein Kind" ? ` für ${kindName}` : ""}`,
-        html: emailHtml,
-      });
-    } catch (e) {
-      console.error("Gmail SMTP Fehler:", e);
-    }
+  if (!smtpUser || !smtpPass) {
+    console.error("SMTP nicht konfiguriert");
+    return NextResponse.json({ fehler: "Versand nicht möglich." }, { status: 500 });
+  }
+
+  try {
+    const transporter = nodemailer.createTransport({ host: "smtp.gmail.com", port: 587, secure: false, auth: { user: smtpUser, pass: smtpPass } });
+    const name = kindName || "dein Kind";
+    await transporter.sendMail({
+      from: `"Sarah | Viki Training" <${smtpUser}>`,
+      to: email,
+      subject: kindName ? `Dein Augen-Check-Bericht für ${kindName}` : "Dein Augen-Check-Bericht",
+      html: berichtHtml(name, profil),
+      text: berichtText(name, profil),
+    });
+  } catch (e) {
+    console.error("Gmail SMTP Fehler:", e);
+    return NextResponse.json({ fehler: "Versand fehlgeschlagen." }, { status: 502 });
   }
 
   return NextResponse.json({ success: true });
 }
 
-function generateReportEmail(
-  kindName: string,
-  vikiTyp: string,
-  gesamtScore: number,
-  auffaelligkeiten: number,
-  kategorien: { name: string; ampel: string; elternText: string }[],
-  musterHinweise: { titel: string; text: string; staerke: string }[],
-  blinzelinfo?: { label: string; ampel: string; elternText: string }
-): string {
-  const name = kindName !== "dein Kind" ? kindName : "dein Kind";
-  const ampelStufe =
-    gesamtScore >= 71 ? { emoji: "🟢", label: "Unauffällig",        farbe: "#16A34A", bg: "#F0FDF4", border: "#86EFAC" } :
-    gesamtScore >= 56 ? { emoji: "🟡", label: "Leichte Hinweise",   farbe: "#CA8A04", bg: "#FEFCE8", border: "#FDE047" } :
-    gesamtScore >= 41 ? { emoji: "🟠", label: "Deutliche Hinweise", farbe: "#D97706", bg: "#FFFBEB", border: "#FCD34D" } :
-                        { emoji: "🔴", label: "Starke Hinweise",    farbe: "#DC2626", bg: "#FEF2F2", border: "#FCA5A5" };
-  const ampelFarbe = ampelStufe.farbe;
-  const ampelLabel = ampelStufe.label;
-  const auffaelligKategorien = kategorien.filter(k => k.ampel !== "gruen");
-  const staerkenKategorien = kategorien.filter(k => k.ampel === "gruen");
+// ─── Bericht-Mail ─────────────────────────────────────────────────────────────
 
-  const staerkenHtml = staerkenKategorien.length > 0 ? `
-    <div style="margin-bottom:28px;">
-      <h3 style="color:#111827;font-size:15px;font-weight:700;margin:0 0 12px;">💪 Das läuft gut</h3>
-      ${staerkenKategorien.map(k => {
-        const txt = ALLTAGS_TEXTE[k.name];
-        return `<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid #F3F4F6;">
-          <div style="font-size:18px;line-height:1.3;">${KATEGORIE_ICONS[k.name] ?? "📋"}</div>
-          <div>
-            <span style="font-weight:700;font-size:13px;color:#111827;">${k.name}</span>
-            ${txt ? `<span style="font-size:13px;color:#6B7280;"> — ${txt.positiv}</span>` : ""}
-          </div>
-        </div>`;
-      }).join("")}
-    </div>
-  ` : "";
+function berichtText(name: string, p: ScreeningProfil): string {
+  const zeilen = [
+    "Hallo!",
+    "",
+    `Hier ist dein Bericht zum Augen-Check für ${name}.`,
+    "",
+    `Ergebnis: ${STUFEN[p.gesamtStufe].label}`,
+    "",
+  ];
+  if (p.warnzeichen.length) {
+    zeilen.push("BITTE ABKLÄREN LASSEN:", ...p.warnzeichen.map(w => `- ${w.text}`), WARNZEICHEN_EMPFEHLUNG, "");
+  } else if (p.untersuchungEmpfohlen) {
+    zeilen.push(UNTERSUCHUNG_TEXT, "");
+  }
+  for (const b of p.bereiche) {
+    const t = BEREICH_TEXTE[b.id];
+    zeilen.push(`${b.name}: ${STUFEN[b.stufe].label}`);
+    zeilen.push(b.stufe === 0 ? t.positiv : `${t.beobachtet} ${t.alltag} ${t.hinweis}`, "");
+  }
+  if (p.ausdauerHinweis) zeilen.push(`Ausdauer: ${AUSDAUER_TEXT}`, "");
+  for (const z of p.zusammenhaenge) zeilen.push(`${z.titel}: ${z.text}`, "");
+  zeilen.push(
+    `Superblick-Kurs: ${kursLink("bericht-mail")}`,
+    "",
+    "Der Augen-Check ist eine erste Orientierung, keine Diagnose. Er ersetzt keine Untersuchung bei einer Augenärztin, einem Augenarzt oder in der Optometrie.",
+    "",
+    "Liebe Grüße",
+    "Sarah | Viki Training",
+  );
+  return zeilen.join("\n");
+}
 
-  const AMPEL_STUFE: Record<string, { farbe: string; bg: string; border: string; emoji: string }> = {
-    gruen: { farbe: "#166534", bg: "#F0FDF4", border: "#86EFAC", emoji: "🟢" },
-    gelb:  { farbe: "#854D0E", bg: "#FEFCE8", border: "#FDE047", emoji: "🟡" },
-    orange:{ farbe: "#9A3412", bg: "#FFF7ED", border: "#FDBA74", emoji: "🟠" },
-    rot:   { farbe: "#991B1B", bg: "#FEF2F2", border: "#FCA5A5", emoji: "🔴" },
-  };
+function berichtHtml(name: string, p: ScreeningProfil): string {
+  const n = escapeHtml(name);
+  const gesamt = STUFEN[p.gesamtStufe];
+  const hinweise = p.bereiche.filter(b => b.stufe > 0).sort((a, b) => a.score - b.score);
+  const gut = p.bereiche.filter(b => b.stufe === 0);
+  const schwerpunkt = p.schwerpunkt ? p.bereiche.find(b => b.id === p.schwerpunkt) : null;
 
-  const kategorienHtml = auffaelligKategorien.map(k => {
-    const txt = ALLTAGS_TEXTE[k.name];
-    const stufe = AMPEL_STUFE[k.ampel] ?? AMPEL_STUFE.gelb;
-    return `
-    <div style="border:2px solid ${stufe.border};border-radius:12px;overflow:hidden;margin-bottom:16px;">
-      <div style="background:${stufe.bg};padding:12px 16px;display:flex;align-items:center;gap:10px;">
-        <span style="font-size:20px;">${KATEGORIE_ICONS[k.name] ?? "📋"}</span>
-        <div style="flex:1;">
-          <div style="font-weight:700;font-size:14px;color:${stufe.farbe};">${k.name}</div>
-          ${txt ? `<div style="font-size:11px;color:#6B7280;">${txt.fachtitel}</div>` : ""}
+  const warnHtml = p.warnzeichen.length ? `
+    <div style="background:#FEF2F2;border:2px solid #FCA5A5;border-radius:12px;padding:16px 18px;margin-bottom:24px;">
+      <div style="font-weight:700;font-size:15px;color:#991B1B;margin-bottom:6px;">⚠️ Bitte abklären lassen</div>
+      <ul style="margin:0 0 8px;padding-left:18px;font-size:14px;color:#7F1D1D;line-height:1.6;">${p.warnzeichen.map(w => `<li>${w.text}</li>`).join("")}</ul>
+      <div style="font-size:13px;color:#7F1D1D;line-height:1.6;">${WARNZEICHEN_EMPFEHLUNG}</div>
+    </div>` : p.untersuchungEmpfohlen ? `
+    <div style="background:#FFFBEB;border:1px solid #FCD34D;border-radius:12px;padding:14px 16px;margin-bottom:24px;font-size:14px;color:#78350F;line-height:1.6;">
+      <strong>👓 Tipp vorab:</strong> ${UNTERSUCHUNG_TEXT}
+    </div>` : "";
+
+  const gutHtml = gut.length ? `
+    <h3 style="color:#111827;font-size:15px;margin:0 0 10px;">💪 Das läuft gut</h3>
+    ${gut.map(b => `<p style="font-size:14px;color:#374151;line-height:1.6;margin:0 0 8px;">${BEREICH_TEXTE[b.id].icon} <strong>${b.name}</strong> · ${BEREICH_TEXTE[b.id].positiv}</p>`).join("")}
+    <div style="height:16px;"></div>` : "";
+
+  const hinweisHtml = hinweise.length ? `
+    <h3 style="color:#111827;font-size:15px;margin:0 0 12px;">👀 Hier lohnt sich ein genauerer Blick</h3>
+    ${hinweise.map(b => {
+      const s = STUFEN[b.stufe];
+      const t = BEREICH_TEXTE[b.id];
+      return `
+      <div style="border:2px solid ${s.border};border-radius:12px;overflow:hidden;margin-bottom:14px;">
+        <div style="background:${s.bg};padding:10px 16px;font-weight:700;font-size:14px;color:${s.text};">${t.icon} ${b.name} · ${s.emoji} ${s.label}</div>
+        <div style="background:#fff;padding:14px 16px;font-size:14px;color:#374151;line-height:1.6;">
+          <p style="margin:0 0 8px;"><strong>Was aufgefallen ist:</strong> ${t.beobachtet}</p>
+          <p style="margin:0 0 8px;"><strong>Im Alltag kann das bedeuten:</strong> ${t.alltag}</p>
+          <p style="margin:0;background:#F0F9F8;border-radius:8px;padding:8px 10px;font-size:13px;color:#1F5C57;">ℹ️ ${t.hinweis}</p>
         </div>
-        <span style="font-size:12px;font-weight:700;color:${stufe.farbe};">${stufe.emoji} ${AMPEL_LABEL[k.ampel] ?? ""}</span>
-      </div>
-      ${txt ? `
-      <div style="background:white;padding:16px;">
-        <div style="margin-bottom:10px;">
-          <div style="font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Was beobachtet</div>
-          <div style="font-size:13px;color:#374151;line-height:1.6;">${txt.beobachtet}</div>
-        </div>
-        <div style="margin-bottom:10px;">
-          <div style="font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Im Alltag kann das bedeuten</div>
-          <div style="font-size:13px;color:#374151;line-height:1.6;">${txt.alltag}</div>
-        </div>
-        <div style="background:#F0F9F8;border-radius:8px;padding:10px 12px;font-size:12px;color:#1F5C57;line-height:1.6;">ℹ️ ${txt.disclaimer}</div>
-      </div>` : `<div style="background:white;padding:16px;font-size:13px;color:#374151;line-height:1.6;">${k.elternText}</div>`}
-    </div>`;
-  }).join("");
+      </div>`;
+    }).join("")}` : "";
 
-  const musterHtml = musterHinweise.length > 0 ? `
-    <div style="margin-bottom:24px;">
-      <h3 style="color:#111827;font-size:15px;font-weight:700;margin:0 0 12px;">🔎 Erkannte Muster</h3>
-      ${musterHinweise.map(m => `
-        <div style="background:${m.staerke === "stark" ? "#FEF2F2" : "#FFF7ED"};border:1px solid ${m.staerke === "stark" ? "#FCA5A5" : "#FED7AA"};border-radius:10px;padding:14px 16px;margin-bottom:10px;">
-          <div style="font-weight:700;font-size:13px;color:${m.staerke === "stark" ? "#991B1B" : "#92400E"};margin-bottom:5px;">
-            ${m.staerke === "stark" ? "⚠️" : "💡"} ${m.titel}
-          </div>
-          <div style="font-size:13px;color:${m.staerke === "stark" ? "#7F1D1D" : "#78350F"};line-height:1.6;">${m.text}</div>
-        </div>
-      `).join("")}
-    </div>
-  ` : "";
+  const ausdauerHtml = p.ausdauerHinweis ? `<p style="font-size:14px;color:#374151;line-height:1.6;margin:0 0 20px;"><strong>🧠 Ausdauer:</strong> ${AUSDAUER_TEXT}</p>` : "";
 
-  const blinzelHtml = blinzelinfo ? `
-    <div style="background:#F0F9FF;border:1px solid #BAE6FD;border-radius:10px;padding:14px 16px;margin-bottom:24px;">
-      <div style="font-weight:700;font-size:13px;color:#0369A1;margin-bottom:4px;">
-        👁️ Blinzelverhalten am Bildschirm — ${blinzelinfo.label}
-      </div>
-      <div style="font-size:13px;color:#0C4A6E;line-height:1.6;">${blinzelinfo.elternText}</div>
-    </div>
-  ` : "";
+  const zusammenhangHtml = p.zusammenhaenge.length ? `
+    <h3 style="color:#111827;font-size:15px;margin:8px 0 10px;">🔎 Erkannte Zusammenhänge</h3>
+    ${p.zusammenhaenge.map(z => `<div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:10px;padding:12px 14px;margin-bottom:10px;font-size:14px;color:#1E3A8A;line-height:1.6;"><strong>${z.titel}:</strong> ${z.text}</div>`).join("")}` : "";
+
+  const schwerpunktHtml = schwerpunkt
+    ? `<p style="color:#374151;font-size:14px;line-height:1.6;margin:0 0 12px;">Dein Schwerpunkt: <strong>${schwerpunkt.name}</strong>. Im Superblick-Kurs gibt es dazu: ${BEREICH_TEXTE[schwerpunkt.id].training}.</p>`
+    : `<p style="color:#374151;font-size:14px;line-height:1.6;margin:0 0 12px;">Im Augen-Check ist kein Schwerpunkt aufgefallen. Wenn Lesen trotzdem schwerfällt, sprich mit der Lehrkraft oder lass die Augen fachlich untersuchen.</p>`;
 
   return `<!DOCTYPE html>
-<html lang="de">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>VIKI Superblick Bericht</title></head>
-<body style="margin:0;padding:20px;background:#F3F4F6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
-<div style="max-width:600px;margin:0 auto;background:white;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
-
-  <div style="background:#F5943A;padding:32px 40px;text-align:center;">
-    <div style="font-size:40px;margin-bottom:8px;">🦸</div>
-    <h1 style="color:white;margin:0;font-size:24px;font-weight:800;">VIKI Superblick</h1>
-    <p style="color:rgba(255,255,255,0.9);margin:6px 0 0;font-size:14px;">Persönlicher Screening-Bericht</p>
+<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Dein Augen-Check-Bericht</title></head>
+<body style="margin:0;padding:16px;background:#F3F4F6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;">
+<div style="max-width:600px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;">
+  <div style="background:#F5943A;padding:26px 32px;text-align:center;">
+    <h1 style="color:#fff;margin:0;font-size:22px;">Dein Augen-Check-Bericht</h1>
+    <p style="color:rgba(255,255,255,0.92);margin:6px 0 0;font-size:14px;">VIKI Training · erste Orientierung, keine Diagnose</p>
   </div>
+  <div style="padding:28px 32px;">
+    <p style="color:#374151;font-size:15px;line-height:1.6;margin:0 0 20px;">Hallo!<br>Hier ist dein Bericht zum Augen-Check für <strong>${n}</strong>. Danke, dass du dir die Zeit genommen und genau hingeschaut hast.</p>
 
-  <div style="padding:32px 40px;">
-    <p style="color:#374151;font-size:16px;line-height:1.6;margin:0 0 6px;">Hallo!</p>
-    <p style="color:#374151;font-size:15px;line-height:1.6;margin:0 0 24px;">
-      Hier ist der vollständige VIKI Superblick Screening-Bericht für <strong>${name}</strong>.
-      Danke, dass du dir die Zeit für diesen Test genommen hast — und dafür, dass du genau hinschaust.
-    </p>
+    ${warnHtml}
 
-    <!-- Gesamt-Ergebnis (Ampel) -->
-    <div style="background:${ampelStufe.bg};border:2px solid ${ampelStufe.border};border-radius:14px;padding:24px;text-align:center;margin-bottom:28px;">
-      <div style="font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Screening-Ergebnis für ${name}</div>
-      <div style="font-size:48px;line-height:1;margin-bottom:10px;">${ampelStufe.emoji}</div>
-      <div style="font-size:22px;font-weight:800;color:${ampelFarbe};margin-bottom:8px;">${ampelLabel}</div>
-      <div style="font-size:13px;color:#6B7280;">${auffaelligkeiten > 0 ? `${auffaelligkeiten} Bereich${auffaelligkeiten > 1 ? "e" : ""} mit Hinweisen` : "Alle Bereiche unauffällig"}</div>
+    <div style="background:${gesamt.bg};border:2px solid ${gesamt.border};border-radius:14px;padding:20px;text-align:center;margin-bottom:24px;">
+      <div style="font-size:40px;line-height:1;margin-bottom:6px;">${gesamt.emoji}</div>
+      <div style="font-size:20px;font-weight:800;color:${gesamt.text};">${gesamt.label}</div>
+      <div style="font-size:13px;color:#6B7280;margin-top:4px;">${hinweise.length ? `${hinweise.length} von 4 Bereichen mit Hinweisen` : "In allen 4 Bereichen unauffällig"}</div>
     </div>
 
-    ${musterHtml}
+    ${gutHtml}
+    ${hinweisHtml}
+    ${ausdauerHtml}
+    ${zusammenhangHtml}
 
-    ${staerkenHtml}
-
-    <!-- Hinweise -->
-    ${auffaelligKategorien.length > 0 ? `
-    <div style="margin-bottom:28px;">
-      <h3 style="color:#111827;font-size:15px;font-weight:700;margin:0 0 14px;">👀 Hinweise aufgefallen</h3>
-      ${kategorienHtml}
-    </div>` : ""}
-
-    ${auffaelligKategorien.length === 0 ? `
-    <div style="background:#F0FDF4;border-radius:12px;padding:16px;text-align:center;margin-bottom:24px;">
-      <p style="color:#16A34A;font-weight:600;margin:0;">✅ Alle 6 Bereiche unauffällig — großartig!</p>
-    </div>
-    ` : ""}
-
-    <!-- Was jetzt? -->
-    <div style="background:#FEF3E2;border:1px solid #FED7AA;border-radius:12px;padding:20px 24px;margin-bottom:24px;">
-      <h3 style="color:#92400E;font-size:15px;font-weight:700;margin:0 0 10px;">Was tun mit diesen Ergebnissen?</h3>
-      <ol style="margin:0;padding-left:18px;font-size:13px;color:#78350F;line-height:1.8;">
-        <li>Lies den Bericht in Ruhe durch — du wirst jetzt verstehen, warum manche Dinge für dein Kind schwieriger sind.</li>
-        <li>Bei Auffälligkeiten unterstützt gezieltes Visualtraining — es kombiniert Übungen zur Förderung visueller Fähigkeiten mit Elementen der Reflexintegration und unterstützt Kinder dabei, entspannter zu lesen und zu lernen.</li>
-      </ol>
+    <div style="background:#FEF3E2;border:2px solid #F5943A;border-radius:14px;padding:22px;margin-top:20px;">
+      <h3 style="color:#1F2937;font-size:17px;margin:0 0 8px;">Wie es weitergehen kann</h3>
+      ${schwerpunktHtml}
+      <p style="color:#374151;font-size:14px;line-height:1.6;margin:0 0 16px;">Der Superblick-Kurs ist spielerisches Visualtraining für zu Hause, mit kurzen Übungen für Augen-Teamarbeit, Blicksprünge, Buchstaben und Bewegungsübungen zur Reflexintegration.</p>
+      <div style="text-align:center;"><a href="${kursLink("bericht-mail")}" style="display:inline-block;background:#F5943A;color:#fff;font-weight:700;font-size:15px;padding:13px 28px;border-radius:10px;text-decoration:none;">Kurs ansehen →</a></div>
     </div>
 
-    <!-- CTA -->
-    <div style="background:#FEF3E2;border:2px solid #F5943A;border-radius:14px;padding:24px;text-align:center;">
-      <div style="display:inline-block;background:#F5943A;color:white;font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.5px;">🚀 Jetzt durchstarten</div>
-      <h3 style="color:#1F2937;font-size:18px;font-weight:800;margin:0 0 8px;">Der VIKI Superblick Kurs</h3>
-      <p style="color:#6B7280;font-size:13px;margin:0 0 16px;line-height:1.5;">
-        Mit Visualtraining die Basis für müheloses Lesen &amp; entspanntes Lernen legen — entwickelt von Dr. Sarah Kopetzky, Funktionaloptometristin.
-      </p>
-      <a href="https://kurse.vikitraining.at/superblick-kurs" target="_blank" style="display:inline-block;background:#F5943A;color:white;font-weight:700;font-size:15px;padding:14px 32px;border-radius:10px;text-decoration:none;mso-padding-alt:0;line-height:48px;">
-        Kurs ansehen →
-      </a>
-    </div>
+    <p style="color:#374151;font-size:15px;line-height:1.6;margin:24px 0 0;">Liebe Grüße<br>Sarah | Viki Training</p>
   </div>
-
-  <!-- Momentaufnahme -->
-  <div style="padding:0 40px 16px;">
-    <div style="background:#F0FDF4;border:1px solid #86EFAC;border-radius:10px;padding:16px 18px;">
-      <p style="font-size:13px;font-weight:700;color:#166534;margin:0 0 6px;">🌱 Was dein Kind heute gezeigt hat, ist keine feste Grenze.</p>
-      <p style="font-size:12px;color:#166534;line-height:1.6;margin:0;">
-        Visuelle Fähigkeiten entwickeln sich. Viele Bereiche können durch passende Übungen und regelmäßiges Training verbessert werden. Das Screening zeigt deshalb keine endgültigen Ergebnisse, sondern eine Momentaufnahme, die als Orientierung dienen soll.
-      </p>
-    </div>
-  </div>
-
-  <!-- Disclaimer -->
-  <div style="padding:0 40px 24px;">
-    <div style="background:#F9FAFB;border:1px solid #E5E7EB;border-radius:10px;padding:16px 18px;">
-      <p style="font-size:11px;font-weight:700;color:#374151;margin:0 0 6px;">⚠️ Rechtlicher Hinweis</p>
-      <p style="font-size:11px;color:#6B7280;line-height:1.6;margin:0 0 8px;">
-        Der VIKI Superblick Screening-Test dient ausschließlich der <strong>unverbindlichen Erstorientierung</strong> und stellt <strong>keine medizinische oder optometrische Diagnose</strong> dar. Die Ergebnisse basieren auf Elternbeobachtung und können Fehler enthalten. Die Ergebnisse sollten deshalb immer im Zusammenhang mit dem gesamten Entwicklungs- und Lernverhalten des Kindes betrachtet werden. Eine professionelle Untersuchung kann durch dieses Tool nicht ersetzt werden. Bei deutlichen Auffälligkeiten empfiehlt sich eine Vorstellung bei einer Funktionaloptometristin / einem Funktionaloptometristen oder einer Augenärztin / einem Augenarzt.
-      </p>
-      <p style="font-size:11px;color:#6B7280;line-height:1.6;margin:0;">
-        <strong>Datenschutz:</strong> Testergebnisse werden nur für diesen Bericht verwendet. Deine E-Mail wird für diesen Bericht genutzt und nur mit deiner Zustimmung für VIKI-Informationen. Abmeldung jederzeit: <a href="mailto:hallo@vikitraining.at" style="color:#9CA3AF;">hallo@vikitraining.at</a>
-      </p>
-    </div>
-  </div>
-
-  <div style="background:#F9FAFB;padding:20px 40px;border-top:1px solid #E5E7EB;text-align:center;">
-    <p style="color:#9CA3AF;font-size:12px;margin:0;line-height:1.6;">
-      Dr. Sarah Kopetzky · Funktionaloptometristin<br>
-      <a href="https://vikitraining.at" style="color:#9CA3AF;text-decoration:none;">vikitraining.at</a> ·
-      <a href="mailto:hallo@vikitraining.at" style="color:#9CA3AF;text-decoration:none;">hallo@vikitraining.at</a><br>
-      <a href="https://viki-screening.vercel.app/datenschutz" style="color:#9CA3AF;">Datenschutz</a> ·
-      <a href="https://viki-screening.vercel.app/impressum" style="color:#9CA3AF;">Impressum</a>
+  <div style="padding:0 32px 24px;">
+    <p style="font-size:11px;color:#6B7280;line-height:1.6;margin:0;background:#F9FAFB;border:1px solid #E5E7EB;border-radius:10px;padding:12px 14px;">
+      <strong>Wichtig:</strong> Der Augen-Check ist eine erste Orientierung auf Basis deiner Beobachtungen, keine medizinische oder optometrische Diagnose. Er ersetzt keine Untersuchung bei einer Augenärztin, einem Augenarzt oder in der Optometrie.
+      Die Ergebnisse werden nur für diesen Bericht verwendet. Fragen oder Widerruf: <a href="mailto:hallo@vikitraining.at" style="color:#6B7280;">hallo@vikitraining.at</a>
     </p>
   </div>
-
+  <div style="background:#F9FAFB;padding:16px 32px;border-top:1px solid #E5E7EB;text-align:center;font-size:12px;color:#9CA3AF;line-height:1.6;">
+    Dr. Sarah Kopetzky · Funktionaloptometristin · <a href="https://vikitraining.at" style="color:#9CA3AF;">vikitraining.at</a><br>
+    <a href="https://viki-screening.vercel.app/datenschutz" style="color:#9CA3AF;">Datenschutz</a> · <a href="https://viki-screening.vercel.app/impressum" style="color:#9CA3AF;">Impressum</a>
+  </div>
 </div>
-</body>
-</html>`;
+</body></html>`;
 }

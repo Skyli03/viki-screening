@@ -1,185 +1,149 @@
 "use client";
 import { useState } from "react";
+import { useImBrowser } from "@/lib/im-browser";
 import { useRouter } from "next/navigation";
+import { ladeStand, neuerCheck } from "@/lib/speicher";
+import { ersterOffenerSchritt } from "@/lib/schritte";
 
-const SCHRITTE = [
-  { nr: "1", icon: "📖", titel: "Lesetest", text: "Dein Kind liest aus einem eigenen Buch laut vor — du beobachtest Augen, Haltung und Lesefluss." },
-  { nr: "2", icon: "👁️", titel: "Übungen", text: "3 kurze Eltern-Übungen (Konvergenz, Augenbewegung, Blicksprung) + 3 spielerische Mini-Aufgaben am Bildschirm. Dauert ca. 5 Minuten." },
-  { nr: "3", icon: "📋", titel: "Fragebogen", text: "Du beantwortest ca. 25 kurze Fragen über Alltagsbeobachtungen deines Kindes. Dauert ca. 3–4 Minuten." },
+const ABLAUF = [
+  { nr: "1", icon: "📋", titel: "Deine Beobachtungen", dauer: "ca. 4 Min.", text: "16 kurze Fragen zum Alltag. Das machst du allein, dein Kind muss noch nicht dabei sein." },
+  { nr: "2", icon: "✏️", titel: "Mit deinem Kind", dauer: "ca. 6 Min.", text: "Kurz vorlesen, zwei Augen-Übungen mit einem Stift und ein Buchstaben-Spiel am Handy." },
+  { nr: "3", icon: "🎯", titel: "Dein Ergebnis", dauer: "sofort", text: "Ein erstes Ergebnis siehst du sofort. Den ausführlichen Bericht bekommst du per E-Mail." },
+];
+const FARBEN = ["#8DCDC5", "#F5943A", "#EE6B85"];
+
+const KLASSEN = [
+  { val: 1, oben: "1.", unten: "Klasse" },
+  { val: 2, oben: "2.", unten: "Klasse" },
+  { val: 3, oben: "3.", unten: "Klasse" },
+  { val: 4, oben: "4.", unten: "oder älter" },
 ];
 
 export default function Startseite() {
   const router = useRouter();
   const [kindName, setKindName] = useState("");
-  const [geschlecht, setGeschlecht] = useState<"m" | "f" | "">("");
   const [klasse, setKlasse] = useState<number | null>(null);
   const [fehler, setFehler] = useState("");
+  const imBrowser = useImBrowser();
+  const angefangen = imBrowser && (() => {
+    const s = ladeStand();
+    return !!s.klasse && ersterOffenerSchritt(s) !== "fragen-1";
+  })();
 
   function starten() {
-    if (!kindName.trim()) { setFehler("Bitte gib den Namen deines Kindes ein."); return; }
     if (!klasse) { setFehler("Bitte wähle die Schulstufe deines Kindes."); return; }
-    sessionStorage.setItem("kindName", kindName.trim());
-    sessionStorage.setItem("geschlecht", geschlecht);
-    sessionStorage.setItem("klasse", String(klasse));
-    router.push("/screening");
+    neuerCheck(kindName.trim().slice(0, 30), klasse);
+    router.push("/screening/fragen-1");
   }
 
   return (
     <div className="min-h-screen" style={{ background: "#F0ECE7" }}>
-      {/* Header */}
       <header className="bg-white shadow-sm py-2 px-6">
         <div className="max-w-3xl mx-auto flex items-center justify-between">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/logo.png" alt="VIKI Training" className="h-14 w-auto" />
-          <div className="text-xs text-gray-400 font-medium uppercase tracking-wide">Kostenloser Augen-Check</div>
+          <div className="hidden sm:block text-xs text-gray-500 font-medium uppercase tracking-wide">Kostenloser Augen-Check</div>
         </div>
       </header>
 
-      <main className="max-w-3xl mx-auto px-4 sm:px-6 py-10">
-        {/* Hero */}
-        <div className="text-center mb-10">
-          <div className="text-6xl mb-4">👁️✨</div>
+      <main className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
+        <div className="text-center mb-8">
+          <div className="text-6xl mb-4">👀</div>
           <h1 className="text-3xl font-bold text-gray-900 mb-3 leading-tight">
-            Wie gut sieht und lernt<br />dein Kind wirklich?
+            Lesen ist anstrengend?<br />Schau, ob die Augen mitspielen.
           </h1>
           <p className="text-lg text-gray-600 max-w-xl mx-auto">
-            Dieser kostenlose Augen-Check gibt dir in <strong>15 Minuten</strong> eine erste Orientierung, ob visuelle Schwierigkeiten beim Lesen und Lernen deines Kindes eine Rolle spielen könnten.
+            Der kostenlose Augen-Check gibt dir in <strong>ca. 10–12 Minuten</strong> eine erste Orientierung, ob die Zusammenarbeit der Augen beim Lesen deines Kindes eine Rolle spielen könnte.
           </p>
         </div>
 
-        {/* So funktioniert's */}
-        <div className="mb-10">
-          <h2 className="text-center text-lg font-bold text-gray-700 mb-4 tracking-wide uppercase" style={{ letterSpacing: "0.05em" }}>
-            So funktioniert der Test
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {SCHRITTE.map((s, i) => (
-              <div key={i} className={`bg-white rounded-2xl p-5 shadow-sm border-2 text-center select-none`}
-                style={{ borderColor: i === 0 ? "#8DCDC5" : i === 1 ? "#F5943A" : "#EE6B85" }}>
-                <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold mx-auto mb-2"
-                  style={{ background: i === 0 ? "#8DCDC5" : i === 1 ? "#F5943A" : "#EE6B85" }}>
-                  {s.nr}
-                </div>
-                <div className="text-2xl mb-2">{s.icon}</div>
-                <div className="font-semibold text-gray-900 mb-1">{s.titel}</div>
-                <div className="text-sm text-gray-500">{s.text}</div>
-              </div>
-            ))}
+        {angefangen && (
+          <div className="bg-white rounded-2xl border-2 p-5 mb-6 text-center" style={{ borderColor: "#F5943A" }}>
+            <p className="font-semibold text-gray-900 mb-3">Du hast schon angefangen. Möchtest du weitermachen?</p>
+            <button onClick={() => router.push("/screening")} className="w-full text-white font-bold py-3 rounded-xl" style={{ background: "#F5943A" }}>
+              Weitermachen →
+            </button>
           </div>
+        )}
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
+          {ABLAUF.map((s, i) => (
+            <div key={s.nr} className="bg-white rounded-2xl p-4 shadow-sm border-2 flex sm:block gap-3 sm:text-center" style={{ borderColor: FARBEN[i] }}>
+              <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold shrink-0 sm:mx-auto sm:mb-2" style={{ background: FARBEN[i] }}>
+                {s.nr}
+              </div>
+              <div>
+                <div className="font-semibold text-gray-900">{s.icon} {s.titel} <span className="text-sm font-normal text-gray-500">· {s.dauer}</span></div>
+                <div className="text-sm text-gray-600 mt-1">{s.text}</div>
+              </div>
+            </div>
+          ))}
         </div>
 
-        {/* Formular */}
-        <div className="bg-white rounded-2xl shadow-md border-2 p-8" style={{ borderColor: "#8DCDC5" }}>
-          <h2 className="text-xl font-bold text-gray-900 mb-6">Lass uns beginnen 🚀</h2>
-
+        <div className="bg-white rounded-2xl shadow-md border-2 p-6 sm:p-8" style={{ borderColor: "#8DCDC5" }}>
+          <h2 className="text-xl font-bold text-gray-900 mb-5">Los geht&apos;s</h2>
           <div className="space-y-5">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Vorname deines Kindes
+              <label htmlFor="kindname" className="block text-sm font-semibold text-gray-700 mb-2">
+                Vorname deines Kindes <span className="font-normal text-gray-400">(freiwillig, bleibt auf deinem Gerät)</span>
               </label>
               <input
+                id="kindname"
                 type="text"
+                maxLength={30}
                 value={kindName}
-                onChange={(e) => { setKindName(e.target.value); setFehler(""); }}
-                placeholder="z.B. Lukas"
-                className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-lg focus:outline-none transition-colors"
-                style={{ outlineColor: "#8DCDC5" }}
-                onFocus={e => e.currentTarget.style.borderColor = "#8DCDC5"}
-                onBlur={e => e.currentTarget.style.borderColor = "#E5E7EB"}
+                onChange={e => setKindName(e.target.value)}
+                placeholder="z. B. Lukas"
+                className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-lg focus:outline-none focus:border-[#8DCDC5]"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Bub oder Mädchen?
-              </label>
-              <div className="grid grid-cols-2 gap-3">
-                {([
-                  { val: "m" as const, emoji: "👦", label: "Bub" },
-                  { val: "f" as const, emoji: "👧", label: "Mädchen" },
-                ] as const).map((opt) => (
+              <p className="block text-sm font-semibold text-gray-700 mb-2">In welche Klasse geht dein Kind?</p>
+              <div className="grid grid-cols-4 gap-2">
+                {KLASSEN.map(k => (
                   <button
-                    key={opt.val}
+                    key={k.val}
                     type="button"
-                    onClick={() => { setGeschlecht(opt.val); setFehler(""); }}
-                    className="py-3 rounded-xl font-semibold text-lg border-2 transition-colors flex items-center justify-center gap-2 cursor-pointer"
-                    style={
-                      geschlecht === opt.val
-                        ? { background: "#8DCDC5", borderColor: "#8DCDC5", color: "white" }
-                        : { background: "white", borderColor: "#E5E7EB", color: "#374151" }
-                    }
+                    aria-pressed={klasse === k.val}
+                    onClick={() => { setKlasse(k.val); setFehler(""); }}
+                    className="py-3 rounded-xl border-2 transition-colors flex flex-col items-center leading-tight"
+                    style={klasse === k.val
+                      ? { background: "#8DCDC5", borderColor: "#8DCDC5", color: "white" }
+                      : { background: "white", borderColor: "#E5E7EB", color: "#374151" }}
                   >
-                    <span>{opt.emoji}</span> {opt.label}
+                    <span className="text-lg font-bold">{k.oben}</span>
+                    <span className="text-xs">{k.unten}</span>
                   </button>
                 ))}
               </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                In welche Klasse geht dein Kind?
-              </label>
-              <div className="grid grid-cols-4 gap-3">
-                {[
-                  { val: 1, label: "1. Klasse" },
-                  { val: 2, label: "2. Klasse" },
-                  { val: 3, label: "3. Klasse" },
-                  { val: 4, label: "4. Klasse und höher" },
-                ].map(({ val, label }) => (
-                  <button
-                    key={val}
-                    type="button"
-                    onClick={() => { setKlasse(val); setFehler(""); }}
-                    className="py-3 rounded-xl font-semibold border-2 transition-colors cursor-pointer"
-                    style={
-                      klasse === val
-                        ? { background: "#8DCDC5", borderColor: "#8DCDC5", color: "white" }
-                        : { background: "white", borderColor: "#E5E7EB", color: "#374151" }
-                    }
-                  >
-                    {val === 4 ? (
-                      <span className="flex flex-col items-center leading-tight">
-                        <span className="text-lg font-semibold">4. Klasse</span>
-                        <span className="text-xs font-normal opacity-75">und höher</span>
-                      </span>
-                    ) : label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {fehler && (
-              <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm">
-                {fehler}
-              </div>
-            )}
+            {fehler && <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm">{fehler}</div>}
 
             <button
               onClick={starten}
-              className="w-full text-white font-bold text-xl py-4 rounded-xl transition-all shadow-md hover:scale-105 active:scale-100"
+              className="w-full text-white font-bold text-xl py-4 rounded-xl shadow-md transition-colors hover:bg-[#E07E25]"
               style={{ background: "#F5943A" }}
-              onMouseEnter={e => (e.currentTarget.style.background = "#E07E25")}
-              onMouseLeave={e => (e.currentTarget.style.background = "#F5943A")}
             >
-              Jetzt kostenlos starten →
+              Augen-Check starten →
             </button>
           </div>
-
-          <p className="text-xs text-gray-400 text-center mt-4">
-            🔒 Kein Account nötig · Keine Kamera · DSGVO-konform
+          <p className="text-xs text-gray-500 text-center mt-4">
+            🔒 Kostenlos · Kein Konto nötig · Keine Kamera
           </p>
         </div>
 
-        {/* Footer */}
         <div className="mt-6 text-center space-y-2">
-          <p className="text-xs text-gray-400">
-            ⚠️ Dieser Test ersetzt keine augenärztliche oder optometrische Diagnostik. Bei Verdacht auf Sehprobleme wende dich bitte an eine Fachperson.
+          <p className="text-xs text-gray-500">
+            Der Augen-Check ist eine erste Orientierung, keine Diagnose. Er ersetzt keine Untersuchung bei einer Augenärztin, einem Augenarzt oder in der Optometrie.
           </p>
           <div className="text-sm text-gray-500">
             <a href="https://vikitraining.at" target="_blank" rel="noopener noreferrer" className="hover:underline" style={{ color: "#F5943A" }}>vikitraining.at</a>
             {" · Funktionaloptometrie & Visualtraining · "}
-            <a href="/impressum" className="hover:underline text-gray-400">Impressum</a>
+            <a href="/impressum" className="hover:underline">Impressum</a>
             {" · "}
-            <a href="/datenschutz" className="hover:underline text-gray-400">Datenschutz</a>
+            <a href="/datenschutz" className="hover:underline">Datenschutz</a>
           </div>
         </div>
       </main>

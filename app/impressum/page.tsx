@@ -1,9 +1,10 @@
+import Link from "next/link";
 export default function Impressum() {
   return (
     <div className="min-h-screen" style={{ background: "#F0ECE7" }}>
       <header className="bg-white shadow-sm py-2 px-6">
         <div className="max-w-3xl mx-auto flex items-center justify-between">
-          <a href="/"><img src="/logo.png" alt="VIKI Training" className="h-14 w-auto" /></a>
+          <Link href="/"><img src="/logo.png" alt="VIKI Training" className="h-14 w-auto" /></Link>
         </div>
       </header>
 
@@ -59,7 +60,7 @@ export default function Impressum() {
           </div>
 
           <div className="mt-8 pt-6 border-t border-gray-100">
-            <a href="/" className="text-sm font-semibold" style={{ color: "#F5943A" }}>← Zurück zum Augen-Check</a>
+            <Link href="/" className="text-sm font-semibold" style={{ color: "#F5943A" }}>← Zurück zum Augen-Check</Link>
           </div>
         </div>
       </main>

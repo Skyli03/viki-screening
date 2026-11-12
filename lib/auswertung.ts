@@ -1,412 +1,199 @@
-import type { ScreeningDaten } from "@/lib/screening-types";
+import type { Antwort, ScreeningDaten } from "@/lib/screening-types";
 
-export interface KategorieScore {
+// ─── Auswertung Augen-Check ───────────────────────────────────────────────────
+// Bewusst einfach und nachvollziehbar: 4 Bereiche mit Ampel, dazu Ausdauer als
+// kurzer Hinweis (keine Ampel) und Warnzeichen, die eine fachliche Abklärung
+// nahelegen. Keine Normwerte, keine Diagnose — nur Orientierung.
+
+export type BereichId = "lesen" | "teamarbeit" | "buchstaben" | "koerper";
+
+/** 0 = unauffällig, 1 = leichte, 2 = deutliche, 3 = starke Hinweise */
+export type Stufe = 0 | 1 | 2 | 3;
+
+export interface Bereich {
+  id: BereichId;
   name: string;
   score: number;
-  ampel: "gruen" | "gelb" | "rot";
-  beschreibung: string;
-  elternText: string;
-  icon: string;
+  stufe: Stufe;
 }
 
-export interface MusterHinweis {
+export interface Warnzeichen {
+  id: string;
+  text: string;
+}
+
+export interface Zusammenhang {
   titel: string;
   text: string;
-  staerke: "mittel" | "stark";
-}
-
-export interface BlinzelInfo {
-  ampel: "gruen" | "gelb" | "rot";
-  label: string;
-  elternText: string;
 }
 
 export interface ScreeningProfil {
-  typ: "A" | "B" | "C" | "D";
-  hauptproblem: string;
-  kategorien: KategorieScore[];
-  gesamtScore: number;
-  auffaelligkeitenAnzahl: number;
-  blinzelinfo: BlinzelInfo;
-  musterHinweise: MusterHinweis[];
+  bereiche: Bereich[];
+  gesamtStufe: Stufe;
+  /** Bereich mit den stärksten Hinweisen, null wenn alles unauffällig */
+  schwerpunkt: BereichId | null;
+  warnzeichen: Warnzeichen[];
+  /** Letzte Augenuntersuchung länger her / nie / unbekannt */
+  untersuchungEmpfohlen: boolean;
+  ausdauerHinweis: boolean;
+  zusammenhaenge: Zusammenhang[];
 }
 
-function getAmpel(score: number): "gruen" | "gelb" | "rot" {
-  if (score >= 71) return "gruen";
-  if (score >= 41) return "gelb";
-  return "rot";
+export const BEREICH_NAMEN: Record<BereichId, string> = {
+  lesen: "Lesen & Augenbewegungen",
+  teamarbeit: "Augen-Teamarbeit beim Nahsehen",
+  buchstaben: "Buchstaben unterscheiden",
+  koerper: "Körper & Haltung",
+};
+
+export function stufeAusScore(score: number): Stufe {
+  if (score >= 71) return 0;
+  if (score >= 56) return 1;
+  if (score >= 41) return 2;
+  return 3;
 }
 
-// ─── 1. Lesefluss & Augenbewegungen ──────────────────────────────────────────
-// Sources: BuchLeseErgebnis + PCLeseErgebnis + Fragebogen l1-l10
-
-function scoreLesefluss(daten: ScreeningDaten): number {
-  let score = 100;
-  const b = daten.buchLese;
-  const pc = daten.pcLese;
-  const fragen = daten.fragebogen;
-
-  // Buchlesetest — direkte klinische Beobachtungen
-  if (b.verliert_zeile)            score -= 20;
-  if (b.ueberspringt_woerter)      score -= 15;
-  if (b.benutzt_finger)            score -= 10;
-  if (b.viele_fehler_bekannte_woerter) score -= 20;
-  if (b.fluessig)                  score = Math.max(score, 80);
-
-  if (b.leseabstand === "zu_nah" || b.leseabstand === "wechselnd") score -= 10;
-  if (b.kopfhaltung === "schief_oder_verdreht") score -= 10;
-
-  // Monokularer Vergleich: wenn ein Auge deutlich besser → Binokularproblem
-  if (b.monokular === "besser") score -= 15;
-
-  // PC-Lesetest Qualität
-  const q = pc.lesequalitaet;
-  if (q.includes("vertauscht")) score -= 20;
-  if (q.includes("holprig"))    score -= 12;
-  if (q.includes("endungen"))   score -= 8;
-  if (q.includes("langsam") && !q.includes("vertauscht")) score -= 8;
-  if (q.includes("fluessig"))   score = Math.max(score, 75);
-
-  // PC-Lesetest Fehleranzahl
-  if (pc.fehlerAnzahl >= 8)  score -= 20;
-  else if (pc.fehlerAnzahl >= 4) score -= 10;
-
-  // Fragebogen Lesefragen l1-l10 (0=nie/1=manchmal/2=oft/3=immer)
-  const lKeys = ["l1","l2","l3","l4","l5","l6","l7","l8","l9","l10"];
-  const lSumme = lKeys.reduce((s, k) => s + (fragen[k] ?? 0), 0);
-  const lMax = lKeys.length * 3;
-  const lProzent = lSumme / lMax;
-  if (lProzent > 0.6)      score -= 20;
-  else if (lProzent > 0.35) score -= 10;
-  else if (lProzent > 0.15) score -= 4;
-
-  return Math.max(0, Math.min(100, score));
+function wert(fragen: Record<string, Antwort> | undefined, id: string): number | null {
+  const v = fragen?.[id];
+  return typeof v === "number" && v >= 0 && v <= 3 ? v : null;
 }
 
-// ─── 2. Augensteuerung ────────────────────────────────────────────────────────
-// Sources: KonvergenzErgebnis + FixationErgebnis + StiftReiseErgebnis
-
-function scoreAugensteuerung(daten: ScreeningDaten): number {
-  let score = 100;
-  const k = daten.konvergenz;
-  const f = daten.fixation;
-  const sak = daten.sakkaden;
-  const s = daten.stiftReise;
-
-  // Konvergenz
-  if (k.beideAugen === "deutlich_auffaellig") score -= 35;
-  else if (k.beideAugen === "leicht_auffaellig") score -= 18;
-
-  if (k.zeichen.includes("doppelbilder")) score -= 15;
-  if (k.zeichen.includes("auge_springt_raus")) score -= 15;
-  if (k.zeichen.includes("schaut_weg")) score -= 10;
-
-  // Fixation (10 Sekunden ruhig fixieren)
-  if (f.qualitaet === "stark_unruhig_oder_abgelenkt") score -= 30;
-  else if (f.qualitaet === "leicht_unruhig") score -= 15;
-
-  // Blicksprünge (Sakkaden)
-  if (sak.praezision === "ungenau_sucht") score -= 25;
-  else if (sak.praezision === "ueberschiesst") score -= 12;
-  if (sak.kopf_mitbewegt) score -= 8;
-
-  // Stift-Reise (smooth pursuit)
-  if (s.folgt === "verliert_stift") score -= 30;
-  else if (s.folgt === "ruckelig_mit_pausen") score -= 18;
-
-  if (s.kopf_mitbewegt) score -= 10;
-
-  // Nah-Fern Konvergenz (eigene Übung)
-  if (s.konvergenz_nahfern === "kann_nicht_fixieren") score -= 20;
-  else if (s.konvergenz_nahfern === "ein_auge_langsamer" || s.konvergenz_nahfern === "ruckelt") score -= 12;
-
-  return Math.max(0, Math.min(100, score));
+/** Durchschnitt der beantworteten Fragen als Anteil 0–1 ("weiß nicht" zählt nicht) */
+function anteil(fragen: Record<string, Antwort> | undefined, ids: string[]): number {
+  const werte = ids.map(id => wert(fragen, id)).filter((v): v is number => v !== null);
+  if (werte.length === 0) return 0;
+  return werte.reduce((s, v) => s + v, 0) / (werte.length * 3);
 }
 
-// ─── 3. Visuelle Verarbeitung ─────────────────────────────────────────────────
-// Sources: MiniTests buchstaben + formen, class-scaled
-
-function scoreVisuelleVerarbeitung(daten: ScreeningDaten, klasse: number): number {
-  let score = 100;
-  const lrs = daten.miniTests.buchstaben;
-  const disk = daten.miniTests.formen;
-
-  // Buchstabenverwechslungen (class-scaled)
-  const lrsGrenz = klasse <= 1
-    ? { gelb: 5, rot: 8 }
-    : klasse <= 2
-    ? { gelb: 3, rot: 5 }
-    : { gelb: 1, rot: 3 };
-
-  if (lrs.verwechslungen >= lrsGrenz.rot)   score -= 35;
-  else if (lrs.verwechslungen >= lrsGrenz.gelb) score -= 18;
-
-  // Visuelle Diskrimination (Spürnase)
-  if (disk.fehlerrate > 0.4)       score -= 25;
-  else if (disk.fehlerrate > 0.25) score -= 15;
-  else if (disk.fehlerrate > 0.1)  score -= 8;
-
-  if (disk.geschwindigkeit > 4000) score -= 10;
-  else if (disk.geschwindigkeit > 2800) score -= 5;
-
-  return Math.max(0, Math.min(100, score));
+/** "Oft" oder "Immer" */
+function haeufig(fragen: Record<string, Antwort> | undefined, id: string): boolean {
+  return (wert(fragen, id) ?? 0) >= 2;
 }
 
-// ─── 4. Visuelle Merkspanne (Blitzgedächtnis) ────────────────────────────────
-
-function scoreMerkspanne(daten: ScreeningDaten, klasse: number): number {
-  let score = 100;
-  const m = daten.miniTests.merkspanne;
-
-  if (m.fehlerrate > 0.6)       score -= 40;
-  else if (m.fehlerrate > 0.4)  score -= 25;
-  else if (m.fehlerrate > 0.25) score -= 12;
-
-  // Reaktionszeit (class-adjusted)
-  const rtGrenz = klasse <= 2 ? { gelb: 3500, rot: 5000 } : { gelb: 2500, rot: 4000 };
-  if (m.reaktionszeit > rtGrenz.rot)  score -= 15;
-  else if (m.reaktionszeit > rtGrenz.gelb) score -= 8;
-
-  return Math.max(0, Math.min(100, score));
+function begrenzen(score: number): number {
+  return Math.max(0, Math.min(100, Math.round(score)));
 }
 
-// ─── 5. Konzentration ─────────────────────────────────────────────────────────
+// ─── Bereiche ─────────────────────────────────────────────────────────────────
 
-function scoreKonzentration(fragen: Record<string, number>): number {
-  const keys = ["k1","k2","k3","k4","k5","k6","k7","k8"];
-  const summe = keys.reduce((s, k) => s + (fragen[k] ?? 0), 0);
-  const max = keys.length * 3;
-  return Math.round(Math.max(0, 100 - (summe / max) * 100));
+function scoreLesen(d: ScreeningDaten): number {
+  let s = 100;
+  if (d.lesen?.fluessig === false) s -= 15;
+  if (d.lesen?.zeile_verloren) s -= 20;
+  if (d.lesen?.finger) s -= 10;
+
+  if (d.augenReise?.folgen === "verliert") s -= 25;
+  else if (d.augenReise?.folgen === "ruckelig") s -= 12;
+  if (d.augenReise?.springen === "sucht") s -= 20;
+  else if (d.augenReise?.springen === "korrigiert") s -= 10;
+  if (d.augenReise?.kopf_mitbewegt) s -= 8;
+
+  // "Manchmal" bei allen Fragen (Anteil 0,33) zählt bewusst noch nicht.
+  const a = anteil(d.fragebogen, ["l1", "l2", "l6", "l8"]);
+  if (a > 0.6) s -= 20;
+  else if (a > 0.4) s -= 10;
+  return begrenzen(s);
 }
 
-// ─── 6. Reflexintegration ────────────────────────────────────────────────────
-// MORO (r1,r2) und ATNR (r7,r8) doppelt gewichtet
+function scoreTeamarbeit(d: ScreeningDaten): number {
+  let s = 100;
+  if (d.konvergenz?.augen === "weicht_deutlich_aus") s -= 40;
+  else if (d.konvergenz?.augen === "weicht_kurz_aus") s -= 20;
+  const z = d.konvergenz?.zeichen ?? [];
+  if (z.includes("doppelbilder")) s -= 20;
+  if (z.includes("schaut_weg")) s -= 10;
+  if (z.includes("anstrengend")) s -= 8;
+  if (d.lesen?.haltung === "auffaellig") s -= 10;
 
-function scoreReflexintegration(fragen: Record<string, number>, buchLese: ScreeningDaten["buchLese"]): number {
-  const allKeys = ["r1","r2","r3","r4","r5","r6","r7","r8"];
-  const gewichtung: Record<string, number> = {
-    r1: 1.5, r2: 1.5, r3: 1.0, r4: 1.0,
-    r5: 1.0, r6: 1.0, r7: 1.5, r8: 1.5,
-  };
-  const summe = allKeys.reduce((s, k) => s + (fragen[k] ?? 0) * (gewichtung[k] ?? 1), 0);
-  const maxGewichtet = allKeys.reduce((s, k) => s + 3 * (gewichtung[k] ?? 1), 0);
-  let score = Math.round(100 - (summe / maxGewichtet) * 100);
-
-  // Lesebeobachtungen als zusätzliches Reflex-Signal
-  const q = buchLese;
-  if (q.verliert_zeile && q.benutzt_finger)    score = Math.min(score, 60);
-  if (q.kopfhaltung === "schief_oder_verdreht") score = Math.min(score, 65);
-
-  return Math.max(0, score);
+  const a = anteil(d.fragebogen, ["l4", "l5", "l7", "l9"]);
+  if (a > 0.6) s -= 20;
+  else if (a > 0.4) s -= 10;
+  return begrenzen(s);
 }
 
-// ─── Blinzelverhalten (PC-Lesetest) ──────────────────────────────────────────
+function scoreBuchstaben(d: ScreeningDaten): number {
+  let s = 100;
+  const fehler = Number(d.buchstaben?.fehler) || 0;
+  // 8 Runden. In der 1. Klasse sind b/d-Verwechslungen noch häufig → großzügiger.
+  const grenze = d.klasse <= 1 ? { gelb: 3, rot: 5 } : d.klasse === 2 ? { gelb: 2, rot: 4 } : { gelb: 2, rot: 3 };
+  if (fehler >= grenze.rot) s -= 45;
+  else if (fehler >= grenze.gelb) s -= 25;
+  if (d.klasse >= 2 && haeufig(d.fragebogen, "l3")) s -= 15;
+  return begrenzen(s);
+}
 
-function berecheBlinzelinfo(blinzeln: ScreeningDaten["pcLese"]["blinzeln"]): BlinzelInfo {
-  switch (blinzeln) {
-    case "selten":
-      return {
-        ampel: "rot",
-        label: "Sehr selten",
-        elternText:
-          "Dein Kind blinzelt beim Lesen am Bildschirm sehr selten. Seltenes Blinzeln trocknet die Augen aus und ist ein Zeichen von visuellem Stress. Kurze Pausen alle 20 Minuten helfen.",
-      };
-    case "normal":
-      return {
-        ampel: "gruen",
-        label: "Unauffällig",
-        elternText:
-          "Das Blinzelverhalten am Bildschirm war unauffällig — die Augen entspannen sich regelmäßig.",
-      };
-    case "oft":
-      return {
-        ampel: "gelb",
-        label: "Häufig",
-        elternText:
-          "Dein Kind blinzelt beim Lesen am Bildschirm oft. Das kann auf Augenreizung oder erhöhte Anspannung hinweisen.",
-      };
-    default:
-      return {
-        ampel: "gelb",
-        label: "Nicht beobachtet",
-        elternText: "Das Blinzelverhalten am Bildschirm wurde nicht beobachtet.",
-      };
+function scoreKoerper(d: ScreeningDaten): number {
+  const anzahl = ["k1", "k2", "k3"].filter(id => haeufig(d.fragebogen, id)).length;
+  return [100, 65, 50, 35][anzahl];
+}
+
+// ─── Warnzeichen ──────────────────────────────────────────────────────────────
+
+function erkenneWarnzeichen(d: ScreeningDaten): Warnzeichen[] {
+  const w: Warnzeichen[] = [];
+  if (d.konvergenz?.zeichen?.includes("doppelbilder")) {
+    w.push({ id: "doppelbilder", text: "Bei der Stift-Übung hat dein Kind Doppelbilder bemerkt." });
   }
+  if (d.konvergenz?.augen === "weicht_deutlich_aus") {
+    w.push({ id: "auge_weicht_aus", text: "Bei der Stift-Übung ist ein Auge deutlich nach außen ausgewichen." });
+  }
+  if (haeufig(d.fragebogen, "l9")) {
+    w.push({ id: "verschwommen", text: "Dein Kind sagt oft, dass Buchstaben verschwimmen, wackeln oder doppelt erscheinen." });
+  }
+  if (haeufig(d.fragebogen, "l4")) {
+    w.push({ id: "kopfschmerzen", text: "Dein Kind klagt oft über Kopfschmerzen oder müde Augen nach dem Lesen." });
+  }
+  return w;
 }
 
-// ─── Mustererkennung ──────────────────────────────────────────────────────────
-
-function erkenneMuster(scores: Record<string, number>, daten: ScreeningDaten): MusterHinweis[] {
-  const hinweise: MusterHinweis[] = [];
-
-  // Konvergenzinsuffizienz-Muster
-  const k = daten.konvergenz;
-  if (
-    (k.beideAugen === "leicht_auffaellig" || k.beideAugen === "deutlich_auffaellig" || k.zeichen.includes("doppelbilder")) &&
-    scores.lesefluss < 70
-  ) {
-    hinweise.push({
-      titel: "Zusammenarbeit der Augen beim Nahsehen",
-      text: "Die Kombination aus Auffälligkeiten bei den Übungen zum Nahsehen und einem unruhigen Lesefluss deutet darauf hin, dass die Zusammenarbeit beider Augen beim Lesen zusätzliche Energie kostet. Dadurch können Lesen, Abschreiben oder längeres Arbeiten im Nahbereich anstrengender werden. Ein gezieltes Visualtraining kann diese Fähigkeiten unterstützen.",
-      staerke: k.beideAugen === "deutlich_auffaellig" ? "stark" : "mittel",
+function erkenneZusammenhaenge(bereiche: Record<BereichId, Stufe>): Zusammenhang[] {
+  const z: Zusammenhang[] = [];
+  if (bereiche.teamarbeit > 0 && bereiche.lesen > 0) {
+    z.push({
+      titel: "Nahsehen und Lesefluss",
+      text: "Hinweise zeigten sich sowohl bei der Zusammenarbeit der Augen in der Nähe als auch beim Lesen selbst. Wenn das Nahsehen viel Kraft kostet, kann Lesen schneller anstrengend werden. Ob das bei deinem Kind so ist, klärt eine fachliche Untersuchung.",
     });
   }
-
-  // Monokularer Vergleich + Augensteuerung → klarer Binokularbefund
-  if (daten.buchLese.monokular === "besser" && scores.augensteuerung < 70) {
-    hinweise.push({
-      titel: "Binokulare Zusammenarbeit",
-      text: "Beim Lesen mit einem abgedeckten Auge gelang die Aufgabe flüssiger als mit beiden Augen gemeinsam. Das kann darauf hindeuten, dass die Zusammenarbeit beider Augen noch nicht optimal abgestimmt ist. Genau diese Fähigkeiten stehen im Visualtraining im Mittelpunkt und lassen sich gezielt fördern.",
-      staerke: "stark",
+  if (bereiche.koerper > 0 && (bereiche.lesen > 0 || bereiche.teamarbeit > 0)) {
+    z.push({
+      titel: "Körper und Augen",
+      text: "Neben den Augen-Übungen hast du auch bei Haltung und Bewegung einiges beobachtet. Haltung, Gleichgewicht und Augensteuerung hängen eng zusammen. Darum denken wir Augen und Körper im Training gemeinsam.",
     });
   }
-
-  // Reflexdominantes Muster
-  if (scores.reflexintegration < 55 && scores.konzentration < 60 && scores.augensteuerung < 65) {
-    hinweise.push({
-      titel: "Reflexintegration beeinflusst Lernen",
-      text: "Die Kombination aus Auffälligkeiten bei Reflexintegration, Konzentration und Augensteuerung zeigt, dass mehrere Bereiche zusammenwirken können. Frühkindliche Reflexe können Haltung, Gleichgewicht, Blicksteuerung und Konzentration beeinflussen. Deshalb werden diese Bereiche im Visualtraining gemeinsam trainiert.",
-      staerke: scores.reflexintegration < 40 ? "stark" : "mittel",
-    });
-  }
-
-  // Sitzposition + STNR/TLR
-  const fragen = daten.fragebogen;
-  const stnr1 = fragen["r5"] ?? 0;
-  const stnr2 = fragen["r6"] ?? 0;
-  const tlr1 = fragen["r3"] ?? 0;
-  if (stnr1 + stnr2 >= 4 && tlr1 >= 2) {
-    hinweise.push({
-      titel: "STNR-/TLR-Muster: Sitzen und Schreiben",
-      text: "Die Kombination aus einer auffälligen Sitzhaltung, unbewussten Mitbewegungen und Schwierigkeiten beim Schreiben wird häufig bei Kindern beobachtet, deren Haltungs- und Bewegungsentwicklung noch Unterstützung benötigt. Deshalb sind Übungen zur Reflexintegration ein wichtiger Bestandteil unseres Visualtrainings und können dazu beitragen, Bewegungsabläufe zu stabilisieren und das Lernen zu erleichtern.",
-      staerke: "mittel",
-    });
-  }
-
-  return hinweise;
+  return z;
 }
 
 // ─── Hauptauswertung ──────────────────────────────────────────────────────────
 
-export function berechneScreeningProfil(
-  daten: ScreeningDaten,
-  klasse: number
-): ScreeningProfil {
-  const scores = {
-    lesefluss:            scoreLesefluss(daten),
-    augensteuerung:       scoreAugensteuerung(daten),
-    visuelleVerarbeitung: scoreVisuelleVerarbeitung(daten, klasse),
-    merkspanne:           scoreMerkspanne(daten, klasse),
-    konzentration:        scoreKonzentration(daten.fragebogen),
-    reflexintegration:    scoreReflexintegration(daten.fragebogen, daten.buchLese),
+export function berechneScreeningProfil(daten: ScreeningDaten): ScreeningProfil {
+  const scores: Record<BereichId, number> = {
+    lesen: scoreLesen(daten),
+    teamarbeit: scoreTeamarbeit(daten),
+    buchstaben: scoreBuchstaben(daten),
+    koerper: scoreKoerper(daten),
   };
 
-  const kategorien: KategorieScore[] = [
-    {
-      name: "Lesefluss",
-      score: scores.lesefluss,
-      ampel: getAmpel(scores.lesefluss),
-      beschreibung: "Zeilenverluste, Wortüberspringen, Lesefluss und -qualität",
-      elternText:
-        scores.lesefluss < 41
-          ? "Beim Lesen zeigt dein Kind deutliche Auffälligkeiten: Zeilen verlieren, Wörter überspringen oder raten statt wirklich lesen. Das kostet viel Energie."
-          : scores.lesefluss < 71
-          ? "Der Lesefluss zeigt leichte Unregelmäßigkeiten — einzelne Auffälligkeiten beim Lesen wurden beobachtet."
-          : "Der Lesefluss ist gut und stabil — dein Kind liest flüssig und verliert keine Zeilen.",
-      icon: "📖",
-    },
-    {
-      name: "Augensteuerung",
-      score: scores.augensteuerung,
-      ampel: getAmpel(scores.augensteuerung),
-      beschreibung: "Konvergenz, Fixation und Stift-Folgebewegungen",
-      elternText:
-        scores.augensteuerung < 41
-          ? `Die Augensteuerung zeigt deutliche Auffälligkeiten — Konvergenztest, Fixation und/oder Stift-Folgebewegungen waren eingeschränkt.${daten.konvergenz.zeichen.includes("doppelbilder") ? " Beim Konvergenztest wurden Doppelbilder berichtet — das sollte fachlich abgeklärt werden." : ""}`
-          : scores.augensteuerung < 71
-          ? "Die Augensteuerung ist in einzelnen Bereichen noch nicht optimal."
-          : "Die Augensteuerung ist gut — Konvergenz, Fixation und Verfolgung unauffällig.",
-      icon: "🎯",
-    },
-    {
-      name: "Visuelle Verarbeitung",
-      score: scores.visuelleVerarbeitung,
-      ampel: getAmpel(scores.visuelleVerarbeitung),
-      beschreibung: "Buchstaben unterscheiden (b/d, p/q) und visuelle Diskrimination",
-      elternText:
-        scores.visuelleVerarbeitung < 41
-          ? "Dein Kind hat Schwierigkeiten, ähnliche Buchstaben visuell zu unterscheiden — das kann Lesen und Schreiben deutlich erschweren."
-          : scores.visuelleVerarbeitung < 71
-          ? "Die visuelle Unterscheidungsfähigkeit zeigt leichte Auffälligkeiten — für das Klassenalter beobachtbar."
-          : "Dein Kind kann Buchstaben und Symbole gut unterscheiden.",
-      icon: "🔍",
-    },
-    {
-      name: "Visuelle Merkspanne",
-      score: scores.merkspanne,
-      ampel: getAmpel(scores.merkspanne),
-      beschreibung: "Kurzfristiges visuelles Gedächtnis (Blitzgedächtnis)",
-      elternText:
-        scores.merkspanne < 41
-          ? "Das kurzzeitige visuelle Merken fällt schwer — dein Kind hat Mühe, kurz gesehene Symbole zu behalten. Das betrifft z. B. das Abschreiben von der Tafel."
-          : scores.merkspanne < 71
-          ? "Die visuelle Merkspanne ist leicht eingeschränkt — manchmal gehen kurz gesehene Details verloren."
-          : "Die visuelle Merkspanne ist gut — kurz Gesehenes bleibt gut im Gedächtnis.",
-      icon: "⚡",
-    },
-    {
-      name: "Konzentration",
-      score: scores.konzentration,
-      ampel: getAmpel(scores.konzentration),
-      beschreibung: "Aufmerksamkeit, Ruhe und Fokus",
-      elternText:
-        scores.konzentration < 41
-          ? "Dein Kind zeigt laut deinen Angaben deutliche Konzentrationsschwierigkeiten — oft ein Zusammenspiel aus visuellem Stress und Aufmerksamkeit."
-          : scores.konzentration < 71
-          ? "Gelegentliche Konzentrationsprobleme können mit visueller Überlastung zusammenhängen."
-          : "Die Konzentration ist im Normalbereich.",
-      icon: "🧠",
-    },
-    {
-      name: "Reflexintegration",
-      score: scores.reflexintegration,
-      ampel: getAmpel(scores.reflexintegration),
-      beschreibung: "Frühkindliche Reflexe (MORO, TLR, STNR, ATNR)",
-      elternText:
-        scores.reflexintegration < 41
-          ? "Mehrere frühkindliche Reflexe scheinen noch aktiv zu sein — MORO und ATNR beeinflussen dabei direkt die Augensteuerung und das Lesen."
-          : scores.reflexintegration < 71
-          ? "Einzelne frühkindliche Reflexe könnten noch nicht vollständig integriert sein."
-          : "Die Reflexintegration zeigt keine Auffälligkeiten.",
-      icon: "🦺",
-    },
-  ];
+  const bereiche: Bereich[] = (Object.keys(scores) as BereichId[]).map(id => ({
+    id,
+    name: BEREICH_NAMEN[id],
+    score: scores[id],
+    stufe: stufeAusScore(scores[id]),
+  }));
 
-  const auffaelligkeitenAnzahl = kategorien.filter(k => k.ampel !== "gruen").length;
+  // Gesamtergebnis = auffälligster Bereich (kein Durchschnitt, sonst "verschwindet" ein roter Bereich).
+  const gesamtStufe = Math.max(...bereiche.map(b => b.stufe)) as Stufe;
+  const niedrigster = bereiche.reduce((a, b) => (b.score < a.score ? b : a));
+  const schwerpunkt = niedrigster.stufe > 0 ? niedrigster.id : null;
 
-  const gesamtScore = Math.round(
-    Object.values(scores).reduce((s, v) => s + v, 0) / 6
-  );
-
-  // VIKI-Typ
-  const niedrigste = kategorien.reduce((a, b) => a.score < b.score ? a : b);
-  let typ: "A" | "B" | "C" | "D" = "D";
-  let hauptproblem = "Ganzheitlicher Förderbedarf";
-
-  if (niedrigste.name === "Lesefluss" && scores.lesefluss < 50) {
-    typ = "A"; hauptproblem = "Lesefluss & Augenbewegungen";
-  } else if (niedrigste.name === "Augensteuerung" && scores.augensteuerung < 50) {
-    typ = "B"; hauptproblem = "Augensteuerung & Fokus";
-  } else if (niedrigste.name === "Reflexintegration" && scores.reflexintegration < 50) {
-    typ = "C"; hauptproblem = "Reflexintegration & Körperwahrnehmung";
-  }
-
-  const blinzelinfo = berecheBlinzelinfo(daten.pcLese.blinzeln);
-  const musterHinweise = erkenneMuster(scores, daten);
+  const stufen = Object.fromEntries(bereiche.map(b => [b.id, b.stufe])) as Record<BereichId, Stufe>;
 
   return {
-    typ, hauptproblem,
-    kategorien, gesamtScore, auffaelligkeitenAnzahl,
-    blinzelinfo, musterHinweise,
+    bereiche,
+    gesamtStufe,
+    schwerpunkt,
+    warnzeichen: erkenneWarnzeichen(daten),
+    untersuchungEmpfohlen: daten.vorfragen?.untersuchung !== "unter_1_jahr",
+    ausdauerHinweis: haeufig(daten.fragebogen, "a1") && haeufig(daten.fragebogen, "a2"),
+    zusammenhaenge: erkenneZusammenhaenge(stufen),
   };
 }

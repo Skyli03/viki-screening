@@ -1,82 +1,44 @@
 ================================================================
-VIKI SUPERBLICK SCREENING — ALLE FRAGEN
-Elternfragebogen · Stand April 2026
-Antwortskala: Nie / Manchmal / Oft / Immer
+AUGEN-CHECK (VIKI SCREENING) — ALLE FRAGEN UND ÜBUNGEN
+Stand November 2026 (Kurzfassung, ca. 10–12 Minuten)
+Antwortskala Fragebogen: Nie / Manchmal / Oft / Immer / Weiß nicht
 ================================================================
 
-ABSCHNITT A: LESEN & SCHULVERHALTEN (10 Fragen)
-------------------------------------------------
-l1  Mein Kind verliert beim Lesen häufig die Zeile.
-l2  Mein Kind liest sehr langsam für sein Alter.
-l3  Mein Kind vertauscht Buchstaben (z.B. b und d, p und q).
-l4  Mein Kind klagt über Kopfschmerzen oder müde Augen nach dem Lesen.
-l5  Mein Kind hält das Buch sehr nah oder sehr weit weg.
-l6  Mein Kind überspringt beim Lesen Wörter oder ganze Zeilen.
-l7  Mein Kind muss beim Lesen mit dem Finger die Zeile verfolgen.
-l8  Mein Kind hat Schwierigkeiten beim Abschreiben von der Tafel.
-l9  Mein Kind vermeidet Lesen oder Hausaufgaben, wo möglich.
-l10 Mein Kind sieht Buchstaben oder Wörter verschwommen oder doppelt.
+TEIL 1 — ELTERN ALLEIN (ca. 4 Min.)
 
-ABSCHNITT B: KONZENTRATION & AUFMERKSAMKEIT (8 Fragen)
--------------------------------------------------------
-k1  Mein Kind kann sich schlecht längere Zeit auf eine Aufgabe konzentrieren.
-k2  Mein Kind ist motorisch sehr unruhig und zappelig.
-k3  Mein Kind reagiert sehr empfindlich auf Licht oder laute Geräusche.
-k4  Mein Kind wirkt oft abgelenkt und träumt viel.
-k5  Mein Kind hat Schwierigkeiten, Anweisungen zu befolgen.
-k6  Mein Kind verliert schnell die Motivation bei schwierigen Aufgaben.
-k7  Mein Kind hat Probleme beim Einschlafen oder schläft unruhig.
-k8  Mein Kind hat Stimmungsschwankungen oder reagiert sehr impulsiv.
+Vorfragen
+- Trägt dein Kind eine Brille? (Ja / Nein / Weiß nicht)
+- Wann wurden die Augen zuletzt untersucht? (unter 1 Jahr / länger her / noch nie / weiß nicht)
 
-ABSCHNITT C: KÖRPER & REFLEXE (8 Fragen)
------------------------------------------
-r1  Mein Kind reagiert übertrieben erschrocken auf laute oder plötzliche Geräusche.   [MORO]
-r2  Mein Kind hat Angst vor Bewegung (Schaukeln, Lift, schnelle Bewegungen).           [MORO]
-r3  Mein Kind hat eine schlechte Körperhaltung — sitzt gebeugt oder hängt durch.       [TLR]
-r4  Mein Kind hat Schwierigkeiten beim Treppensteigen oder schätzt Entfernungen falsch ein. [TLR]
-r5  Mein Kind macht beim Schreiben unbewusste Kopf- oder Mundbewegungen.               [STNR]
-r6  Mein Kind kann nicht lange ruhig am Tisch sitzen, rutscht ständig.                [STNR]
-r7  Mein Kind hat Schwierigkeiten bei Bewegungen, die beide Körperseiten gleichzeitig nutzen. [ATNR]
-r8  Mein Kind dreht beim Schreiben den Kopf zur Schreibhand.                           [ATNR]
+Lesen & Sehen
+l1  Verliert beim Lesen die Zeile oder überspringt Wörter.
+l2  Liest langsamer als andere Kinder in der Klasse.
+l3  Verwechselt ähnliche Buchstaben (b/d, p/q).
+l4  Klagt nach dem Lesen über Kopfschmerzen, brennende oder müde Augen.   [Warnzeichen bei oft/immer]
+l5  Geht beim Lesen oder Schreiben mit dem Kopf sehr nah ans Blatt.
+l6  Braucht den Finger, um in der Zeile zu bleiben.
+l7  Hat Mühe beim Abschreiben von der Tafel.
+l8  Vermeidet Lesen oder Hausaufgaben, wo es nur geht.
+l9  Sagt, dass Buchstaben verschwimmen, wackeln oder doppelt erscheinen.  [Warnzeichen bei oft/immer]
 
-================================================================
-INTERAKTIVE TESTS (werden vom Kind selbst gespielt)
-================================================================
+Ausdauer (nur Text-Hinweis, keine Ampel)
+a1  Kann sich bei den Hausaufgaben nur kurz konzentrieren.
+a2  Wird beim Lesen schnell müde oder gibt rasch auf.
 
-TEST 1 — LASERBLICK (Fixation)
-  10 Runden · Ein Stern erscheint an zufälliger Position
-  → Kind klickt auf Stern oder drückt Leertaste
-  Misst: Reaktionszeit, Genauigkeit
+Körper & Haltung
+k1  Erschrickt sehr stark bei lauten oder plötzlichen Geräuschen.            (Moro)
+k2  Kann beim Schreiben schwer ruhig sitzen, rutscht, liegt fast am Tisch.   (STNR)
+k3  Dreht beim Schreiben den Kopf zur Schreibhand / legt Kopf oder Heft schief. (ATNR)
 
-TEST 2 — BLITZBLICK (Sakkaden)
-  16 Runden · Oranges Leuchten wechselt links/rechts
-  → Kind klickt auf leuchtende Seite oder drückt ← →
-  Misst: Reaktionszeit, Konsistenz der Augenbewegung
+TEIL 2 — MIT KIND (ca. 6 Min.)
+1. Vorlesen (1 Min. aus eigenem Buch): flüssig? Zeile verloren? Finger? Abstand/Kopfhaltung?
+2. Stift-Übung (Konvergenz): Augen gleichmäßig / kurz ausgewichen / deutlich ausgewichen;
+   zusätzlich Doppelbilder [Warnzeichen], wegschauen/blinzeln, anstrengend.
+   "Deutlich ausgewichen" = Warnzeichen.
+3. Augen-Reise: Stift folgen (ruhig / ruckelig / verliert) + 6 Blicksprünge auf Ansage
+   (genau / korrigiert / sucht) + Kopf mitbewegt?
+4. Buchstabenjäger (Kind): 8 Runden gleich/verschieden, ohne Zeitlimit.
 
-TEST 3 — SUPERFINGER (Smooth Pursuit)
-  15 Sekunden · Rakete bewegt sich horizontal
-  → Kind verfolgt mit der Maus
-  Misst: Abweichung beim Verfolgen
-
-TEST 4 — SPÜRNASE (Visuelle Diskrimination)
-  10 Runden · 4 Symbole, eines ist anders
-  → Kind klickt auf das andere Symbol
-  Misst: Fehlerrate, Geschwindigkeit
-
-TEST 5 — BUCHSTABENJÄGER (LRS / b-d-p-q)
-  12 Runden · Zwei Buchstaben werden gezeigt
-  → Kind drückt "Gleich" oder "Verschieden"
-  Misst: Verwechslungen (b/d/p/q), Reaktionszeit
-
-TEST 6 — SUPERHELDEN-RADAR (Peripheres Sehen)
-  12 Runden · Kind fixiert Mittelpunkt, Blitz erscheint am Rand
-  → Kind klickt auf Blitz
-  Misst: Reaktionszeit, Trefferquote
-
-================================================================
-HINWEIS FÜR DR. SARAH-MARIA KOPETZKY:
-Bitte durchgehen und markieren:
-  [ ] Fragen die geändert werden sollen
-  [ ] Fragen die gelöscht werden sollen
-  [ ] Neue Fragen die hinzugefügt werden sollen
-================================================================
+AUSWERTUNG: 4 Bereiche mit Ampel (Lesen & Augenbewegungen, Augen-Teamarbeit,
+Buchstaben unterscheiden, Körper & Haltung). Gesamtergebnis = auffälligster Bereich.
+Logik: lib/auswertung.ts, Texte: lib/alltags-texte.ts

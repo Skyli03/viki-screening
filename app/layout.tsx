@@ -4,8 +4,8 @@ import "./globals.css";
 import CookieHinweis from "./components/CookieHinweis";
 
 export const metadata: Metadata = {
-  title: "VIKI Superblick — Kostenloser Augen-Check für dein Kind",
-  description: "Erste Orientierung in 15 Minuten: Spielen visuelle Schwierigkeiten beim Lesen und Lernen deines Kindes eine Rolle? Kostenloser Online-Augen-Check von vikitraining.at",
+  title: "Kostenloser Augen-Check für dein Kind | VIKI Training",
+  description: "Erste Orientierung in ca. 10–12 Minuten: Spielt die Zusammenarbeit der Augen beim Lesen deines Kindes eine Rolle? Kostenloser Online-Augen-Check von VIKI Training, keine Diagnose.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

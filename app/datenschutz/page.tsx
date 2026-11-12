@@ -1,9 +1,10 @@
+import Link from "next/link";
 export default function Datenschutz() {
   return (
     <div className="min-h-screen" style={{ background: "#F0ECE7" }}>
       <header className="bg-white shadow-sm py-2 px-6">
         <div className="max-w-3xl mx-auto">
-          <a href="/"><img src="/logo.png" alt="VIKI Training" className="h-14 w-auto" /></a>
+          <Link href="/"><img src="/logo.png" alt="VIKI Training" className="h-14 w-auto" /></Link>
         </div>
       </header>
 
@@ -23,8 +24,8 @@ export default function Datenschutz() {
               <h2 className="font-bold text-gray-900 text-base mb-2">2. Welche Daten wir verarbeiten</h2>
               <p className="mb-2">Im Rahmen des kostenlosen Augen-Checks verarbeiten wir folgende Daten:</p>
               <ul className="list-disc list-inside space-y-1 text-gray-600">
-                <li><strong>Vorname des Kindes, Schulstufe und Antworten im Check</strong> — werden während des Checks nur lokal in deinem Browser gespeichert. Die Auswertung passiert ebenfalls in deinem Browser.</li>
-                <li><strong>Ergebnisbericht</strong> — nur wenn du den vollständigen Bericht per E-Mail anforderst, werden der Vorname deines Kindes und die Auswertung an unseren Server übermittelt, um daraus die Bericht-E-Mail zu erstellen und an dich zu senden (siehe Punkt 3). Wir legen dafür keine eigene Datenbank an.</li>
+                <li><strong>Vorname des Kindes (freiwillig), Schulstufe und Antworten im Check</strong> — werden während des Checks nur lokal in deinem Browser gespeichert. Die Auswertung passiert ebenfalls in deinem Browser.</li>
+                <li><strong>Ergebnisbericht</strong> — nur wenn du den vollständigen Bericht per E-Mail anforderst, werden die Antworten aus dem Check und (falls angegeben) der Vorname deines Kindes an unseren Server übermittelt. Dort werden sie ausgewertet, um daraus die Bericht-E-Mail zu erstellen und an dich zu senden (siehe Punkt 3). Wir speichern sie nicht und legen dafür keine eigene Datenbank an.</li>
                 <li><strong>E-Mail-Adresse</strong> — wird für den Versand des Berichts verwendet. Nur wenn du zusätzlich dem Erhalt von Tipps und Infos zustimmst (freiwilliges zweites Häkchen), wird sie (ohne Namen und ohne Ergebnisse deines Kindes) an unseren E-Mail-Marketing-Dienst systeme.io übermittelt (siehe Punkt 4).</li>
               </ul>
               <p className="mt-2">Die Ergebnisse des Checks betreffen die Entwicklung deines Kindes und können als Gesundheitsdaten gelten. Wir verarbeiten sie deshalb nur mit deiner ausdrücklichen Einwilligung (Art. 6 Abs. 1 lit. a und Art. 9 Abs. 2 lit. a DSGVO), die du beim Anfordern des Berichts erteilst.</p>
@@ -62,7 +63,7 @@ export default function Datenschutz() {
           </div>
 
           <div className="mt-8 pt-6 border-t border-gray-100">
-            <a href="/" className="text-sm font-semibold" style={{ color: "#F5943A" }}>← Zurück zum Augen-Check</a>
+            <Link href="/" className="text-sm font-semibold" style={{ color: "#F5943A" }}>← Zurück zum Augen-Check</Link>
           </div>
         </div>
       </main>
