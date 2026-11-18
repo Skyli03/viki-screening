@@ -1,11 +1,11 @@
 import type { Antwort, ScreeningDaten } from "@/lib/screening-types";
 
 // ─── Auswertung Augen-Check ───────────────────────────────────────────────────
-// Bewusst einfach und nachvollziehbar: 4 Bereiche mit Ampel, dazu Ausdauer als
+// Bewusst einfach und nachvollziehbar: 3 Bereiche mit Ampel, dazu Ausdauer als
 // kurzer Hinweis (keine Ampel) und Warnzeichen, die eine fachliche Abklärung
 // nahelegen. Keine Normwerte, keine Diagnose — nur Orientierung.
 
-export type BereichId = "lesen" | "teamarbeit" | "buchstaben" | "koerper";
+export type BereichId = "lesen" | "teamarbeit" | "koerper";
 
 /** 0 = unauffällig, 1 = leichte, 2 = deutliche, 3 = starke Hinweise */
 export type Stufe = 0 | 1 | 2 | 3;
@@ -42,7 +42,6 @@ export interface ScreeningProfil {
 export const BEREICH_NAMEN: Record<BereichId, string> = {
   lesen: "Lesen & Augenbewegungen",
   teamarbeit: "Augen-Teamarbeit beim Nahsehen",
-  buchstaben: "Buchstaben unterscheiden",
   koerper: "Körper & Haltung",
 };
 
@@ -89,7 +88,8 @@ function scoreLesen(d: ScreeningDaten): number {
   if (d.augenReise?.kopf_mitbewegt) s -= 8;
 
   // "Manchmal" bei allen Fragen (Anteil 0,33) zählt bewusst noch nicht.
-  const a = anteil(d.fragebogen, ["l1", "l2", "l6", "l8"]);
+  // l3 (b/d verwechseln) erst ab der 2. Klasse, in der 1. Klasse ist das noch normal.
+  const a = anteil(d.fragebogen, d.klasse >= 2 ? ["l1", "l2", "l3", "l6", "l8"] : ["l1", "l2", "l6", "l8"]);
   if (a > 0.6) s -= 20;
   else if (a > 0.4) s -= 10;
   return begrenzen(s);
@@ -99,8 +99,10 @@ function scoreTeamarbeit(d: ScreeningDaten): number {
   let s = 100;
   if (d.konvergenz?.augen === "weicht_deutlich_aus") s -= 40;
   else if (d.konvergenz?.augen === "weicht_kurz_aus") s -= 20;
+  // Normwert Grundschulkinder: doppelt erst unter ca. 6 cm (Hayes 1998, CITT).
+  if (d.konvergenz?.doppelt === "weit") s -= 30;
+  else if (d.konvergenz?.doppelt === "daumen_bis_hand") s -= 15;
   const z = d.konvergenz?.zeichen ?? [];
-  if (z.includes("doppelbilder")) s -= 20;
   if (z.includes("schaut_weg")) s -= 10;
   if (z.includes("anstrengend")) s -= 8;
   if (d.lesen?.haltung === "auffaellig") s -= 10;
@@ -108,17 +110,6 @@ function scoreTeamarbeit(d: ScreeningDaten): number {
   const a = anteil(d.fragebogen, ["l4", "l5", "l7", "l9"]);
   if (a > 0.6) s -= 20;
   else if (a > 0.4) s -= 10;
-  return begrenzen(s);
-}
-
-function scoreBuchstaben(d: ScreeningDaten): number {
-  let s = 100;
-  const fehler = Number(d.buchstaben?.fehler) || 0;
-  // 8 Runden. In der 1. Klasse sind b/d-Verwechslungen noch häufig → großzügiger.
-  const grenze = d.klasse <= 1 ? { gelb: 3, rot: 5 } : d.klasse === 2 ? { gelb: 2, rot: 4 } : { gelb: 2, rot: 3 };
-  if (fehler >= grenze.rot) s -= 45;
-  else if (fehler >= grenze.gelb) s -= 25;
-  if (d.klasse >= 2 && haeufig(d.fragebogen, "l3")) s -= 15;
   return begrenzen(s);
 }
 
@@ -131,8 +122,8 @@ function scoreKoerper(d: ScreeningDaten): number {
 
 function erkenneWarnzeichen(d: ScreeningDaten): Warnzeichen[] {
   const w: Warnzeichen[] = [];
-  if (d.konvergenz?.zeichen?.includes("doppelbilder")) {
-    w.push({ id: "doppelbilder", text: "Bei der Stift-Übung hat dein Kind Doppelbilder bemerkt." });
+  if (d.konvergenz?.doppelt === "weit") {
+    w.push({ id: "doppelbilder", text: "Bei der Stift-Übung hat dein Kind den Stift schon in größerem Abstand doppelt gesehen." });
   }
   if (d.konvergenz?.augen === "weicht_deutlich_aus") {
     w.push({ id: "auge_weicht_aus", text: "Bei der Stift-Übung ist ein Auge deutlich nach außen ausgewichen." });
@@ -169,7 +160,6 @@ export function berechneScreeningProfil(daten: ScreeningDaten): ScreeningProfil 
   const scores: Record<BereichId, number> = {
     lesen: scoreLesen(daten),
     teamarbeit: scoreTeamarbeit(daten),
-    buchstaben: scoreBuchstaben(daten),
     koerper: scoreKoerper(daten),
   };
 

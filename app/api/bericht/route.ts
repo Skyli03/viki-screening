@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 import { berechneScreeningProfil, type ScreeningProfil } from "@/lib/auswertung";
 import {
-  AUSDAUER_TEXT, BEREICH_TEXTE, STUFEN, UNTERSUCHUNG_TEXT, WARNZEICHEN_EMPFEHLUNG, kursLink,
+  AUSDAUER_TEXT, BEREICH_TEXTE, STUFEN, UNTERSUCHUNG_TEXT, WARNZEICHEN_EMPFEHLUNG, WARNZEICHEN_TITEL, kursLink,
 } from "@/lib/alltags-texte";
 import type { Antwort, KonvergenzZeichen, ScreeningDaten } from "@/lib/screening-types";
 import { FRAGEN } from "@/data/fragebogen";
@@ -47,8 +47,7 @@ function pruefeDaten(roh: unknown): ScreeningDaten | null {
   const augen = eines(d.konvergenz?.augen, ["gleichmaessig", "weicht_kurz_aus", "weicht_deutlich_aus"] as const);
   const folgen = eines(d.augenReise?.folgen, ["fluessig", "ruckelig", "verliert"] as const);
   const springen = eines(d.augenReise?.springen, ["praezise", "korrigiert", "sucht"] as const);
-  const fehler = Number(d.buchstaben?.fehler);
-  if (!brille || !untersuchung || !haltung || !augen || !folgen || !springen || !Number.isInteger(fehler) || fehler < 0 || fehler > 8) {
+  if (!brille || !untersuchung || !haltung || !augen || !folgen || !springen) {
     return null;
   }
 
@@ -58,7 +57,9 @@ function pruefeDaten(roh: unknown): ScreeningDaten | null {
     fragebogen[f.id] = v === 0 || v === 1 || v === 2 || v === 3 ? v : null;
   }
 
-  const alleZeichen: KonvergenzZeichen[] = ["doppelbilder", "schaut_weg", "anstrengend"];
+  // Ältere Zwischenstände haben noch kein "doppelt" → als "unklar" werten.
+  const doppelt = eines(d.konvergenz?.doppelt, ["nah_oder_nie", "daumen_bis_hand", "weit", "unklar"] as const) ?? "unklar";
+  const alleZeichen: KonvergenzZeichen[] = ["schaut_weg", "anstrengend"];
   const zeichen = Array.isArray(d.konvergenz?.zeichen)
     ? alleZeichen.filter(z => d.konvergenz.zeichen.includes(z))
     : [];
@@ -68,9 +69,8 @@ function pruefeDaten(roh: unknown): ScreeningDaten | null {
     vorfragen: { brille, untersuchung },
     fragebogen,
     lesen: { fluessig: d.lesen?.fluessig === true, zeile_verloren: d.lesen?.zeile_verloren === true, finger: d.lesen?.finger === true, haltung },
-    konvergenz: { augen, zeichen },
+    konvergenz: { augen, doppelt, zeichen },
     augenReise: { folgen, springen, kopf_mitbewegt: d.augenReise?.kopf_mitbewegt === true },
-    buchstaben: { fehler, runden: 8 },
   };
 }
 
@@ -197,7 +197,7 @@ function berichtText(name: string, p: ScreeningProfil): string {
     "",
   ];
   if (p.warnzeichen.length) {
-    zeilen.push("BITTE ABKLÄREN LASSEN:", ...p.warnzeichen.map(w => `- ${w.text}`), WARNZEICHEN_EMPFEHLUNG, "");
+    zeilen.push(`${WARNZEICHEN_TITEL}:`, ...p.warnzeichen.map(w => `- ${w.text}`), WARNZEICHEN_EMPFEHLUNG, "");
   } else if (p.untersuchungEmpfohlen) {
     zeilen.push(UNTERSUCHUNG_TEXT, "");
   }
@@ -227,10 +227,10 @@ function berichtHtml(name: string, p: ScreeningProfil): string {
   const schwerpunkt = p.schwerpunkt ? p.bereiche.find(b => b.id === p.schwerpunkt) : null;
 
   const warnHtml = p.warnzeichen.length ? `
-    <div style="background:#FEF2F2;border:2px solid #FCA5A5;border-radius:12px;padding:16px 18px;margin-bottom:24px;">
-      <div style="font-weight:700;font-size:15px;color:#991B1B;margin-bottom:6px;">⚠️ Bitte abklären lassen</div>
-      <ul style="margin:0 0 8px;padding-left:18px;font-size:14px;color:#7F1D1D;line-height:1.6;">${p.warnzeichen.map(w => `<li>${w.text}</li>`).join("")}</ul>
-      <div style="font-size:13px;color:#7F1D1D;line-height:1.6;">${WARNZEICHEN_EMPFEHLUNG}</div>
+    <div style="background:#FFFBEB;border:1px solid #FCD34D;border-radius:12px;padding:16px 18px;margin-bottom:24px;">
+      <div style="font-weight:700;font-size:15px;color:#78350F;margin-bottom:6px;">👓 ${WARNZEICHEN_TITEL}</div>
+      <ul style="margin:0 0 8px;padding-left:18px;font-size:14px;color:#374151;line-height:1.6;">${p.warnzeichen.map(w => `<li>${w.text}</li>`).join("")}</ul>
+      <div style="font-size:13px;color:#4B5563;line-height:1.6;">${WARNZEICHEN_EMPFEHLUNG}</div>
     </div>` : p.untersuchungEmpfohlen ? `
     <div style="background:#FFFBEB;border:1px solid #FCD34D;border-radius:12px;padding:14px 16px;margin-bottom:24px;font-size:14px;color:#78350F;line-height:1.6;">
       <strong>👓 Tipp vorab:</strong> ${UNTERSUCHUNG_TEXT}
@@ -283,7 +283,7 @@ function berichtHtml(name: string, p: ScreeningProfil): string {
     <div style="background:${gesamt.bg};border:2px solid ${gesamt.border};border-radius:14px;padding:20px;text-align:center;margin-bottom:24px;">
       <div style="font-size:40px;line-height:1;margin-bottom:6px;">${gesamt.emoji}</div>
       <div style="font-size:20px;font-weight:800;color:${gesamt.text};">${gesamt.label}</div>
-      <div style="font-size:13px;color:#6B7280;margin-top:4px;">${hinweise.length ? `${hinweise.length} von 4 Bereichen mit Hinweisen` : "In allen 4 Bereichen unauffällig"}</div>
+      <div style="font-size:13px;color:#6B7280;margin-top:4px;">${hinweise.length ? `${hinweise.length} von ${p.bereiche.length} Bereichen mit Hinweisen` : `In allen ${p.bereiche.length} Bereichen unauffällig`}</div>
     </div>
 
     ${gutHtml}

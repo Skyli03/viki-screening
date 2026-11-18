@@ -18,10 +18,14 @@ export interface LeseErgebnis {
   haltung: "unauffaellig" | "auffaellig";
 }
 
-export type KonvergenzZeichen = "doppelbilder" | "schaut_weg" | "anstrengend";
+export type KonvergenzZeichen = "schaut_weg" | "anstrengend";
+
+/** Ab welchem Abstand der Stift doppelt wurde. Ganz nah (unter ca. 6 cm) ist normal. */
+export type DoppeltAbstand = "nah_oder_nie" | "daumen_bis_hand" | "weit" | "unklar";
 
 export interface KonvergenzErgebnis {
   augen: "gleichmaessig" | "weicht_kurz_aus" | "weicht_deutlich_aus";
+  doppelt: DoppeltAbstand;
   zeichen: KonvergenzZeichen[];
 }
 
@@ -31,11 +35,6 @@ export interface AugenReiseErgebnis {
   kopf_mitbewegt: boolean;
 }
 
-export interface BuchstabenErgebnis {
-  fehler: number;
-  runden: number;
-}
-
 export interface ScreeningDaten {
   klasse: number;
   vorfragen: Vorfragen;
@@ -43,5 +42,4 @@ export interface ScreeningDaten {
   lesen: LeseErgebnis;
   konvergenz: KonvergenzErgebnis;
   augenReise: AugenReiseErgebnis;
-  buchstaben: BuchstabenErgebnis;
 }

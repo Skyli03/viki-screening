@@ -1,6 +1,6 @@
 "use client";
 import type {
-  Antwort, AugenReiseErgebnis, BuchstabenErgebnis, KonvergenzErgebnis,
+  Antwort, AugenReiseErgebnis, KonvergenzErgebnis,
   LeseErgebnis, ScreeningDaten, Vorfragen,
 } from "@/lib/screening-types";
 
@@ -17,7 +17,6 @@ export interface CheckStand {
   lesen?: LeseErgebnis;
   konvergenz?: KonvergenzErgebnis;
   augenReise?: AugenReiseErgebnis;
-  buchstaben?: BuchstabenErgebnis;
 }
 
 const LEER: CheckStand = { kindName: "", klasse: null, vorfragen: {}, fragebogen: {} };
@@ -52,7 +51,7 @@ export function neuerCheck(kindName: string, klasse: number) {
 
 export function alsScreeningDaten(s: CheckStand): ScreeningDaten | null {
   const v = s.vorfragen;
-  if (!s.klasse || !v.brille || !v.untersuchung || !s.lesen || !s.konvergenz || !s.augenReise || !s.buchstaben) {
+  if (!s.klasse || !v.brille || !v.untersuchung || !s.lesen || !s.konvergenz || !s.augenReise) {
     return null;
   }
   return {
@@ -62,7 +61,6 @@ export function alsScreeningDaten(s: CheckStand): ScreeningDaten | null {
     lesen: s.lesen,
     konvergenz: s.konvergenz,
     augenReise: s.augenReise,
-    buchstaben: s.buchstaben,
   };
 }
 

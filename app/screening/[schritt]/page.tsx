@@ -5,7 +5,6 @@ import Fragebogen from "@/components/Fragebogen";
 import Vorlesen from "@/components/tests/Vorlesen";
 import StiftUebung from "@/components/tests/StiftUebung";
 import AugenReise from "@/components/tests/AugenReise";
-import Buchstabenjaeger from "@/components/tests/Buchstabenjaeger";
 import { SchrittKopf, WeiterKnopf, ORANGE } from "@/components/ui";
 import { anzeigeName, ladeStand, speichereStand, type CheckStand } from "@/lib/speicher";
 import { useImBrowser } from "@/lib/im-browser";
@@ -68,7 +67,7 @@ export default function SchrittSeite() {
         {schritt === "fragen-2" && <Fragebogen seite={2} onFertig={() => weiter()} />}
         {schritt === "pause" && (
           <div>
-            <SchrittKopf emoji="🎉" titel="Teil 1 ist geschafft!" unter={`Für Teil 2 (ca. 6 Minuten) brauchst du jetzt ${kindName === "dein Kind" ? "dein Kind" : kindName}.`} />
+            <SchrittKopf emoji="🎉" titel="Teil 1 ist geschafft!" unter={`Für Teil 2 (ca. 5 Minuten) brauchst du jetzt ${kindName === "dein Kind" ? "dein Kind" : kindName}.`} />
             <div className="bg-white rounded-2xl border-2 p-5 mb-6" style={{ borderColor: "#8DCDC5" }}>
               <p className="font-semibold text-gray-900 mb-3">Leg dir bereit:</p>
               <ul className="space-y-2 text-gray-700">
@@ -88,7 +87,6 @@ export default function SchrittSeite() {
         {schritt === "lesen" && <Vorlesen kindName={kindName} onFertig={r => weiter({ lesen: r })} />}
         {schritt === "stift" && <StiftUebung kindName={kindName} onFertig={r => weiter({ konvergenz: r })} />}
         {schritt === "augen-reise" && <AugenReise kindName={kindName} onFertig={r => weiter({ augenReise: r })} />}
-        {schritt === "spiel" && <Buchstabenjaeger kindName={kindName} klasse={stand.klasse!} onFertig={r => weiter({ buchstaben: r })} />}
       </main>
     </div>
   );

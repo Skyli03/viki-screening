@@ -7,7 +7,7 @@ import type { ScreeningDaten } from "@/lib/screening-types";
 import { alsScreeningDaten, anzeigeName, ladeStand } from "@/lib/speicher";
 import { useImBrowser } from "@/lib/im-browser";
 import {
-  AUSDAUER_TEXT, BEREICH_TEXTE, STUFEN, UNTERSUCHUNG_TEXT, WARNZEICHEN_EMPFEHLUNG, kursLink,
+  AUSDAUER_TEXT, BEREICH_TEXTE, STUFEN, UNTERSUCHUNG_TEXT, WARNZEICHEN_EMPFEHLUNG, WARNZEICHEN_TITEL, kursLink,
 } from "@/lib/alltags-texte";
 
 type Versand = "offen" | "laeuft" | "gesendet" | "fehler_versand";
@@ -92,14 +92,14 @@ export default function ErgebnisPage() {
           </p>
         </div>
 
-        {/* Warnzeichen haben Vorrang vor allem anderen */}
+        {/* Beobachtungen, die eine Fachperson einordnen sollte: ruhig formuliert, nicht alarmierend */}
         {profil.warnzeichen.length > 0 && (
-          <div className="rounded-2xl p-5 border-2" style={{ background: "#FEF2F2", borderColor: "#FCA5A5" }}>
-            <h3 className="font-bold text-red-900 mb-2">⚠️ Bitte abklären lassen</h3>
-            <ul className="space-y-1 text-red-900 mb-3">
+          <div className="rounded-2xl p-5 border-2 bg-white" style={{ borderColor: "#FCD34D" }}>
+            <h3 className="font-bold text-gray-900 mb-2">👓 {WARNZEICHEN_TITEL}</h3>
+            <ul className="space-y-1 text-gray-700 mb-3">
               {profil.warnzeichen.map(w => <li key={w.id}>• {w.text}</li>)}
             </ul>
-            <p className="text-sm text-red-900">{WARNZEICHEN_EMPFEHLUNG}</p>
+            <p className="text-sm text-gray-600">{WARNZEICHEN_EMPFEHLUNG}</p>
           </div>
         )}
         {profil.untersuchungEmpfohlen && profil.warnzeichen.length === 0 && (
@@ -117,8 +117,8 @@ export default function ErgebnisPage() {
               <div className="text-xl font-bold" style={{ color: gesamt.text }}>{gesamt.label}</div>
               <div className="text-sm mt-1" style={{ color: gesamt.text }}>
                 {hinweise.length === 0
-                  ? "In allen 4 Bereichen unauffällig."
-                  : `${hinweise.length} von 4 Bereichen mit Hinweisen`}
+                  ? `In allen ${profil.bereiche.length} Bereichen unauffällig.`
+                  : `${hinweise.length} von ${profil.bereiche.length} Bereichen mit Hinweisen`}
               </div>
             </div>
           </div>
@@ -300,7 +300,7 @@ export default function ErgebnisPage() {
               <h3 className="font-bold text-gray-900 mb-3">📋 Deine nächsten Schritte</h3>
               <ol className="space-y-2 text-gray-700 list-decimal pl-5">
                 {(profil.warnzeichen.length > 0 || profil.untersuchungEmpfohlen) && (
-                  <li>Lass die Augen fachlich untersuchen (siehe Hinweis oben).</li>
+                  <li>Lass die Augen bei Gelegenheit fachlich anschauen (siehe Tipp oben).</li>
                 )}
                 <li>Lies den Bericht in Ruhe und vergleiche ihn mit deinen Beobachtungen im Alltag.</li>
                 <li>Wenn du gezielt üben möchtest: Schau dir den Superblick-Kurs an.</li>

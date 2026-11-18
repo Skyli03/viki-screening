@@ -72,7 +72,8 @@ export default function Fragebogen({ seite, onFertig }: Props) {
               )}
               <div className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm">
                 <p className="text-gray-800 font-medium mb-3">{frage.text}</p>
-                <div className="grid grid-cols-5 gap-1.5">
+                {/* Handy: Nie/Manchmal/Oft/Immer in einer Reihe, "Weiß nicht" darunter über die ganze Breite */}
+                <div className="grid grid-cols-4 sm:grid-cols-5 gap-1 sm:gap-1.5">
                   {ANTWORT_OPTIONEN.map(opt => {
                     const aktiv = frage.id in antworten && antworten[frage.id] === opt.wert;
                     const farbe = FARBEN[String(opt.wert)];
@@ -82,7 +83,7 @@ export default function Fragebogen({ seite, onFertig }: Props) {
                         type="button"
                         aria-pressed={aktiv}
                         onClick={() => antworte(frage.id, opt.wert)}
-                        className="py-2.5 px-1 rounded-xl border-2 text-xs sm:text-sm font-semibold leading-tight transition-all"
+                        className={`min-w-0 py-2.5 px-0 sm:px-1 rounded-xl border-2 text-xs sm:text-sm font-semibold leading-tight transition-all ${opt.wert === null ? "col-span-4 sm:col-span-1 py-2" : ""}`}
                         style={aktiv ? { borderColor: farbe, color: farbe, background: "#FAFAFA" } : { borderColor: "#E5E7EB", color: "#6B7280" }}
                       >
                         {opt.label}

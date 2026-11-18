@@ -7,7 +7,7 @@ import { ersterOffenerSchritt } from "@/lib/schritte";
 
 const ABLAUF = [
   { nr: "1", icon: "📋", titel: "Deine Beobachtungen", dauer: "ca. 4 Min.", text: "16 kurze Fragen zum Alltag. Das machst du allein, dein Kind muss noch nicht dabei sein." },
-  { nr: "2", icon: "✏️", titel: "Mit deinem Kind", dauer: "ca. 6 Min.", text: "Kurz vorlesen, zwei Augen-Übungen mit einem Stift und ein Buchstaben-Spiel am Handy." },
+  { nr: "2", icon: "✏️", titel: "Mit deinem Kind", dauer: "ca. 5 Min.", text: "Kurz vorlesen und zwei Augen-Übungen mit Stiften." },
   { nr: "3", icon: "🎯", titel: "Dein Ergebnis", dauer: "sofort", text: "Ein erstes Ergebnis siehst du sofort. Den ausführlichen Bericht bekommst du per E-Mail." },
 ];
 const FARBEN = ["#8DCDC5", "#F5943A", "#EE6B85"];
@@ -53,7 +53,7 @@ export default function Startseite() {
             Lesen ist anstrengend?<br />Schau, ob die Augen mitspielen.
           </h1>
           <p className="text-lg text-gray-600 max-w-xl mx-auto">
-            Der kostenlose Augen-Check gibt dir in <strong>ca. 10–12 Minuten</strong> eine erste Orientierung, ob die Zusammenarbeit der Augen beim Lesen deines Kindes eine Rolle spielen könnte.
+            Der kostenlose Augen-Check gibt dir in <strong>ca. 10 Minuten</strong> eine erste Orientierung, ob die Zusammenarbeit der Augen beim Lesen deines Kindes eine Rolle spielen könnte.
           </p>
         </div>
 

@@ -5,7 +5,7 @@ import CookieHinweis from "./components/CookieHinweis";
 
 export const metadata: Metadata = {
   title: "Kostenloser Augen-Check für dein Kind | VIKI Training",
-  description: "Erste Orientierung in ca. 10–12 Minuten: Spielt die Zusammenarbeit der Augen beim Lesen deines Kindes eine Rolle? Kostenloser Online-Augen-Check von VIKI Training, keine Diagnose.",
+  description: "Erste Orientierung in ca. 10 Minuten: Spielt die Zusammenarbeit der Augen beim Lesen deines Kindes eine Rolle? Kostenloser Online-Augen-Check von VIKI Training, keine Diagnose.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

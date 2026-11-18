@@ -4,7 +4,7 @@ import { FRAGEN } from "@/data/fragebogen";
 // Jeder Schritt hat eine eigene Adresse (/screening/<id>). So zählt Vercel
 // Analytics die Aufrufe pro Schritt und man sieht, wo Eltern abbrechen.
 
-export type SchrittId = "fragen-1" | "fragen-2" | "pause" | "lesen" | "stift" | "augen-reise" | "spiel";
+export type SchrittId = "fragen-1" | "fragen-2" | "pause" | "lesen" | "stift" | "augen-reise";
 
 export const SCHRITTE: { id: SchrittId; label: string; teil: 1 | 2 }[] = [
   { id: "fragen-1",    label: "Fragen",          teil: 1 },
@@ -13,7 +13,6 @@ export const SCHRITTE: { id: SchrittId; label: string; teil: 1 | 2 }[] = [
   { id: "lesen",       label: "Vorlesen",        teil: 2 },
   { id: "stift",       label: "Stift-Übung",     teil: 2 },
   { id: "augen-reise", label: "Augen-Reise",     teil: 2 },
-  { id: "spiel",       label: "Buchstabenjäger", teil: 2 },
 ];
 
 function beantwortet(s: CheckStand, abschnitte: string[]): boolean {
@@ -28,7 +27,6 @@ export function schrittErledigt(id: SchrittId, s: CheckStand): boolean {
     case "lesen":    return !!s.lesen;
     case "stift":    return !!s.konvergenz;
     case "augen-reise": return !!s.augenReise;
-    case "spiel":    return !!s.buchstaben;
   }
 }
 

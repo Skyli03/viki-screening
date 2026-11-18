@@ -28,7 +28,7 @@ export default function AugenReise({ kindName, onFertig }: Props) {
           <div className="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
             <p className="font-semibold text-gray-900 mb-2">Teil 1: Dem Stift folgen</p>
             <VideoEmbed src="/videos/augenbewegung.mp4" />
-            <p className="text-gray-700">Führe einen Stift in etwa 30 cm Abstand langsam von links nach rechts und schräg von unten links nach oben rechts, jeweils 2× hin und her. {kindName} folgt nur mit den Augen.</p>
+            <p className="text-gray-700">Führe einen Stift auf Augenhöhe in etwa 30 cm Abstand langsam von links nach rechts und zurück, insgesamt 3× hin und her. {kindName} schaut auf die Stiftspitze (nicht auf deine Hand) und folgt nur mit den Augen.</p>
           </div>
 
           <div className="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">

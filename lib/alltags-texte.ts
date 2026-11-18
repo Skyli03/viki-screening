@@ -37,14 +37,6 @@ export const BEREICH_TEXTE: Record<BereichId, BereichText> = {
     positiv: "Bei der Stift-Übung haben beide Augen gut zusammengearbeitet.",
     training: "Übungen zur Teamarbeit beider Augen beim Nahsehen",
   },
-  buchstaben: {
-    icon: "🔤",
-    beobachtet: "Beim Buchstabenjäger oder im Fragebogen zeigten sich Hinweise darauf, dass ähnliche Buchstaben wie b/d oder p/q noch nicht immer sicher unterschieden werden.",
-    alltag: "Manche Kinder brauchen etwas länger, um ähnliche Buchstaben auseinanderzuhalten. Lesen und Abschreiben gehen dann langsamer.",
-    hinweis: "Das ist kein Hinweis auf Legasthenie oder eine Lernschwäche. Es zeigt nur, dass das Unterscheiden ähnlicher Formen noch nicht ganz automatisch läuft.",
-    positiv: "Ähnliche Buchstaben wurden sicher unterschieden.",
-    training: "Spiele zum sicheren Unterscheiden von Formen und Buchstaben",
-  },
   koerper: {
     icon: "🤸",
     beobachtet: "Im Fragebogen hast du Merkmale beschrieben, die man häufig bei Kindern sieht, bei denen frühkindliche Reflexe noch Einfluss auf Haltung und Bewegung haben können.",
@@ -61,8 +53,10 @@ export const AUSDAUER_TEXT =
 export const UNTERSUCHUNG_TEXT =
   "Die letzte Augenuntersuchung ist länger als ein Jahr her oder du weißt es nicht genau. Lass am besten zuerst die Sehschärfe bei einer Augenärztin, einem Augenarzt oder einer Optometristin bzw. einem Optometristen prüfen. Erst dann lässt sich gut einschätzen, welche Rolle die Zusammenarbeit der Augen spielt.";
 
+export const WARNZEICHEN_TITEL = "Tipp: einmal fachlich anschauen lassen";
+
 export const WARNZEICHEN_EMPFEHLUNG =
-  "Diese Beobachtungen solltest du fachlich abklären lassen, bei einer Augenärztin bzw. einem Augenarzt oder einer Funktionaloptometristin bzw. einem Funktionaloptometristen. Das hat Vorrang vor jedem Training.";
+  "Diese Beobachtungen kann eine Fachperson gut einordnen, zum Beispiel eine Augenärztin bzw. ein Augenarzt oder eine Funktionaloptometristin bzw. ein Funktionaloptometrist. So weißt du sicher, was dahintersteckt, und kannst in Ruhe entscheiden, wie es weitergeht.";
 
 export const KURS_URL = "https://kurse.vikitraining.at/superblick-kurs";
 export function kursLink(medium: "ergebnis" | "ergebnis-ohne-mail" | "bericht-mail"): string {
