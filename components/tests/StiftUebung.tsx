@@ -34,8 +34,9 @@ export default function StiftUebung({ kindName, onFertig }: Props) {
           <ol className="space-y-2 text-gray-700">
             <li><strong>1.</strong> Halte einen Stift etwa 30 cm vor die Nase von {kindName}, auf Augenhöhe.</li>
             <li><strong>2.</strong> Sag vorher: „Schau auf die Spitze und sag sofort Stopp, wenn du zwei Stifte siehst.“</li>
-            <li><strong>3.</strong> Führe den Stift langsam Richtung Nase. Bei „Stopp“ bleibst du kurz stehen und schätzt den Abstand zur Nase: Passt dein Daumen dazwischen? Dann wieder zurück. Das Ganze 3×.</li>
+            <li><strong>3.</strong> Führe den Stift langsam Richtung Nase. Bei „Stopp“ hältst du den Stift still und misst den Abstand von der Stiftspitze bis zur Nase. Dann wieder zurück. Das Ganze 3×.</li>
           </ol>
+          <p className="text-sm text-gray-600">📏 <strong>Hinweis:</strong> Am einfachsten geht das mit einem Lineal aus der Schultasche. Kein Lineal zur Hand? Nimm eine Bankkarte: Die kurze Seite ist gut 5 cm lang, die lange Seite gut 8,5 cm. Auf den Millimeter kommt es nicht an.</p>
           <Achtungbox titel="👀 Darauf achtest du:">
             <ul className="space-y-1">
               <li>• Gehen beide Augen gleichmäßig nach innen?</li>
@@ -60,9 +61,9 @@ export default function StiftUebung({ kindName, onFertig }: Props) {
           <Auswahl label="Ein Auge ist deutlich ausgewichen" sub="Klar nach außen weggegangen oder konnte gar nicht folgen" ton="stark" aktiv={augen === "weicht_deutlich_aus"} onClick={() => setAugen("weicht_deutlich_aus")} />
         </Frageblock>
         <Frageblock frage={`Ab wann hat ${kindName} zwei Stifte gesehen?`}>
-          <Auswahl label="Gar nicht oder erst ganz nah" sub="Näher als ein Daumen lang (unter ca. 6 cm). Das ist normal." ton="gut" aktiv={doppelt === "nah_oder_nie"} onClick={() => setDoppelt("nah_oder_nie")} />
-          <Auswahl label="Etwas früher" sub="Etwa ein Daumen bis eine Handbreite (ca. 6–10 cm)" ton="mittel" aktiv={doppelt === "daumen_bis_hand"} onClick={() => setDoppelt("daumen_bis_hand")} />
-          <Auswahl label="Schon weit weg" sub="Mehr als eine Handbreite (über ca. 10 cm)" ton="stark" aktiv={doppelt === "weit"} onClick={() => setDoppelt("weit")} />
+          <Auswahl label="Gar nicht oder erst ganz nah" sub="Näher als ca. 6 cm (etwa die kurze Seite einer Bankkarte). Das ist normal." ton="gut" aktiv={doppelt === "nah_oder_nie"} onClick={() => setDoppelt("nah_oder_nie")} />
+          <Auswahl label="Etwas früher" sub="Ca. 6–10 cm" ton="mittel" aktiv={doppelt === "daumen_bis_hand"} onClick={() => setDoppelt("daumen_bis_hand")} />
+          <Auswahl label="Schon weit weg" sub="Mehr als ca. 10 cm (deutlich weiter als die lange Seite einer Bankkarte)" ton="stark" aktiv={doppelt === "weit"} onClick={() => setDoppelt("weit")} />
           <Auswahl label="Weiß nicht" sub="Mein Kind konnte es nicht sagen" aktiv={doppelt === "unklar"} onClick={() => setDoppelt("unklar")} />
         </Frageblock>
         <Frageblock frage="Ist dir noch etwas aufgefallen? (Mehrfachauswahl, darf auch leer bleiben)">

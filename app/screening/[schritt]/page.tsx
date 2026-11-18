@@ -74,6 +74,7 @@ export default function SchrittSeite() {
                 <li>👧 {kindName === "dein Kind" ? "Dein Kind" : kindName}, gut ausgeschlafen und nicht hungrig</li>
                 <li>📖 Ein Buch, das {kindName} kennt und gern liest</li>
                 <li>✏️ Zwei Stifte</li>
+                <li>📏 Ein Lineal (oder eine Bankkarte)</li>
                 <li>💡 Einen hellen, ruhigen Platz</li>
               </ul>
               {stand.vorfragen.brille === "ja" && (
