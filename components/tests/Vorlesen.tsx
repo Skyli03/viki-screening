@@ -13,6 +13,7 @@ export default function Vorlesen({ kindName, onFertig }: Props) {
   const [fluessig, setFluessig] = useState<boolean | null>(null);
   const [zeile, setZeile] = useState<boolean | null>(null);
   const [finger, setFinger] = useState<boolean | null>(null);
+  const [verwechselt, setVerwechselt] = useState<boolean | null>(null);
   const [haltung, setHaltung] = useState<LeseErgebnis["haltung"] | null>(null);
 
   if (phase === "anleitung") {
@@ -26,6 +27,7 @@ export default function Vorlesen({ kindName, onFertig }: Props) {
               <li>• Liest {kindName} flüssig oder holprig?</li>
               <li>• Geht die Zeile verloren, werden Wörter übersprungen?</li>
               <li>• Hilft der Finger beim Mitlesen?</li>
+              <li>• Werden ähnliche Buchstaben verwechselt, z. B. b/d oder p/q?</li>
               <li>• Ist der Kopf sehr nah am Buch oder schief?</li>
             </ul>
           </Achtungbox>
@@ -36,7 +38,7 @@ export default function Vorlesen({ kindName, onFertig }: Props) {
     );
   }
 
-  const fertig = fluessig !== null && zeile !== null && finger !== null && haltung !== null;
+  const fertig = fluessig !== null && zeile !== null && finger !== null && verwechselt !== null && haltung !== null;
 
   return (
     <div>
@@ -60,6 +62,12 @@ export default function Vorlesen({ kindName, onFertig }: Props) {
             <Auswahl label="Ja" ton="mittel" aktiv={finger === true} onClick={() => setFinger(true)} />
           </div>
         </Frageblock>
+        <Frageblock frage="Hat es ähnlich aussehende Buchstaben öfter verwechselt (z. B. b/d, p/q)?">
+          <div className="grid grid-cols-2 gap-2">
+            <Auswahl label="Nein, kaum" ton="gut" aktiv={verwechselt === false} onClick={() => setVerwechselt(false)} />
+            <Auswahl label="Ja, öfter" ton="mittel" aktiv={verwechselt === true} onClick={() => setVerwechselt(true)} />
+          </div>
+        </Frageblock>
         <Frageblock frage="Abstand und Kopfhaltung?">
           <Auswahl label="Unauffällig" sub="Etwa eine Unterarmlänge Abstand, Kopf gerade" ton="gut" aktiv={haltung === "unauffaellig"} onClick={() => setHaltung("unauffaellig")} />
           <Auswahl label="Auffällig" sub="Sehr nah am Buch, Kopf schief oder Abstand wechselt ständig" ton="mittel" aktiv={haltung === "auffaellig"} onClick={() => setHaltung("auffaellig")} />
@@ -67,7 +75,7 @@ export default function Vorlesen({ kindName, onFertig }: Props) {
       </div>
       <WeiterKnopf
         disabled={!fertig}
-        onClick={() => fertig && onFertig({ fluessig: fluessig!, zeile_verloren: zeile!, finger: finger!, haltung: haltung! })}
+        onClick={() => fertig && onFertig({ fluessig: fluessig!, zeile_verloren: zeile!, finger: finger!, verwechselt: verwechselt!, haltung: haltung! })}
       >
         Weiter →
       </WeiterKnopf>

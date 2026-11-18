@@ -68,7 +68,7 @@ function pruefeDaten(roh: unknown): ScreeningDaten | null {
     klasse,
     vorfragen: { brille, untersuchung },
     fragebogen,
-    lesen: { fluessig: d.lesen?.fluessig === true, zeile_verloren: d.lesen?.zeile_verloren === true, finger: d.lesen?.finger === true, haltung },
+    lesen: { fluessig: d.lesen?.fluessig === true, zeile_verloren: d.lesen?.zeile_verloren === true, finger: d.lesen?.finger === true, verwechselt: d.lesen?.verwechselt === true, haltung },
     konvergenz: { augen, doppelt, zeichen },
     augenReise: { folgen, springen, kopf_mitbewegt: d.augenReise?.kopf_mitbewegt === true },
   };

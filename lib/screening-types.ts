@@ -14,6 +14,8 @@ export interface LeseErgebnis {
   fluessig: boolean;
   zeile_verloren: boolean;
   finger: boolean;
+  /** Ähnlich aussehende Buchstaben (b/d, p/q) öfter verwechselt. Fehlt bei älteren Zwischenständen. */
+  verwechselt?: boolean;
   /** Sehr nah am Buch, Kopf schief oder Abstand wechselt ständig */
   haltung: "unauffaellig" | "auffaellig";
 }

@@ -148,12 +148,15 @@ export default function ErgebnisPage() {
                 const sichtbar = freigeschaltet || i < 2;
                 return (
                   <div key={b.id} className="rounded-2xl border-2 overflow-hidden" style={{ borderColor: stufe.border }}>
-                    <div className="flex items-center gap-3 px-5 py-3" style={{ background: stufe.bg }}>
-                      <span className="text-2xl">{txt.icon}</span>
-                      <div className="flex-1 font-bold" style={{ color: stufe.text }}>{b.name}</div>
-                      <span className="text-xs font-bold px-2 py-1 rounded-full whitespace-nowrap" style={{ background: stufe.border, color: stufe.text }}>
-                        {stufe.emoji} {stufe.label}
-                      </span>
+                    {/* Etikett unter dem Namen, damit es am Handy nicht aus dem Kasten ragt */}
+                    <div className="flex items-start gap-3 px-5 py-3" style={{ background: stufe.bg }}>
+                      <span className="text-2xl shrink-0">{txt.icon}</span>
+                      <div className="min-w-0">
+                        <div className="font-bold" style={{ color: stufe.text }}>{b.name}</div>
+                        <span className="inline-block mt-1 text-xs font-bold px-2 py-1 rounded-full" style={{ background: stufe.border, color: stufe.text }}>
+                          {stufe.emoji} {stufe.label}
+                        </span>
+                      </div>
                     </div>
                     {sichtbar ? (
                       <div className="bg-white px-5 py-4 space-y-3 text-gray-700">

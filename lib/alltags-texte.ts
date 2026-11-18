@@ -23,7 +23,7 @@ export interface BereichText {
 export const BEREICH_TEXTE: Record<BereichId, BereichText> = {
   lesen: {
     icon: "📖",
-    beobachtet: "Beim Vorlesen, bei der Augen-Reise oder im Fragebogen zeigten sich Hinweise auf einen unruhigen Lesefluss, zum Beispiel Zeilenverluste, übersprungene Wörter oder ruckelige Augenbewegungen.",
+    beobachtet: "Beim Vorlesen, bei der Augen-Reise oder im Fragebogen zeigten sich Hinweise auf einen unruhigen Lesefluss, zum Beispiel Zeilenverluste, übersprungene Wörter, verwechselte Buchstaben oder ruckelige Augenbewegungen.",
     alltag: "Manche Kinder brauchen beim Lesen länger, verlieren öfter die Zeile oder beginnen zu raten, obwohl sie die Buchstaben gut kennen. Lesen und Hausaufgaben werden dadurch anstrengender.",
     hinweis: "Das sagt nichts über Intelligenz oder Fleiß aus. Flüssiges Lesen braucht viele Fähigkeiten, die Augenbewegungen sind eine davon.",
     positiv: "Beim Vorlesen und bei der Augen-Reise zeigten sich keine Auffälligkeiten.",

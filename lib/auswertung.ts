@@ -80,6 +80,8 @@ function scoreLesen(d: ScreeningDaten): number {
   if (d.lesen?.fluessig === false) s -= 15;
   if (d.lesen?.zeile_verloren) s -= 20;
   if (d.lesen?.finger) s -= 10;
+  // b/d-Verwechslungen sind in der 1. Klasse noch häufig → dort schwächer gewichtet.
+  if (d.lesen?.verwechselt) s -= d.klasse >= 2 ? 10 : 5;
 
   if (d.augenReise?.folgen === "verliert") s -= 25;
   else if (d.augenReise?.folgen === "ruckelig") s -= 12;
