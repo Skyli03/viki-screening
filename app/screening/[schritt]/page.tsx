@@ -73,7 +73,7 @@ export default function SchrittSeite() {
               <ul className="space-y-2 text-gray-700">
                 <li>👧 {kindName === "dein Kind" ? "Dein Kind" : kindName}, gut ausgeschlafen und nicht hungrig</li>
                 <li>📖 Ein Buch, das {kindName} kennt und gern liest</li>
-                <li>✏️ Zwei Stifte</li>
+                <li>✏️ Zwei Stifte und einen kleinen Sticker</li>
                 <li>📏 Ein Lineal (oder eine Bankkarte)</li>
                 <li>💡 Einen hellen, ruhigen Platz</li>
               </ul>

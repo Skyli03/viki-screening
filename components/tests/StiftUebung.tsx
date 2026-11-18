@@ -32,9 +32,10 @@ export default function StiftUebung({ kindName, onFertig }: Props) {
           <Infobox>💡 Beim Lesen schauen beide Augen gemeinsam auf denselben Buchstaben und drehen sich dafür leicht nach innen. Klappt diese Teamarbeit nicht gut, kann Lesen schnell anstrengend werden.</Infobox>
           <VideoEmbed src="/videos/konvergenz.mp4" />
           <ol className="space-y-2 text-gray-700">
-            <li><strong>1.</strong> Halte einen Stift etwa 30 cm vor die Nase von {kindName}, auf Augenhöhe.</li>
-            <li><strong>2.</strong> Sag vorher: „Schau auf die Spitze und sag sofort Stopp, wenn du zwei Stifte siehst.“</li>
-            <li><strong>3.</strong> Führe den Stift langsam Richtung Nase. Bei „Stopp“ hältst du den Stift still und misst den Abstand von der Stiftspitze bis zur Nase. Dann wieder zurück. Das Ganze 3×.</li>
+            <li><strong>1.</strong> Klebe einen kleinen Sticker auf die Stiftspitze oder mal einen kleinen Buchstaben drauf. So hat {kindName} etwas Genaues zum Anschauen.</li>
+            <li><strong>2.</strong> Halte den Stift etwa 30 cm vor die Nase von {kindName}, auf Augenhöhe.</li>
+            <li><strong>3.</strong> Sag vorher: „Schau auf den Sticker und sag sofort Stopp, wenn du zwei Stifte siehst.“</li>
+            <li><strong>4.</strong> Führe den Stift langsam Richtung Nase. Bei „Stopp“ hältst du den Stift still und misst den Abstand von der Stiftspitze bis zur Nase. Dann wieder zurück. Das Ganze 3×.</li>
           </ol>
           <p className="text-sm text-gray-600">📏 <strong>Hinweis:</strong> Am einfachsten geht das mit einem Lineal aus der Schultasche. Kein Lineal zur Hand? Nimm eine Bankkarte: Die kurze Seite ist gut 5 cm lang, die lange Seite gut 8,5 cm. Auf den Millimeter kommt es nicht an.</p>
           <Achtungbox titel="👀 Darauf achtest du:">
