@@ -6,7 +6,7 @@ import { ladeStand, neuerCheck } from "@/lib/speicher";
 import { ersterOffenerSchritt } from "@/lib/schritte";
 
 const ABLAUF = [
-  { nr: "1", icon: "📋", titel: "Deine Beobachtungen", dauer: "ca. 4 Min.", text: "16 kurze Fragen zum Alltag. Das machst du allein, dein Kind muss noch nicht dabei sein." },
+  { nr: "1", icon: "📋", titel: "Deine Beobachtungen", dauer: "ca. 4 Min.", text: "17 kurze Fragen zum Alltag. Das machst du allein, dein Kind muss noch nicht dabei sein." },
   { nr: "2", icon: "✏️", titel: "Mit deinem Kind", dauer: "ca. 5 Min.", text: "Kurz vorlesen und zwei Augen-Übungen mit Stiften." },
   { nr: "3", icon: "🎯", titel: "Dein Ergebnis", dauer: "sofort", text: "Ein erstes Ergebnis siehst du sofort. Den ausführlichen Bericht bekommst du per E-Mail." },
 ];

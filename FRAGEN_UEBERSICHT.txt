@@ -20,6 +20,7 @@ l6  Braucht den Finger, um in der Zeile zu bleiben.
 l7  Hat Mühe beim Abschreiben von der Tafel.
 l8  Vermeidet Lesen oder Hausaufgaben, wo es nur geht.
 l9  Sagt, dass Buchstaben verschwimmen, wackeln oder doppelt erscheinen.  [Warnzeichen bei oft/immer]
+l10 Versteht einen Text besser, wenn ich ihn vorlese, als wenn es ihn selbst liest.
 
 Ausdauer (nur Text-Hinweis, keine Ampel)
 a1  Kann sich bei den Hausaufgaben nur kurz konzentrieren.
@@ -44,4 +45,5 @@ TEIL 2 — MIT KIND (ca. 5 Min.)
 
 AUSWERTUNG: 3 Bereiche mit Ampel (Lesen & Augenbewegungen, Augen-Teamarbeit,
 Körper & Haltung). Warnzeichen erscheinen als ruhiger Tipp "einmal fachlich anschauen lassen". Gesamtergebnis = auffälligster Bereich.
+Stufen (ohne Rot): Läuft gut / Kleine Hinweise / Mehrere Hinweise / Deutliche Hinweise.
 Logik: lib/auswertung.ts, Texte: lib/alltags-texte.ts

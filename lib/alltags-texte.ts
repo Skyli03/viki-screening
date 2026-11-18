@@ -4,10 +4,11 @@ import type { BereichId, Stufe } from "@/lib/auswertung";
 // Regeln: keine Diagnose, keine Ursache für LRS/ADHS, keine Heilversprechen.
 
 export const STUFEN: Record<Stufe, { emoji: string; label: string; bg: string; border: string; text: string }> = {
-  0: { emoji: "🟢", label: "Unauffällig",        bg: "#F0FDF4", border: "#86EFAC", text: "#166534" },
-  1: { emoji: "🟡", label: "Leichte Hinweise",   bg: "#FEFCE8", border: "#FDE047", text: "#854D0E" },
-  2: { emoji: "🟠", label: "Deutliche Hinweise", bg: "#FFF7ED", border: "#FDBA74", text: "#9A3412" },
-  3: { emoji: "🔴", label: "Starke Hinweise",    bg: "#FEF2F2", border: "#FCA5A5", text: "#991B1B" },
+// Bewusst ohne Rot: höchste Stufe ist ein kräftiges Orange, damit nichts alarmierend wirkt.
+  0: { emoji: "🟢", label: "Läuft gut",          bg: "#F0FDF4", border: "#86EFAC", text: "#166534" },
+  1: { emoji: "🟡", label: "Kleine Hinweise",    bg: "#FEFCE8", border: "#FDE047", text: "#854D0E" },
+  2: { emoji: "🟠", label: "Mehrere Hinweise",   bg: "#FFF7ED", border: "#FDBA74", text: "#9A3412" },
+  3: { emoji: "🟠", label: "Deutliche Hinweise", bg: "#FFEDD5", border: "#FB923C", text: "#7C2D12" },
 };
 
 export interface BereichText {

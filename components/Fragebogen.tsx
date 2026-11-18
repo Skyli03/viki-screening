@@ -10,7 +10,8 @@ interface Props {
   onFertig: () => void;
 }
 
-const FARBEN: Record<string, string> = { "0": "#16A34A", "1": "#CA8A04", "2": "#EA580C", "3": "#DC2626", null: "#6B7280" };
+// Bewusst ohne Rot: Oft = dunkles Orange, Immer = noch dunkleres Orange.
+const FARBEN: Record<string, string> = { "0": "#16A34A", "1": "#CA8A04", "2": "#C2410C", "3": "#9A3412", null: "#6B7280" };
 
 export default function Fragebogen({ seite, onFertig }: Props) {
   const [antworten, setAntworten] = useState<Record<string, Antwort>>(() => ladeStand().fragebogen);

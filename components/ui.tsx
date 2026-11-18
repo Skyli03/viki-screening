@@ -25,7 +25,7 @@ type Ton = "gut" | "mittel" | "stark" | "neutral";
 const TOENE: Record<Ton, { bg: string; border: string; text: string }> = {
   gut:     { bg: "#F0FDF4", border: "#86EFAC", text: "#166534" },
   mittel:  { bg: "#FFFBEB", border: "#FCD34D", text: "#92400E" },
-  stark:   { bg: "#FEF2F2", border: "#FCA5A5", text: "#991B1B" },
+  stark:   { bg: "#FFEDD5", border: "#FB923C", text: "#9A3412" },
   neutral: { bg: "#F0F9F8", border: TUERKIS,   text: TUERKIS_DUNKEL },
 };
 

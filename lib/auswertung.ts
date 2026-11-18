@@ -91,7 +91,7 @@ function scoreLesen(d: ScreeningDaten): number {
 
   // "Manchmal" bei allen Fragen (Anteil 0,33) zählt bewusst noch nicht.
   // l3 (b/d verwechseln) erst ab der 2. Klasse, in der 1. Klasse ist das noch normal.
-  const a = anteil(d.fragebogen, d.klasse >= 2 ? ["l1", "l2", "l3", "l6", "l8"] : ["l1", "l2", "l6", "l8"]);
+  const a = anteil(d.fragebogen, d.klasse >= 2 ? ["l1", "l2", "l3", "l6", "l8", "l10"] : ["l1", "l2", "l6", "l8", "l10"]);
   if (a > 0.6) s -= 20;
   else if (a > 0.4) s -= 10;
   return begrenzen(s);

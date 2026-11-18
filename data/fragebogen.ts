@@ -14,7 +14,7 @@ export interface Frage {
   abschnitt: "lesen" | "ausdauer" | "koerper";
 }
 
-// 14 Fragen. Reflex-Fragen: MORO (k1), STNR (k2), ATNR (k3) — passend zum Superblick-Kurs.
+// 15 Fragen. Reflex-Fragen: MORO (k1), STNR (k2), ATNR (k3) — passend zum Superblick-Kurs.
 export const FRAGEN: Frage[] = [
   // Lesen & Sehen
   { id: "l1", abschnitt: "lesen", text: "Mein Kind verliert beim Lesen die Zeile oder überspringt Wörter." },
@@ -26,6 +26,7 @@ export const FRAGEN: Frage[] = [
   { id: "l7", abschnitt: "lesen", text: "Mein Kind hat Mühe beim Abschreiben von der Tafel." },
   { id: "l8", abschnitt: "lesen", text: "Mein Kind vermeidet Lesen oder Hausaufgaben, wo es nur geht." },
   { id: "l9", abschnitt: "lesen", text: "Mein Kind sagt, dass Buchstaben verschwimmen, wackeln oder doppelt erscheinen." },
+  { id: "l10", abschnitt: "lesen", text: "Mein Kind versteht einen Text besser, wenn ich ihn vorlese, als wenn es ihn selbst liest." },
 
   // Ausdauer
   { id: "a1", abschnitt: "ausdauer", text: "Mein Kind kann sich bei den Hausaufgaben nur kurz konzentrieren." },
